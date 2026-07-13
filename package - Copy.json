@@ -1,0 +1,12 @@
+{
+  "name": "case-manager-server",
+  "version": "1.0.0",
+  "description": "سيرفر محلي لمزامنة نظام إدارة القضايا بين اللاب توب والموبايل عبر الواي فاي",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2"
+  }
+}
