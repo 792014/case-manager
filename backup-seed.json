@@ -1,0 +1,3395 @@
+{
+  "cases": [
+    {
+      "id": "1774093825539",
+      "subject": "براءة ذمة رسوم قضائية ",
+      "plaintiff": "رضا مصطفي عبد الرحيم ",
+      "defendant": "وزير العدل ",
+      "number": "1",
+      "year": "2026",
+      "circulationNumber": "2025/95/2889/26",
+      "sessionDate": "2026-07-22",
+      "department": "العاشرة مدني كلي حكومة ",
+      "notes": "",
+      "status": "pending",
+      "createdAt": "2026-03-21T11:50:25.539Z",
+      "sessionHistory": [
+        {
+          "date": "2026-03-25",
+          "type": "initial",
+          "reason": "الجلسة المبدئية",
+          "recordedDate": "2026-03-21T11:50:25.539Z",
+          "notes": ""
+        },
+        {
+          "date": "2026-03-25",
+          "newDate": "2026-05-13",
+          "type": "postponement",
+          "reason": "للتقرير ",
+          "notes": "",
+          "recordedDate": "2026-03-25T19:58:06.009Z"
+        },
+        {
+          "date": "2026-05-13",
+          "newDate": "2026-06-17",
+          "type": "postponement",
+          "reason": "للتقرير",
+          "notes": "",
+          "recordedDate": "2026-05-18T11:13:56.981Z"
+        },
+        {
+          "date": "2026-06-17",
+          "newDate": "2026-07-22",
+          "type": "postponement",
+          "reason": "للتقرير",
+          "notes": "",
+          "recordedDate": "2026-06-27T08:23:55.410Z"
+        }
+      ]
+    },
+    {
+      "id": "1774094057919",
+      "subject": "براءة ذمة مقابل انتفاع ",
+      "plaintiff": "شوقت سيد ابراهيم حسن ",
+      "defendant": "محافظ المنيا ",
+      "number": "5",
+      "year": "2025",
+      "circulationNumber": "2025/161/566/26",
+      "sessionDate": "2026-07-22",
+      "department": "العاشرة مدني كلي حكومة ",
+      "notes": "",
+      "status": "pending",
+      "createdAt": "2026-03-21T11:54:17.920Z",
+      "sessionHistory": [
+        {
+          "date": "2026-03-25",
+          "type": "initial",
+          "reason": "الجلسة المبدئية",
+          "recordedDate": "2026-03-21T11:54:17.920Z",
+          "notes": ""
+        },
+        {
+          "date": "2026-03-25",
+          "newDate": "2026-05-13",
+          "type": "postponement",
+          "reason": "للتقرير ",
+          "notes": "",
+          "recordedDate": "2026-03-25T19:58:06.009Z"
+        },
+        {
+          "date": "2026-05-13",
+          "newDate": "2026-06-17",
+          "type": "postponement",
+          "reason": "للتقرير",
+          "notes": "",
+          "recordedDate": "2026-05-18T11:13:56.981Z"
+        },
+        {
+          "date": "2026-06-17",
+          "newDate": "2026-07-22",
+          "type": "postponement",
+          "reason": "للتقرير",
+          "notes": "",
+          "recordedDate": "2026-06-27T08:23:55.410Z"
+        }
+      ]
+    },
+    {
+      "id": "1774094158522",
+      "subject": "براءة ذمة مقابل انتفاع ",
+      "plaintiff": "محمودسيد ابراهيم حسن ",
+      "defendant": "محافظ المنيا ",
+      "number": "4",
+      "year": "2025",
+      "circulationNumber": "2025/156/562/26",
+      "sessionDate": "2026-07-22",
+      "department": "العاشرة مدني كلي حكومة ",
+      "notes": "",
+      "status": "pending",
+      "createdAt": "2026-03-21T11:55:58.522Z",
+      "sessionHistory": [
+        {
+          "date": "2026-03-25",
+          "type": "initial",
+          "reason": "الجلسة المبدئية",
+          "recordedDate": "2026-03-21T11:55:58.522Z",
+          "notes": ""
+        },
+        {
+          "date": "2026-03-25",
+          "newDate": "2026-05-13",
+          "type": "postponement",
+          "reason": "للتقرير ",
+          "notes": "",
+          "recordedDate": "2026-03-25T19:58:06.009Z"
+        },
+        {
+          "date": "2026-05-13",
+          "newDate": "2026-06-17",
+          "type": "postponement",
+          "reason": "للتقرير",
+          "notes": "",
+          "recordedDate": "2026-05-18T11:13:56.981Z"
+        },
+        {
+          "date": "2026-06-17",
+          "newDate": "2026-07-22",
+          "type": "postponement",
+          "reason": "للتقرير",
+          "notes": "",
+          "recordedDate": "2026-06-27T08:23:55.410Z"
+        }
+      ]
+    },
+    {
+      "id": "1774094265595",
+      "subject": "براءة ذمة مقابل انتفاع ",
+      "plaintiff": "عزت عزمي شحاته ",
+      "defendant": "محافظ المنيا ",
+      "number": "13",
+      "year": "2024",
+      "circulationNumber": "2024/782/2228/26",
+      "sessionDate": "2026-07-22",
+      "department": "العاشرة مدني كلي حكومة ",
+      "notes": "",
+      "status": "pending",
+      "createdAt": "2026-03-21T11:57:45.595Z",
+      "sessionHistory": [
+        {
+          "date": "2026-03-25",
+          "type": "initial",
+          "reason": "الجلسة المبدئية",
+          "recordedDate": "2026-03-21T11:57:45.596Z",
+          "notes": ""
+        },
+        {
+          "date": "2026-03-25",
+          "newDate": "2026-05-13",
+          "type": "postponement",
+          "reason": "للتقرير ",
+          "notes": "",
+          "recordedDate": "2026-03-25T19:58:06.009Z"
+        },
+        {
+          "date": "2026-05-13",
+          "newDate": "2026-06-17",
+          "type": "postponement",
+          "reason": "للتقرير",
+          "notes": "",
+          "recordedDate": "2026-05-18T11:13:56.981Z"
+        },
+        {
+          "date": "2026-06-17",
+          "newDate": "2026-07-22",
+          "type": "postponement",
+          "reason": "للتقرير",
+          "notes": "",
+          "recordedDate": "2026-06-27T08:23:55.410Z"
+        }
+      ]
+    },
+    {
+      "id": "1774094654060",
+      "subject": "استئناف الحكم رقم 28 لسنة 2022 م ج ابو قرقاص",
+      "plaintiff": "احمد فؤاد فريد ",
+      "defendant": "وكيل وزارة الري",
+      "number": "12",
+      "year": "2024",
+      "circulationNumber": "2024/14/214/26",
+      "sessionDate": "2026-07-22",
+      "department": "العاشرة مدني مستانف",
+      "notes": "",
+      "status": "pending",
+      "createdAt": "2026-03-21T12:04:14.060Z",
+      "sessionHistory": [
+        {
+          "date": "2026-03-25",
+          "type": "initial",
+          "reason": "الجلسة المبدئية",
+          "recordedDate": "2026-03-21T12:04:14.060Z",
+          "notes": ""
+        },
+        {
+          "date": "2026-03-25",
+          "newDate": "2026-05-13",
+          "type": "postponement",
+          "reason": "للتقرير ",
+          "notes": "",
+          "recordedDate": "2026-03-25T19:58:06.009Z"
+        },
+        {
+          "date": "2026-05-13",
+          "newDate": "2026-06-17",
+          "type": "postponement",
+          "reason": "للتقرير",
+          "notes": "",
+          "recordedDate": "2026-05-18T11:12:12.623Z"
+        },
+        {
+          "date": "2026-06-17",
+          "newDate": "2026-07-22",
+          "type": "postponement",
+          "reason": "للتقرير",
+          "notes": "",
+          "recordedDate": "2026-06-27T08:23:55.410Z"
+        }
+      ]
+    },
+    {
+      "id": "1774774621127",
+      "subject": "تعيين قيم ",
+      "plaintiff": "محمود عادل عبد الحافظ ",
+      "defendant": "وزير العدل ",
+      "number": "926",
+      "year": "2025",
+      "circulationNumber": "2025/775/2490/26",
+      "sessionDate": "2026-07-16",
+      "department": "العاشرة مدني كلي ",
+      "notes": "",
+      "status": "pending",
+      "createdAt": "2026-03-29T08:57:01.127Z",
+      "sessionHistory": [
+        {
+          "date": "2026-04-02",
+          "type": "initial",
+          "reason": "الجلسة المبدئية",
+          "recordedDate": "2026-03-29T08:57:01.127Z",
+          "notes": ""
+        },
+        {
+          "date": "2026-04-02",
+          "newDate": "2026-04-23",
+          "type": "postponement",
+          "reason": "لاعلان من لم يعلن باصل صحيفة التصحيح ",
+          "notes": "",
+          "recordedDate": "2026-04-05T19:08:09.746Z"
+        },
+        {
+          "date": "2026-04-23",
+          "newDate": "2026-05-14",
+          "type": "postponement",
+          "reason": "للتحري ",
+          "notes": "",
+          "recordedDate": "2026-04-27T20:48:10.482Z"
+        },
+        {
+          "date": "2026-05-14",
+          "newDate": "2026-06-04",
+          "type": "postponement",
+          "reason": "لادخال خصوم جدد",
+          "notes": "",
+          "recordedDate": "2026-06-30T10:02:10.874Z"
+        },
+        {
+          "date": "2026-06-04",
+          "newDate": "2026-06-25",
+          "type": "postponement",
+          "reason": "للاعلان",
+          "notes": "",
+          "recordedDate": "2026-06-30T10:03:16.406Z"
+        },
+        {
+          "date": "2026-06-25",
+          "newDate": "2026-07-16",
+          "type": "postponement",
+          "reason": "للاعلان",
+          "notes": "",
+          "recordedDate": "2026-06-30T10:04:42.985Z"
+        }
+      ]
+    },
+    {
+      "id": "1774774760405",
+      "subject": "تثبيت ملكية",
+      "plaintiff": "حمدي مسلم عيسي نصر ",
+      "defendant": "السجل العيني ",
+      "number": "747",
+      "year": "2024",
+      "circulationNumber": "2025/42/163/26",
+      "sessionDate": "2026-07-09",
+      "department": "العاشرة مدني كلي ",
+      "notes": "",
+      "status": "pending",
+      "createdAt": "2026-03-29T08:59:20.405Z",
+      "sessionHistory": [
+        {
+          "date": "2026-04-02",
+          "type": "initial",
+          "reason": "الجلسة المبدئية",
+          "recordedDate": "2026-03-29T08:59:20.405Z",
+          "notes": ""
+        },
+        {
+          "date": "2026-04-02",
+          "newDate": "2026-06-11",
+          "type": "postponement",
+          "reason": "لورود التقرير",
+          "notes": "",
+          "recordedDate": "2026-04-05T19:14:47.686Z"
+        },
+        {
+          "date": "2026-06-11",
+          "newDate": "2026-06-25",
+          "type": "postponement",
+          "reason": "لتعديل الطلبات الختامية",
+          "notes": "",
+          "recordedDate": "2026-06-15T22:05:46.084Z"
+        },
+        {
+          "date": "2026-06-25",
+          "newDate": "2026-07-09",
+          "type": "postponement",
+          "reason": "للاعلان",
+          "notes": "",
+          "recordedDate": "2026-06-30T10:05:17.203Z"
+        }
+      ]
+    },
+    {
+      "id": "1774774844046",
+      "subject": "سد مطلات ",
+      "plaintiff": "بهاء بكر توفيق شعبان ",
+      "defendant": "الوحدة المحلية",
+      "number": "445",
+      "year": "2025",
+      "circulationNumber": "2025/670/2198/26",
+      "sessionDate": "2026-09-03",
+      "department": "العاشرة مدني كلي ",
+      "notes": "",
+      "status": "pending",
+      "createdAt": "2026-03-29T09:00:44.046Z",
+      "sessionHistory": [
+        {
+          "date": "2026-04-02",
+          "type": "initial",
+          "reason": "الجلسة المبدئية",
+          "recordedDate": "2026-03-29T09:00:44.046Z",
+          "notes": ""
+        },
+        {
+          "date": "2026-04-02",
+          "newDate": "2026-06-11",
+          "type": "postponement",
+          "reason": "لورود التقرير",
+          "notes": "",
+          "recordedDate": "2026-04-05T19:14:47.686Z"
+        },
+        {
+          "date": "2026-06-11",
+          "newDate": "2026-09-03",
+          "type": "postponement",
+          "reason": "للتقرير",
+          "notes": "",
+          "recordedDate": "2026-06-15T22:19:42.178Z"
+        }
+      ]
+    },
+    {
+      "id": "1774774912078",
+      "subject": "طردللغصب ",
+      "plaintiff": "رضا سيد حمادة مبارك ",
+      "defendant": "المحام العام ",
+      "number": "885",
+      "year": "2025",
+      "circulationNumber": "2025/753/2436/26",
+      "sessionDate": "2026-04-02",
+      "department": "العاشرة مدني كلي ",
+      "notes": "",
+      "status": "pending",
+      "createdAt": "2026-03-29T09:01:52.078Z",
+      "sessionHistory": [
+        {
+          "date": "2026-04-02",
+          "type": "initial",
+          "reason": "الجلسة المبدئية",
+          "recordedDate": "2026-03-29T09:01:52.078Z",
+          "notes": ""
+        }
+      ]
+    },
+    {
+      "id": "1774774968291",
+      "subject": "تسليم ",
+      "plaintiff": "احمد علي ابراهيم ",
+      "defendant": "الوحدة المحلية",
+      "number": "950",
+      "year": "2025",
+      "circulationNumber": "2025/792/2525/26",
+      "sessionDate": "2026-04-02",
+      "department": "العاشرة مدني كلي ",
+      "notes": "",
+      "status": "pending",
+      "createdAt": "2026-03-29T09:02:48.291Z",
+      "sessionHistory": [
+        {
+          "date": "2026-04-02",
+          "type": "initial",
+          "reason": "الجلسة المبدئية",
+          "recordedDate": "2026-03-29T09:02:48.291Z",
+          "notes": ""
+        }
+      ]
+    },
+    {
+      "id": "1774775095519",
+      "subject": "نقل حيازة ",
+      "plaintiff": "ابانوب ساري شفيق",
+      "defendant": "رئيس قسم الحيازات الزراعية",
+      "number": "919",
+      "year": "2025",
+      "circulationNumber": "2025/889/2824/26",
+      "sessionDate": "2026-04-02",
+      "department": "العاشرة مدني كلي ",
+      "notes": "",
+      "status": "pending",
+      "createdAt": "2026-03-29T09:04:55.519Z",
+      "sessionHistory": [
+        {
+          "date": "2026-04-02",
+          "type": "initial",
+          "reason": "الجلسة المبدئية",
+          "recordedDate": "2026-03-29T09:04:55.519Z",
+          "notes": ""
+        }
+      ]
+    },
+    {
+      "id": "1774775210941",
+      "subject": "تثبيت ملكية ",
+      "plaintiff": "احمد عبد الباسط حسين ",
+      "defendant": "وزير العدل",
+      "number": "561",
+      "year": "2025",
+      "circulationNumber": "2025/444/1499/26",
+      "sessionDate": "2026-04-02",
+      "department": "العاشرة مدني كلي",
+      "notes": "",
+      "status": "pending",
+      "createdAt": "2026-03-29T09:06:50.941Z",
+      "sessionHistory": [
+        {
+          "date": "2026-04-02",
+          "type": "initial",
+          "reason": "الجلسة المبدئية",
+          "recordedDate": "2026-03-29T09:06:50.942Z",
+          "notes": ""
+        }
+      ]
+    },
+    {
+      "id": "1774775290760",
+      "subject": "رد الشيء لأصله ",
+      "plaintiff": "علي عبد الرحيم سالمان",
+      "defendant": "وكيل وزارة الزراعة",
+      "number": "398",
+      "year": "2024",
+      "circulationNumber": "2024/9302687/26",
+      "sessionDate": "2026-09-03",
+      "department": "العاشرة مدني كلي ",
+      "notes": "",
+      "status": "pending",
+      "createdAt": "2026-03-29T09:08:10.760Z",
+      "sessionHistory": [
+        {
+          "date": "2026-04-02",
+          "type": "initial",
+          "reason": "الجلسة المبدئية",
+          "recordedDate": "2026-03-29T09:08:10.760Z",
+          "notes": ""
+        },
+        {
+          "date": "2026-04-02",
+          "newDate": "2026-06-11",
+          "type": "postponement",
+          "reason": "لورود التقرير ",
+          "notes": "",
+          "recordedDate": "2026-04-05T19:25:04.319Z"
+        },
+        {
+          "date": "2026-06-11",
+          "newDate": "2026-09-03",
+          "type": "postponement",
+          "reason": "للتقرير",
+          "notes": "",
+          "recordedDate": "2026-06-15T22:09:49.705Z"
+        }
+      ]
+    },
+    {
+      "id": "1774782058740",
+      "subject": "فتح شارع وازالة تعدي ",
+      "plaintiff": "عبد الحكيم عبد الحليم ابراهيم ",
+      "defendant": "الوحدة المحلية ",
+      "number": "151",
+      "year": "2025",
+      "circulationNumber": "2025/280/914/26",
+      "sessionDate": "2026-07-09",
+      "department": "العاشرة مدني كلي ",
+      "notes": "",
+      "status": "pending",
+      "createdAt": "2026-03-29T11:00:58.740Z",
+      "sessionHistory": [
+        {
+          "date": "2026-05-07",
+          "type": "initial",
+          "reason": "الجلسة المبدئية",
+          "recordedDate": "2026-03-29T11:00:58.741Z",
+          "notes": ""
+        },
+        {
+          "date": "2026-05-07",
+          "newDate": "2026-07-09",
+          "type": "postponement",
+          "reason": "للتقرير",
+          "notes": "",
+          "recordedDate": "2026-05-18T11:09:36.688Z"
+        }
+      ]
+    },
+    {
+      "id": "1774782126996",
+      "subject": "طردللغصب ",
+      "plaintiff": "ناصر محمد اسماعيل ",
+      "defendant": "املاك الدولة",
+      "number": "125",
+      "year": "2025",
+      "circulationNumber": "2025/357/1185/26",
+      "sessionDate": "2026-07-09",
+      "department": "العاشرة مدني كلي ",
+      "notes": "",
+      "status": "pending",
+      "createdAt": "2026-03-29T11:02:06.996Z",
+      "sessionHistory": [
+        {
+          "date": "2026-05-07",
+          "type": "initial",
+          "reason": "الجلسة المبدئية",
+          "recordedDate": "2026-03-29T11:02:06.996Z",
+          "notes": ""
+        },
+        {
+          "date": "2026-05-07",
+          "newDate": "2026-07-09",
+          "type": "postponement",
+          "reason": "للتقرير",
+          "notes": "",
+          "recordedDate": "2026-05-18T11:09:36.688Z"
+        }
+      ]
+    },
+    {
+      "id": "1774782593959",
+      "subject": "تعويض ",
+      "plaintiff": "معتمد فخري مسلم ",
+      "defendant": "محافظ المنيا",
+      "number": "1012",
+      "year": "2024",
+      "circulationNumber": "2025/127/473/26",
+      "sessionDate": "2026-07-09",
+      "department": "العاشرة مدني كلي ",
+      "notes": "",
+      "status": "pending",
+      "createdAt": "2026-03-29T11:09:53.959Z",
+      "sessionHistory": [
+        {
+          "date": "2026-05-07",
+          "type": "initial",
+          "reason": "الجلسة المبدئية",
+          "recordedDate": "2026-03-29T11:09:53.959Z",
+          "notes": ""
+        },
+        {
+          "date": "2026-05-07",
+          "newDate": "2026-05-21",
+          "type": "postponement",
+          "reason": "اداري",
+          "notes": "",
+          "recordedDate": "2026-05-18T11:08:06.044Z"
+        },
+        {
+          "date": "2026-05-21",
+          "newDate": "2026-06-11",
+          "type": "postponement",
+          "reason": "للاعلان بالتقرير ",
+          "notes": "",
+          "recordedDate": "2026-06-16T07:30:04.081Z"
+        },
+        {
+          "date": "2026-06-11",
+          "newDate": "2026-07-09",
+          "type": "postponement",
+          "reason": "لتوجيه دعوي فرعية ",
+          "notes": "",
+          "recordedDate": "2026-06-16T07:35:24.381Z"
+        }
+      ]
+    },
+    {
+      "id": "1774953272873",
+      "subject": "طردوتسليم ",
+      "plaintiff": "اوسام شوقي محمود ",
+      "defendant": "محافظ المنيا ",
+      "number": "907",
+      "year": "2025",
+      "circulationNumber": "2025/906/2877/26",
+      "sessionDate": "2026-07-09",
+      "department": "العاشرة مدني كلي الخميس ",
+      "notes": "",
+      "status": "pending",
+      "createdAt": "2026-03-31T10:34:32.873Z",
+      "sessionHistory": [
+        {
+          "date": "2026-03-26",
+          "type": "initial",
+          "reason": "الجلسة المبدئية",
+          "recordedDate": "2026-03-31T10:34:32.873Z",
+          "notes": ""
+        },
+        {
+          "date": "2026-03-26",
+          "newDate": "2026-05-07",
+          "type": "postponement",
+          "reason": "للتقرير ",
+          "notes": "",
+          "recordedDate": "2026-04-11T10:14:22.738Z"
+        },
+        {
+          "date": "2026-05-07",
+          "newDate": "2026-07-09",
+          "type": "postponement",
+          "reason": "للتقرير",
+          "notes": "",
+          "recordedDate": "2026-05-18T11:09:36.688Z"
+        }
+      ]
+    },
+    {
+      "id": "1774949201537",
+      "number": "8",
+      "year": "2025",
+      "plaintiff": "ربيع عمران خليل ",
+      "defendant": "رئيس مجلس الوزراء",
+      "subject": "تقنين وضع يد ",
+      "department": "العاشرة مدني كلي ",
+      "sessionDate": "2026-07-22",
+      "circulationNumber": "2025/582/1885/26",
+      "notes": "تم استرجاع الدعوى من الحكم الصالح",
+      "status": "pending",
+      "createdAt": "2026-05-01T08:37:38.070Z",
+      "sessionHistory": [
+        {
+          "date": "2026-02-18",
+          "type": "initial",
+          "reason": "الجلسة المبدئية",
+          "recordedDate": "2026-03-31T09:26:41.537Z",
+          "notes": ""
+        },
+        {
+          "date": "2026-02-18",
+          "newDate": "2026-03-31",
+          "type": "reserved",
+          "reason": "حجز للحكم",
+          "notes": "",
+          "recordedDate": "2026-03-31T10:01:59.261Z"
+        },
+        {
+          "date": "2026-03-31",
+          "type": "judgment",
+          "judgmentType": "favorable",
+          "reason": "حكم مؤيد",
+          "judgmentText": "خبير جلسة 22/4/2026 لسداد الامانة وجلسة 17/6/2026 للتقرير",
+          "judgmentDate": "2026-03-31",
+          "judgmentId": "1777624607903",
+          "notes": "",
+          "recordedDate": "2026-05-01T08:36:47.903Z"
+        },
+        {
+          "date": "2026-03-31",
+          "type": "judgment",
+          "reason": "حكم صالح",
+          "judgmentText": "خبير جلسة 22/4/2026 لسداد الامانة وجلسة 17/6/2026 للتقرير",
+          "judgmentType": "favorable",
+          "recordedDate": "2026-05-01T08:37:38.070Z",
+          "notes": ""
+        },
+        {
+          "date": "2026-06-17",
+          "type": "returned",
+          "reason": "للتقرير",
+          "recordedDate": "2026-05-01T08:37:38.070Z",
+          "notes": "للتقرير"
+        },
+        {
+          "date": "2026-06-17",
+          "newDate": "2026-07-22",
+          "type": "postponement",
+          "reason": "للتقرير",
+          "notes": "",
+          "recordedDate": "2026-06-27T08:23:55.410Z"
+        }
+      ]
+    },
+    {
+      "id": "1774950960544",
+      "number": "1034 ",
+      "year": "2023",
+      "plaintiff": "ورثة عبد المنعم عبد العزيز محمد",
+      "defendant": "وكيل وزارة الزراعة",
+      "subject": "نقل حيازة",
+      "department": "العاشرة مدني كلي الخميس",
+      "sessionDate": "2026-09-03",
+      "circulationNumber": "",
+      "notes": "تم استرجاع الدعوى من الحكم الصالح",
+      "status": "pending",
+      "createdAt": "2026-05-01T08:41:01.221Z",
+      "sessionHistory": [
+        {
+          "date": "2026-02-19",
+          "type": "initial",
+          "reason": "الجلسة المبدئية",
+          "recordedDate": "2026-03-31T09:56:00.544Z",
+          "notes": ""
+        },
+        {
+          "date": "2026-02-19",
+          "newDate": "2026-03-31",
+          "type": "reserved",
+          "reason": "حجز للحكم",
+          "notes": "",
+          "recordedDate": "2026-03-31T09:59:19.325Z"
+        },
+        {
+          "date": "2026-02-19",
+          "type": "judgment",
+          "judgmentType": "favorable",
+          "reason": "حكم مؤيد",
+          "judgmentText": "حكمت المحكمة باحالة الدعوي لمكتب الخبراء وحددت جلسة 23/4/2026 لسداد الامانة وجلسة 11/6/2026 في حالةعدم سداد الامانة ",
+          "judgmentDate": "2026-04-05",
+          "judgmentId": "1775418407273",
+          "notes": "",
+          "recordedDate": "2026-04-05T19:46:47.273Z"
+        },
+        {
+          "date": "2026-03-31",
+          "type": "judgment",
+          "reason": "حكم صالح",
+          "judgmentText": "حكمت المحكمة باحالة الدعوي لمكتب الخبراء وحددت جلسة 23/4/2026 لسداد الامانة وجلسة 11/6/2026 في حالةعدم سداد الامانة",
+          "judgmentType": "favorable",
+          "recordedDate": "2026-05-01T08:41:01.221Z",
+          "notes": "الطعن: عدم طعن"
+        },
+        {
+          "date": "2026-06-11",
+          "type": "returned",
+          "reason": "للتقرير",
+          "recordedDate": "2026-05-01T08:41:01.221Z",
+          "notes": "للتقرير"
+        },
+        {
+          "date": "2026-06-11",
+          "newDate": "2026-09-03",
+          "type": "postponement",
+          "reason": "للتقرير",
+          "notes": "",
+          "recordedDate": "2026-06-15T22:18:40.026Z"
+        }
+      ]
+    },
+    {
+      "id": "1774775370521",
+      "number": "165",
+      "year": "2026",
+      "plaintiff": "وردة عبد الجابر سالم ",
+      "defendant": "وزير العدل ",
+      "subject": "براءة ذمة رسوم قضائية ",
+      "department": "العاشة مدني كلي ",
+      "sessionDate": "2026-07-09",
+      "circulationNumber": "",
+      "notes": "تم استرجاع الدعوى من الحكم الصالح",
+      "status": "pending",
+      "createdAt": "2026-05-25T01:21:20.393Z",
+      "sessionHistory": [
+        {
+          "date": "2026-04-02",
+          "type": "initial",
+          "reason": "الجلسة المبدئية",
+          "recordedDate": "2026-03-29T09:09:30.521Z",
+          "notes": ""
+        },
+        {
+          "date": "2026-04-02",
+          "newDate": "2026-04-23",
+          "type": "postponement",
+          "reason": "لاعلان المدعين بحكم الاحالة",
+          "notes": "",
+          "recordedDate": "2026-04-05T19:26:07.837Z"
+        },
+        {
+          "date": "2026-04-23",
+          "newDate": "2026-05-20",
+          "type": "reserved",
+          "reason": "حجز للحكم",
+          "notes": "",
+          "recordedDate": "2026-04-27T20:48:59.224Z"
+        },
+        {
+          "date": "2026-05-20",
+          "type": "judgment",
+          "judgmentType": "favorable",
+          "reason": "حكم مؤيد",
+          "judgmentText": "خبير جلسة 11/6/2026 للامانة وجلسة 9/7/2026 للتقرير ",
+          "judgmentDate": "2026-05-20",
+          "judgmentId": "1779672037768",
+          "notes": "",
+          "recordedDate": "2026-05-25T01:20:37.769Z"
+        },
+        {
+          "date": "2026-05-20",
+          "type": "judgment",
+          "reason": "حكم صالح",
+          "judgmentText": "خبير جلسة 11/6/2026 للامانة وجلسة 9/7/2026 للتقرير ",
+          "judgmentType": "favorable",
+          "recordedDate": "2026-05-25T01:21:20.393Z",
+          "notes": "الطعن: عدم طعن"
+        },
+        {
+          "date": "2026-06-11",
+          "type": "returned",
+          "reason": "لسداد الامانة",
+          "recordedDate": "2026-05-25T01:21:20.393Z",
+          "notes": "لسداد الامانة"
+        },
+        {
+          "date": "2026-06-11",
+          "newDate": "2026-07-09",
+          "type": "postponement",
+          "reason": "للتقرير",
+          "notes": "",
+          "recordedDate": "2026-06-15T22:21:19.994Z"
+        }
+      ]
+    },
+    {
+      "id": "1774949720083",
+      "number": "2",
+      "year": "2026",
+      "plaintiff": "محافظ المنيا ",
+      "defendant": "هشام عمر عثمان احمد",
+      "subject": "تدخل هجومي",
+      "department": "العاشرة مدني كلي حكومة",
+      "sessionDate": "2026-07-22",
+      "circulationNumber": "2 لسنة 2026",
+      "notes": "تم استرجاع الدعوى من الحكم الصالح",
+      "status": "pending",
+      "createdAt": "2026-05-25T01:21:45.623Z",
+      "sessionHistory": [
+        {
+          "date": "2026-02-25",
+          "type": "initial",
+          "reason": "الجلسة المبدئية",
+          "recordedDate": "2026-03-31T09:35:20.083Z",
+          "notes": ""
+        },
+        {
+          "date": "2026-02-25",
+          "newDate": "2026-03-31",
+          "type": "reserved",
+          "reason": "حجز للحكم",
+          "notes": "",
+          "recordedDate": "2026-03-31T10:02:34.990Z"
+        },
+        {
+          "date": "2026-03-31",
+          "newDate": "2026-04-22",
+          "type": "returned",
+          "reason": "إعادة من الحجز للحكم",
+          "notes": "",
+          "recordedDate": "2026-05-01T08:43:20.790Z"
+        },
+        {
+          "date": "2026-04-22",
+          "newDate": "2026-04-29",
+          "type": "reserved",
+          "reason": "حجز للحكم",
+          "notes": "",
+          "recordedDate": "2026-05-01T08:43:49.068Z"
+        },
+        {
+          "date": "2026-04-29",
+          "type": "judgment",
+          "judgmentType": "favorable",
+          "reason": "حكم مؤيد",
+          "judgmentText": "حكمت المحكمة باحالة الدعوي لمكتب الخبراء وحددت جلسة 20/5/2026 للامانة وجلسة 17/6/2026 للتقرير ",
+          "judgmentDate": "2026-04-29",
+          "judgmentId": "1779671627170",
+          "notes": "",
+          "recordedDate": "2026-05-25T01:13:47.170Z"
+        },
+        {
+          "date": "2026-04-29",
+          "type": "judgment",
+          "reason": "حكم صالح",
+          "judgmentText": "حكمت المحكمة باحالة الدعوي لمكتب الخبراء وحددت جلسة 20/5/2026 للامانة وجلسة 17/6/2026 للتقرير ",
+          "judgmentType": "favorable",
+          "recordedDate": "2026-05-25T01:21:45.623Z",
+          "notes": "الطعن: عدم طعن"
+        },
+        {
+          "date": "2026-05-20",
+          "type": "returned",
+          "reason": "للامانة",
+          "recordedDate": "2026-05-25T01:21:45.623Z",
+          "notes": "للامانة"
+        },
+        {
+          "date": "2026-05-20",
+          "newDate": "2026-07-22",
+          "type": "postponement",
+          "reason": "للتقرير",
+          "notes": "",
+          "recordedDate": "2026-06-27T08:24:39.730Z"
+        }
+      ]
+    },
+    {
+      "id": "1774090544698",
+      "number": "5",
+      "year": "2026",
+      "plaintiff": "عماد وجيد رياض ",
+      "defendant": "محافظ المنيا ",
+      "subject": "براءة ذمة مقابل انتفاع املاك دولة ",
+      "department": "العاشرة مدني كلي حكومة",
+      "sessionDate": "2026-07-22",
+      "circulationNumber": "",
+      "notes": "تم استرجاع الدعوى من الحكم الصالح",
+      "status": "pending",
+      "createdAt": "2026-05-25T01:22:01.587Z",
+      "sessionHistory": [
+        {
+          "date": "2026-03-11",
+          "type": "initial",
+          "reason": "الجلسة المبدئية",
+          "recordedDate": "2026-03-21T10:55:44.698Z",
+          "notes": ""
+        },
+        {
+          "date": "2026-03-11",
+          "newDate": "2026-03-25",
+          "type": "postponement",
+          "reason": "للاعلان بالطلب العارض",
+          "notes": "",
+          "recordedDate": "2026-03-23T12:22:03.410Z"
+        },
+        {
+          "date": "2026-03-25",
+          "newDate": "2026-04-22",
+          "type": "postponement",
+          "reason": "للاعلان بالطلب العارض والادخال ",
+          "notes": "",
+          "recordedDate": "2026-03-25T20:00:09.003Z"
+        },
+        {
+          "date": "2026-04-22",
+          "newDate": "2026-05-06",
+          "type": "postponement",
+          "reason": "لورود الاعلان ",
+          "notes": "",
+          "recordedDate": "2026-04-27T20:45:25.718Z"
+        },
+        {
+          "date": "2026-05-06",
+          "newDate": "2026-05-20",
+          "type": "reserved",
+          "reason": "حجز للحكم",
+          "notes": "",
+          "recordedDate": "2026-05-09T08:01:22.142Z"
+        },
+        {
+          "date": "2026-05-20",
+          "type": "judgment",
+          "judgmentType": "favorable",
+          "reason": "حكم مؤيد",
+          "judgmentText": "حكمت المحكمة باحالة الدعوي لمكتب الخبراء وحددت جلسة 17/6/2026 للامانة وجلسة 22/7/2026 للتقرير ",
+          "judgmentDate": "2026-05-20",
+          "judgmentId": "1779671412597",
+          "notes": "",
+          "recordedDate": "2026-05-25T01:10:12.605Z"
+        },
+        {
+          "date": "2026-05-20",
+          "type": "judgment",
+          "reason": "حكم صالح",
+          "judgmentText": "حكمت المحكمة باحالة الدعوي لمكتب الخبراء وحددت جلسة 17/6/2026 للامانة وجلسة 22/7/2026 للتقرير ",
+          "judgmentType": "favorable",
+          "recordedDate": "2026-05-25T01:22:01.588Z",
+          "notes": "الطعن: عدم طعن"
+        },
+        {
+          "date": "2026-06-17",
+          "type": "returned",
+          "reason": "للامانة",
+          "recordedDate": "2026-05-25T01:22:01.588Z",
+          "notes": "للامانة"
+        },
+        {
+          "date": "2026-06-17",
+          "newDate": "2026-07-22",
+          "type": "postponement",
+          "reason": "للتقرير",
+          "notes": "",
+          "recordedDate": "2026-06-27T08:23:55.410Z"
+        }
+      ]
+    },
+    {
+      "id": "1774090860420",
+      "number": "6",
+      "year": "2026",
+      "plaintiff": "محمد حسين محمد عثمان ",
+      "defendant": "محافظ المنيا ",
+      "subject": "براءة ذمة مقابل انتفاع ",
+      "department": "العاشرة مدني كلي حكومة ",
+      "sessionDate": "2026-07-22",
+      "circulationNumber": "",
+      "notes": "تم استرجاع الدعوى من الحكم الصالح",
+      "status": "pending",
+      "createdAt": "2026-05-25T01:22:14.272Z",
+      "sessionHistory": [
+        {
+          "date": "2026-03-11",
+          "type": "initial",
+          "reason": "الجلسة المبدئية",
+          "recordedDate": "2026-03-21T11:01:00.420Z",
+          "notes": ""
+        },
+        {
+          "date": "2026-03-11",
+          "newDate": "2026-03-25",
+          "type": "postponement",
+          "reason": "للاعلان بالطلب العارض",
+          "notes": "",
+          "recordedDate": "2026-03-23T12:22:31.429Z"
+        },
+        {
+          "date": "2026-03-25",
+          "newDate": "2026-04-22",
+          "type": "postponement",
+          "reason": "للاعلان بالطلب العارض والادخال ",
+          "notes": "",
+          "recordedDate": "2026-03-25T20:00:09.003Z"
+        },
+        {
+          "date": "2026-04-22",
+          "newDate": "2026-05-06",
+          "type": "postponement",
+          "reason": "لورود الاعلان ",
+          "notes": "",
+          "recordedDate": "2026-04-27T20:45:25.718Z"
+        },
+        {
+          "date": "2026-05-06",
+          "newDate": "2026-05-20",
+          "type": "reserved",
+          "reason": "حجز للحكم",
+          "notes": "",
+          "recordedDate": "2026-05-09T08:01:22.142Z"
+        },
+        {
+          "date": "2026-05-20",
+          "type": "judgment",
+          "judgmentType": "favorable",
+          "reason": "حكم مؤيد",
+          "judgmentText": "حكمت المحكمة باحالة الدعوي لمكتب الخبراء وحددت جلسة 17/6/2026 للامانة وجلسة 22/7/2026 للتقرير ",
+          "judgmentDate": "2026-05-20",
+          "judgmentId": "1779671389067",
+          "notes": "",
+          "recordedDate": "2026-05-25T01:09:49.067Z"
+        },
+        {
+          "date": "2026-05-20",
+          "type": "judgment",
+          "reason": "حكم صالح",
+          "judgmentText": "حكمت المحكمة باحالة الدعوي لمكتب الخبراء وحددت جلسة 17/6/2026 للامانة وجلسة 22/7/2026 للتقرير ",
+          "judgmentType": "favorable",
+          "recordedDate": "2026-05-25T01:22:14.272Z",
+          "notes": "الطعن: عدم طعن"
+        },
+        {
+          "date": "2026-06-17",
+          "type": "returned",
+          "reason": "للامانة",
+          "recordedDate": "2026-05-25T01:22:14.272Z",
+          "notes": "للامانة"
+        },
+        {
+          "date": "2026-06-17",
+          "newDate": "2026-07-22",
+          "type": "postponement",
+          "reason": "للتقرير",
+          "notes": "",
+          "recordedDate": "2026-06-27T08:23:55.410Z"
+        }
+      ]
+    },
+    {
+      "id": "1780432649411",
+      "subject": "فسخ عقد ",
+      "plaintiff": "وائل محمد طلعت احمد",
+      "defendant": "الوحدة المحلية ",
+      "number": "287",
+      "year": "2026",
+      "circulationNumber": "2026/441/1208/26",
+      "sessionDate": "2026-07-16",
+      "department": "العاشرة مدني كلي الخميس",
+      "notes": "",
+      "status": "pending",
+      "createdAt": "2026-06-02T20:37:29.411Z",
+      "sessionHistory": [
+        {
+          "date": "2026-06-25",
+          "type": "initial",
+          "reason": "الجلسة المبدئية",
+          "recordedDate": "2026-06-02T20:37:29.411Z",
+          "notes": ""
+        },
+        {
+          "date": "2026-06-25",
+          "newDate": "2026-07-16",
+          "type": "postponement",
+          "reason": "للاعلان",
+          "notes": "",
+          "recordedDate": "2026-06-30T10:05:52.595Z"
+        }
+      ]
+    },
+    {
+      "id": "1776201640887",
+      "number": "97",
+      "year": "2025",
+      "plaintiff": "رضا عبد الحليم عبد المنعم ",
+      "defendant": "محافظ المنيا ",
+      "subject": "استئناف الحكم رقم 458 لسنة 2023 مدني جزئي ",
+      "department": "العاشرة مدني مستأنف ",
+      "sessionDate": "2026-07-22",
+      "circulationNumber": "",
+      "notes": "تم استرجاع الدعوى من الحكم الصالح",
+      "status": "pending",
+      "createdAt": "2026-06-03T19:59:08.511Z",
+      "sessionHistory": [
+        {
+          "date": "2026-04-01",
+          "type": "initial",
+          "reason": "الجلسة المبدئية",
+          "recordedDate": "2026-04-14T21:20:40.888Z",
+          "notes": ""
+        },
+        {
+          "date": "2026-04-01",
+          "newDate": "2026-04-15",
+          "type": "postponement",
+          "reason": "للاعلان في مواجهة النيابة العامة ",
+          "notes": "",
+          "recordedDate": "2026-04-14T21:21:26.423Z"
+        },
+        {
+          "date": "2026-04-29",
+          "newDate": "2026-05-20",
+          "type": "postponed",
+          "reason": "مد أجل الحكم",
+          "notes": "",
+          "recordedDate": "2026-05-19T09:29:33.733Z"
+        },
+        {
+          "date": "2026-05-20",
+          "type": "judgment",
+          "judgmentType": "favorable",
+          "reason": "حكم مؤيد",
+          "judgmentText": "حكمت المحكمة باحالة الدعوي لمكتب الخبراء وحددت جلسة 17/6/2026 لسداد الامانة وجلسة 22/7/2026 للتقرير ",
+          "judgmentDate": "2026-06-03",
+          "judgmentId": "1780516711808",
+          "notes": "",
+          "recordedDate": "2026-06-03T19:58:31.808Z"
+        },
+        {
+          "date": "2026-06-03",
+          "type": "judgment",
+          "reason": "حكم صالح",
+          "judgmentText": "حكمت المحكمة باحالة الدعوي لمكتب الخبراء وحددت جلسة 17/6/2026 لسداد الامانة وجلسة 22/7/2026 للتقرير ",
+          "judgmentType": "favorable",
+          "recordedDate": "2026-06-03T19:59:08.511Z",
+          "notes": "الطعن: عدم طعن"
+        },
+        {
+          "date": "2026-06-17",
+          "type": "returned",
+          "reason": "لسداد الامانة",
+          "recordedDate": "2026-06-03T19:59:08.511Z",
+          "notes": "لسداد الامانة"
+        },
+        {
+          "date": "2026-06-17",
+          "newDate": "2026-07-22",
+          "type": "postponement",
+          "reason": "للتقرير",
+          "notes": "",
+          "recordedDate": "2026-06-27T08:23:55.410Z"
+        }
+      ]
+    },
+    {
+      "id": "1780987739125",
+      "subject": "تعيين قيم ",
+      "plaintiff": "علي شعراوي سيف",
+      "defendant": "وزير العدل ",
+      "number": "913",
+      "year": "2025",
+      "circulationNumber": "2025/757/2451/26",
+      "sessionDate": "2026-07-09",
+      "department": "العاشرة مدني كلي الخميس ",
+      "notes": "",
+      "status": "pending",
+      "createdAt": "2026-06-09T06:48:59.125Z",
+      "sessionHistory": [
+        {
+          "date": "2026-06-11",
+          "type": "initial",
+          "reason": "الجلسة المبدئية",
+          "recordedDate": "2026-06-09T06:48:59.126Z",
+          "notes": ""
+        },
+        {
+          "date": "2026-06-11",
+          "newDate": "2026-07-09",
+          "type": "postponement",
+          "reason": "للتحري عمن يصلح تعيينه قيم",
+          "notes": "",
+          "recordedDate": "2026-06-15T22:10:22.088Z"
+        }
+      ]
+    },
+    {
+      "id": "1774774547260",
+      "subject": "نقل حيازة ",
+      "plaintiff": "صفوت ابو المكارم احمد ",
+      "defendant": "مدير الادارة الزراعية ",
+      "number": "1061",
+      "year": "2025",
+      "circulationNumber": "2026/183/467/26",
+      "sessionDate": "2026-07-09",
+      "department": "العاشرة مدني كلي",
+      "notes": "",
+      "status": "pending",
+      "createdAt": "2026-03-29T08:55:47.260Z",
+      "sessionHistory": [
+        {
+          "date": "2026-04-02",
+          "type": "initial",
+          "reason": "الجلسة المبدئية",
+          "recordedDate": "2026-03-29T08:55:47.260Z",
+          "notes": ""
+        },
+        {
+          "date": "2026-04-02",
+          "newDate": "2026-04-15",
+          "type": "postponement",
+          "reason": "لورود الاعلان",
+          "notes": "",
+          "recordedDate": "2026-04-05T19:06:52.152Z"
+        },
+        {
+          "date": "2026-04-16",
+          "newDate": "2026-04-16",
+          "type": "cancelled",
+          "reason": "شطب الدعوي",
+          "notes": "",
+          "recordedDate": "2026-05-01T09:00:02.669Z"
+        },
+        {
+          "date": "2026-04-16",
+          "newDate": "2026-06-18",
+          "type": "returned",
+          "reason": "إعادة من الشطب",
+          "notes": "",
+          "recordedDate": "2026-06-27T08:31:19.233Z"
+        },
+        {
+          "date": "2026-06-18",
+          "newDate": "2026-07-09",
+          "type": "postponement",
+          "reason": "للاعلان بالتاجيل الاداري ",
+          "notes": "",
+          "recordedDate": "2026-06-27T08:33:21.681Z"
+        }
+      ]
+    },
+    {
+      "id": "1782810970194",
+      "subject": "براءة زمة رسوم قضائية ",
+      "plaintiff": "وائل كمال جاد ",
+      "defendant": "وزير العدل ",
+      "number": "14",
+      "year": "2026",
+      "circulationNumber": "2026/465/1256/26",
+      "sessionDate": "2026-07-14",
+      "department": "العاشرة مدني كلي حكومة ",
+      "notes": "",
+      "status": "pending",
+      "createdAt": "2026-06-30T09:16:10.195Z",
+      "sessionHistory": [
+        {
+          "date": "2026-07-14",
+          "type": "initial",
+          "reason": "الجلسة المبدئية",
+          "recordedDate": "2026-06-30T09:16:10.195Z",
+          "notes": ""
+        }
+      ]
+    },
+    {
+      "id": "1782811099289",
+      "subject": "عدم اعتداد بمحضر حجز ",
+      "plaintiff": "حسين هلال غزالي ابراهيم ",
+      "defendant": "وزير المالية ",
+      "number": "12",
+      "year": "2026",
+      "circulationNumber": "2026/510/1408/26",
+      "sessionDate": "2026-07-29",
+      "department": "العاشرة مدني كلي حكومة",
+      "notes": "",
+      "status": "pending",
+      "createdAt": "2026-06-30T09:18:19.289Z",
+      "sessionHistory": [
+        {
+          "date": "2026-07-29",
+          "type": "initial",
+          "reason": "الجلسة المبدئية",
+          "recordedDate": "2026-06-30T09:18:19.289Z",
+          "notes": ""
+        }
+      ]
+    }
+  ],
+  "favorableJudgments": [
+    {
+      "id": "1775418248295",
+      "caseId": "1774949281769",
+      "caseNumber": "66/2025",
+      "plaintiff": "البنك الزراعي",
+      "defendant": "محافظ المنيا",
+      "subject": "فصل حد",
+      "department": "العاشرة مدني كلي",
+      "sessionDate": "2026-03-31",
+      "text": "حكمت المحكمة برفض الاستئناف وتاييد الحكم المستانف",
+      "date": "2026-03-31",
+      "appealType": "عدم طعن",
+      "appeal": "",
+      "notes": "",
+      "type": "favorable",
+      "createdAt": "2026-04-05T19:44:08.295Z",
+      "printNotes": "",
+      "sessionHistory": [
+        {
+          "date": "2026-02-18",
+          "type": "initial",
+          "reason": "الجلسة المبدئية",
+          "recordedDate": "2026-03-31T09:28:01.769Z",
+          "notes": ""
+        },
+        {
+          "date": "2026-02-18",
+          "newDate": "2026-03-31",
+          "type": "reserved",
+          "reason": "حجز للحكم",
+          "notes": "",
+          "recordedDate": "2026-03-31T10:01:59.261Z"
+        },
+        {
+          "date": "2026-02-18",
+          "type": "judgment",
+          "judgmentType": "favorable",
+          "reason": "حكم مؤيد",
+          "judgmentText": "حكمت المحكمة برفض الاستئناف وتاييد الحكم المستانف ",
+          "judgmentDate": "2026-04-05",
+          "judgmentId": "1775418248295",
+          "notes": "",
+          "recordedDate": "2026-04-05T19:44:08.295Z"
+        }
+      ]
+    },
+    {
+      "id": "1777625277204",
+      "caseId": "1774950309376",
+      "caseNumber": "56/2025",
+      "plaintiff": "رشا محمد محمد علي ",
+      "defendant": "السجل العيني ",
+      "subject": "استئناف الحكم رقم 151 لسنة 2024",
+      "department": "العاشرة مدني مستانف ",
+      "sessionDate": "2026-03-31",
+      "text": "حكمت المحكمة باعتبار الدعوي كان لم تكن ",
+      "date": "2026-03-31",
+      "appealType": "عدم طعن",
+      "appeal": "",
+      "notes": "",
+      "type": "favorable",
+      "createdAt": "2026-05-01T08:47:57.204Z",
+      "printNotes": "",
+      "sessionHistory": [
+        {
+          "date": "2026-03-04",
+          "type": "initial",
+          "reason": "الجلسة المبدئية",
+          "recordedDate": "2026-03-31T09:45:09.376Z",
+          "notes": ""
+        },
+        {
+          "date": "2026-03-04",
+          "newDate": "2026-03-31",
+          "type": "reserved",
+          "reason": "حجز للحكم",
+          "notes": "",
+          "recordedDate": "2026-03-31T10:00:11.895Z"
+        },
+        {
+          "date": "2026-03-31",
+          "type": "judgment",
+          "judgmentType": "favorable",
+          "reason": "حكم مؤيد",
+          "judgmentText": "حكمت المحكمة باعتبار الدعوي كان لم تكن ",
+          "judgmentDate": "2026-03-31",
+          "judgmentId": "1777625277204",
+          "notes": "",
+          "recordedDate": "2026-05-01T08:47:57.204Z"
+        }
+      ]
+    },
+    {
+      "id": "1777626452490",
+      "caseId": "1774222721450",
+      "caseNumber": "3/2026",
+      "plaintiff": "رشدي مجدي فرنسيس ",
+      "defendant": "وزير العدل ",
+      "subject": "براءةذمة  رسوم قضائية ",
+      "department": "العاشرة مدني كلي حكومة ",
+      "sessionDate": "2026-04-29",
+      "text": "حكمت المحكمة بعدم اختصاص المحكمة واحالة لمحكمة ابوقرقاص الجزئية ",
+      "date": "2026-04-29",
+      "appealType": "عدم طعن",
+      "appeal": "",
+      "notes": "",
+      "type": "favorable",
+      "createdAt": "2026-05-01T09:07:32.490Z",
+      "printNotes": "",
+      "sessionHistory": [
+        {
+          "date": "2026-03-25",
+          "type": "initial",
+          "reason": "الجلسة المبدئية",
+          "recordedDate": "2026-03-22T23:38:41.450Z",
+          "notes": ""
+        },
+        {
+          "date": "2026-03-25",
+          "newDate": "2026-04-29",
+          "type": "reserved",
+          "reason": "حجز للحكم",
+          "notes": "",
+          "recordedDate": "2026-03-25T19:59:22.108Z"
+        },
+        {
+          "date": "2026-04-29",
+          "type": "judgment",
+          "judgmentType": "favorable",
+          "reason": "حكم مؤيد",
+          "judgmentText": "حكمت المحكمة بعدم اختصاص المحكمة واحالة لمحكمة ابوقرقاص الجزئية ",
+          "judgmentDate": "2026-04-29",
+          "judgmentId": "1777626452490",
+          "notes": "",
+          "recordedDate": "2026-05-01T09:07:32.490Z"
+        }
+      ]
+    },
+    {
+      "id": "1777627252352",
+      "caseId": "1774950040595",
+      "caseNumber": "998/2025",
+      "plaintiff": "مينا نشأت فوزي ",
+      "defendant": "وزير العدل ",
+      "subject": "تزييل حكم اجنبي ",
+      "department": "العاشرة مدني كلي ",
+      "sessionDate": "2026-03-31",
+      "text": "رفض",
+      "date": "2026-03-31",
+      "appealType": "عدم طعن",
+      "appeal": "",
+      "notes": "",
+      "type": "favorable",
+      "createdAt": "2026-05-01T09:20:52.352Z",
+      "printNotes": "",
+      "sessionHistory": [
+        {
+          "date": "2026-03-05",
+          "type": "initial",
+          "reason": "الجلسة المبدئية",
+          "recordedDate": "2026-03-31T09:40:40.595Z",
+          "notes": ""
+        },
+        {
+          "date": "2026-03-05",
+          "newDate": "2026-03-31",
+          "type": "reserved",
+          "reason": "حجز للحكم",
+          "notes": "",
+          "recordedDate": "2026-03-31T10:00:58.543Z"
+        },
+        {
+          "date": "2026-03-31",
+          "type": "judgment",
+          "judgmentType": "favorable",
+          "reason": "حكم مؤيد",
+          "judgmentText": "رفض",
+          "judgmentDate": "2026-03-31",
+          "judgmentId": "1777627252352",
+          "notes": "",
+          "recordedDate": "2026-05-01T09:20:52.353Z"
+        }
+      ]
+    },
+    {
+      "id": "1777627491281",
+      "caseId": "1774949403010",
+      "caseNumber": "113/2025",
+      "plaintiff": "سيد عطية مرسي",
+      "defendant": "الوحدة المحلية باسمنت",
+      "subject": "منع تعرض",
+      "department": "العاشرة مدني كلي ",
+      "sessionDate": "2026-03-31",
+      "text": "قبول ورفض وتاييد",
+      "date": "2026-03-31",
+      "appealType": "",
+      "appeal": "",
+      "notes": "",
+      "type": "favorable",
+      "createdAt": "2026-05-01T09:24:51.281Z",
+      "printNotes": "",
+      "sessionHistory": [
+        {
+          "date": "2026-02-18",
+          "type": "initial",
+          "reason": "الجلسة المبدئية",
+          "recordedDate": "2026-03-31T09:30:03.010Z",
+          "notes": ""
+        },
+        {
+          "date": "2026-02-18",
+          "newDate": "2026-03-31",
+          "type": "reserved",
+          "reason": "حجز للحكم",
+          "notes": "",
+          "recordedDate": "2026-03-31T10:01:59.261Z"
+        },
+        {
+          "date": "2026-03-31",
+          "type": "judgment",
+          "judgmentType": "favorable",
+          "reason": "حكم مؤيد",
+          "judgmentText": "قبول ورفض وتاييد",
+          "judgmentDate": "2026-03-31",
+          "judgmentId": "1777627491281",
+          "notes": "",
+          "recordedDate": "2026-05-01T09:24:51.281Z"
+        }
+      ]
+    },
+    {
+      "id": "1777627648226",
+      "caseId": "1774950228246",
+      "caseNumber": "73/2025",
+      "plaintiff": "مصطفي محمد ابراهيم",
+      "defendant": "السجل العيني",
+      "subject": "استئناف الحكم رقم 299 لسنة 2021",
+      "department": "العاشرة مدني مستانف",
+      "sessionDate": "2026-04-29",
+      "text": "الغاء الحكم المستأنف وانعدام الخصومة",
+      "date": "2026-04-29",
+      "appealType": "",
+      "appeal": "",
+      "notes": "",
+      "type": "favorable",
+      "createdAt": "2026-05-01T09:27:28.226Z",
+      "printNotes": "",
+      "sessionHistory": [
+        {
+          "date": "2026-03-04",
+          "type": "initial",
+          "reason": "الجلسة المبدئية",
+          "recordedDate": "2026-03-31T09:43:48.247Z",
+          "notes": ""
+        },
+        {
+          "date": "2026-03-04",
+          "newDate": "2026-03-31",
+          "type": "reserved",
+          "reason": "حجز للحكم",
+          "notes": "",
+          "recordedDate": "2026-03-31T10:00:11.895Z"
+        },
+        {
+          "date": "2026-03-31",
+          "type": "judgment",
+          "judgmentType": "favorable",
+          "reason": "حكم مؤيد",
+          "judgmentText": "الغاء الحكم المستأنف وانعدام الخصومة ",
+          "judgmentDate": "2026-03-31",
+          "judgmentId": "1777627648226",
+          "notes": "",
+          "recordedDate": "2026-05-01T09:27:28.226Z"
+        }
+      ]
+    },
+    {
+      "id": "1777627791263",
+      "caseId": "1774090969145",
+      "caseNumber": "23/2026",
+      "plaintiff": "احمد حمدي سيد عسقلاني ",
+      "defendant": "وزير العدل ",
+      "subject": "استئناف الحكم رقم 495 سنة 2025 م ج ابوقرقاص ",
+      "department": "العاشرة مدني مستانف ",
+      "sessionDate": "2026-04-29",
+      "text": "قبول ورفض وتاييد",
+      "date": "2026-04-29",
+      "appealType": "",
+      "appeal": "",
+      "notes": "",
+      "type": "favorable",
+      "createdAt": "2026-05-01T09:29:51.263Z",
+      "printNotes": "",
+      "sessionHistory": [
+        {
+          "date": "2026-03-25",
+          "type": "initial",
+          "reason": "الجلسة المبدئية",
+          "recordedDate": "2026-03-21T11:02:49.145Z",
+          "notes": ""
+        },
+        {
+          "date": "2026-03-25",
+          "newDate": "2026-04-29",
+          "type": "reserved",
+          "reason": "حجز للحكم",
+          "notes": "",
+          "recordedDate": "2026-03-25T20:00:51.508Z"
+        },
+        {
+          "date": "2026-04-29",
+          "type": "judgment",
+          "judgmentType": "favorable",
+          "reason": "حكم مؤيد",
+          "judgmentText": "قبول ورفض وتاييد",
+          "judgmentDate": "2026-04-29",
+          "judgmentId": "1777627791263",
+          "notes": "",
+          "recordedDate": "2026-05-01T09:29:51.263Z"
+        }
+      ]
+    },
+    {
+      "id": "1777627869237",
+      "caseId": "1774094524853",
+      "caseNumber": "57/2025",
+      "plaintiff": "نجاح جمعة حسن ",
+      "defendant": "السجل العيني ",
+      "subject": "استئناف",
+      "department": "العاشرة مدني مستانف",
+      "sessionDate": "2026-04-29",
+      "text": "عدم قبول الاستئناف لانتهائية النصاب ",
+      "date": "2026-04-29",
+      "appealType": "",
+      "appeal": "",
+      "notes": "",
+      "type": "favorable",
+      "createdAt": "2026-05-01T09:31:09.237Z",
+      "printNotes": "",
+      "sessionHistory": [
+        {
+          "date": "2026-03-25",
+          "type": "initial",
+          "reason": "الجلسة المبدئية",
+          "recordedDate": "2026-03-21T12:02:04.853Z",
+          "notes": ""
+        },
+        {
+          "date": "2026-03-25",
+          "newDate": "2026-04-08",
+          "type": "postponement",
+          "reason": "لتنفيذ حكم الاستجواب ",
+          "notes": "",
+          "recordedDate": "2026-03-25T20:01:32.294Z"
+        },
+        {
+          "date": "2026-04-08",
+          "newDate": "2026-04-22",
+          "type": "postponement",
+          "reason": "للمستندات ",
+          "notes": "",
+          "recordedDate": "2026-04-14T10:55:32.468Z"
+        },
+        {
+          "date": "2026-04-22",
+          "newDate": "2026-04-29",
+          "type": "reserved",
+          "reason": "حجز للحكم",
+          "notes": "",
+          "recordedDate": "2026-04-27T20:46:37.935Z"
+        },
+        {
+          "date": "2026-04-29",
+          "type": "judgment",
+          "judgmentType": "favorable",
+          "reason": "حكم مؤيد",
+          "judgmentText": "عدم قبول الاستئناف لانتهائية النصاب ",
+          "judgmentDate": "2026-04-29",
+          "judgmentId": "1777627869237",
+          "notes": "",
+          "recordedDate": "2026-05-01T09:31:09.237Z"
+        }
+      ]
+    },
+    {
+      "id": "1777628202606",
+      "caseId": "1774093480039",
+      "caseNumber": "29/2026",
+      "plaintiff": "دعاد اشرف رشدي",
+      "defendant": "المحام العام ",
+      "subject": "تعيين قيم ",
+      "department": "العاشرة مدني كلي",
+      "sessionDate": "2026-04-29",
+      "text": "قبول ",
+      "date": "2026-04-29",
+      "appealType": "عدم طعن",
+      "appeal": "",
+      "notes": "",
+      "type": "favorable",
+      "createdAt": "2026-05-01T09:36:42.606Z",
+      "printNotes": "",
+      "sessionHistory": [
+        {
+          "date": "2026-03-05",
+          "type": "initial",
+          "reason": "الجلسة المبدئية",
+          "recordedDate": "2026-03-21T11:44:40.039Z",
+          "notes": ""
+        },
+        {
+          "date": "2026-03-05",
+          "newDate": "2026-04-29",
+          "type": "reserved",
+          "reason": "حجز للحكم",
+          "notes": "",
+          "recordedDate": "2026-04-05T19:32:14.458Z"
+        },
+        {
+          "date": "2026-04-29",
+          "type": "judgment",
+          "judgmentType": "favorable",
+          "reason": "حكم مؤيد",
+          "judgmentText": "قبول ",
+          "judgmentDate": "2026-04-29",
+          "judgmentId": "1777628202606",
+          "notes": "",
+          "recordedDate": "2026-05-01T09:36:42.606Z"
+        }
+      ]
+    },
+    {
+      "id": "1777628317609",
+      "caseId": "1774953461805",
+      "caseNumber": "1016/2023",
+      "plaintiff": "رحاب نبوي عبد الله ",
+      "defendant": "وزير العدل ",
+      "subject": "معارضة رسوم قضائية ",
+      "department": "العاشرة مدني كلي الخميس ",
+      "sessionDate": "2026-04-29",
+      "text": "رفض الدعوي ",
+      "date": "2026-04-29",
+      "appealType": "عدم طعن",
+      "appeal": "",
+      "notes": "",
+      "type": "favorable",
+      "createdAt": "2026-05-01T09:38:37.609Z",
+      "printNotes": "",
+      "sessionHistory": [
+        {
+          "date": "2026-03-26",
+          "type": "initial",
+          "reason": "الجلسة المبدئية",
+          "recordedDate": "2026-03-31T10:37:41.805Z",
+          "notes": ""
+        },
+        {
+          "date": "2026-03-26",
+          "newDate": "2026-04-29",
+          "type": "reserved",
+          "reason": "حجز للحكم",
+          "notes": "",
+          "recordedDate": "2026-04-05T19:37:24.933Z"
+        }
+      ]
+    },
+    {
+      "id": "1779671222376",
+      "caseId": "1774093959353",
+      "caseNumber": "5/2024",
+      "plaintiff": "سيد عبد اللطيف علي ",
+      "defendant": "الوحدة المحلية ",
+      "subject": "تجديدمن الشطب ",
+      "department": "العاشرة مدني كلي حكومة ",
+      "sessionDate": "2026-04-29",
+      "text": "عدم قبول صفة + قبول ",
+      "date": "2026-04-29",
+      "appealType": "عدم طعن",
+      "appeal": "",
+      "notes": "",
+      "type": "favorable",
+      "createdAt": "2026-05-25T01:07:02.376Z",
+      "printNotes": "",
+      "sessionHistory": [
+        {
+          "date": "2026-03-25",
+          "type": "initial",
+          "reason": "الجلسة المبدئية",
+          "recordedDate": "2026-03-21T11:52:39.353Z",
+          "notes": ""
+        },
+        {
+          "date": "2026-03-25",
+          "newDate": "2026-04-29",
+          "type": "reserved",
+          "reason": "حجز للحكم",
+          "notes": "",
+          "recordedDate": "2026-03-25T19:59:22.108Z"
+        },
+        {
+          "date": "2026-04-29",
+          "type": "judgment",
+          "judgmentType": "favorable",
+          "reason": "حكم مؤيد",
+          "judgmentText": "عدم قبول صفة + قبول ",
+          "judgmentDate": "2026-04-29",
+          "judgmentId": "1779671222376",
+          "notes": "",
+          "recordedDate": "2026-05-25T01:07:02.376Z"
+        }
+      ]
+    },
+    {
+      "id": "1779671747958",
+      "caseId": "1774950495016",
+      "caseNumber": "775/2024",
+      "plaintiff": "ممدوح وهبه اسحق ",
+      "defendant": "محافظ المنيا",
+      "subject": "اخلاء وطرد ",
+      "department": "العاشرة مدني كلي الخميس ",
+      "sessionDate": "2026-05-20",
+      "text": "رفض",
+      "date": "2026-05-20",
+      "appealType": "عدم طعن",
+      "appeal": "",
+      "notes": "",
+      "type": "favorable",
+      "createdAt": "2026-05-25T01:15:47.958Z",
+      "printNotes": "",
+      "sessionHistory": [
+        {
+          "date": "2026-02-26",
+          "type": "initial",
+          "reason": "الجلسة المبدئية",
+          "recordedDate": "2026-03-31T09:48:15.016Z",
+          "notes": ""
+        },
+        {
+          "date": "2026-02-26",
+          "newDate": "2026-03-31",
+          "type": "reserved",
+          "reason": "حجز للحكم",
+          "notes": "",
+          "recordedDate": "2026-03-31T09:59:45.921Z"
+        },
+        {
+          "date": "2026-03-31",
+          "newDate": "2026-04-23",
+          "type": "returned",
+          "reason": "إعادة من الحجز للحكم",
+          "notes": "",
+          "recordedDate": "2026-05-01T08:31:18.527Z"
+        },
+        {
+          "date": "2026-05-20",
+          "type": "judgment",
+          "judgmentType": "favorable",
+          "reason": "حكم مؤيد",
+          "judgmentText": "رفض",
+          "judgmentDate": "2026-05-20",
+          "judgmentId": "1779671747958",
+          "notes": "",
+          "recordedDate": "2026-05-25T01:15:47.959Z"
+        }
+      ]
+    },
+    {
+      "id": "1779671888773",
+      "caseId": "1774951102880",
+      "caseNumber": "192/2022",
+      "plaintiff": "ايمن بشري يواقيم",
+      "defendant": "السجل العيني",
+      "subject": "صحة ونفاذ عقد بيع",
+      "department": "العاشرة مدني كلي الخميس",
+      "sessionDate": "2026-05-20",
+      "text": "رفض الطلب العارض \nقبول الدعوي الاصلية ",
+      "date": "2026-05-20",
+      "appealType": "عدم طعن",
+      "appeal": "",
+      "notes": "",
+      "type": "favorable",
+      "createdAt": "2026-05-25T01:18:08.773Z",
+      "printNotes": "",
+      "sessionHistory": [
+        {
+          "date": "2026-02-19",
+          "type": "initial",
+          "reason": "الجلسة المبدئية",
+          "recordedDate": "2026-03-31T09:58:22.880Z",
+          "notes": ""
+        },
+        {
+          "date": "2026-02-19",
+          "newDate": "2026-03-31",
+          "type": "reserved",
+          "reason": "حجز للحكم",
+          "notes": "",
+          "recordedDate": "2026-03-31T09:59:19.325Z"
+        },
+        {
+          "date": "2026-02-19",
+          "type": "judgment",
+          "judgmentType": "favorable",
+          "reason": "حكم مؤيد",
+          "judgmentText": "حكمت المحكمة بالاستجواب لجلسة 23/4/2026",
+          "judgmentDate": "2026-03-31",
+          "judgmentId": "1775418507525",
+          "notes": "",
+          "recordedDate": "2026-04-05T19:48:27.526Z"
+        },
+        {
+          "date": "2026-03-31",
+          "type": "judgment",
+          "reason": "حكم صالح",
+          "judgmentText": "حكمت المحكمة بالاستجواب لجلسة 23/4/2026",
+          "judgmentType": "favorable",
+          "recordedDate": "2026-05-01T08:38:08.542Z",
+          "notes": "الطعن: عدم طعن"
+        },
+        {
+          "date": "2026-04-23",
+          "type": "returned",
+          "reason": "استجواب",
+          "recordedDate": "2026-05-01T08:38:08.542Z",
+          "notes": "استجواب"
+        },
+        {
+          "date": "2026-04-23",
+          "newDate": "2026-05-20",
+          "type": "reserved",
+          "reason": "حجز للحكم",
+          "notes": "",
+          "recordedDate": "2026-05-01T08:58:01.072Z"
+        },
+        {
+          "date": "2026-05-20",
+          "type": "judgment",
+          "judgmentType": "favorable",
+          "reason": "حكم مؤيد",
+          "judgmentText": "رفض الطلب العارض \nقبول الدعوي الاصلية ",
+          "judgmentDate": "2026-05-20",
+          "judgmentId": "1779671888773",
+          "notes": "",
+          "recordedDate": "2026-05-25T01:18:08.773Z"
+        }
+      ]
+    },
+    {
+      "id": "1782846648638",
+      "caseId": "1774944639486",
+      "caseNumber": "25/2026",
+      "plaintiff": "صابر ربيعي حسن ",
+      "defendant": "وكيل وزارة الري ",
+      "subject": "استئناف الحكم رقم 190 لسنة 2024 ",
+      "department": "العاشرة مدني مستانف ",
+      "sessionDate": "2026-06-30",
+      "text": " رفض الاستئناف وتاييد الحكم المستانف",
+      "date": "2026-06-30",
+      "appealType": "عدم طعن",
+      "appeal": "",
+      "notes": "",
+      "type": "favorable",
+      "createdAt": "2026-06-30T19:10:48.735Z",
+      "printNotes": "",
+      "sessionHistory": [
+        {
+          "date": "2026-04-15",
+          "type": "initial",
+          "reason": "الجلسة المبدئية",
+          "recordedDate": "2026-03-31T08:10:39.486Z",
+          "notes": ""
+        },
+        {
+          "date": "2026-04-15",
+          "newDate": "2026-04-29",
+          "type": "postponement",
+          "reason": "لورود اصل العريضة ",
+          "notes": "",
+          "recordedDate": "2026-04-27T20:56:43.347Z"
+        },
+        {
+          "date": "2026-04-29",
+          "newDate": "2026-05-13",
+          "type": "postponement",
+          "reason": "لورود اصل العريضة والمستندات ",
+          "notes": "",
+          "recordedDate": "2026-05-01T08:51:05.807Z"
+        },
+        {
+          "date": "2026-05-13",
+          "newDate": "2026-06-03",
+          "type": "postponement",
+          "reason": "لاعادة الاعلان ",
+          "notes": "",
+          "recordedDate": "2026-05-18T11:11:24.646Z"
+        },
+        {
+          "date": "2026-06-03",
+          "newDate": "2026-06-30",
+          "type": "reserved",
+          "reason": "حجز للحكم",
+          "notes": "",
+          "recordedDate": "2026-06-03T19:54:19.174Z"
+        },
+        {
+          "date": "2026-06-30",
+          "type": "judgment",
+          "judgmentType": "favorable",
+          "reason": "حكم مؤيد",
+          "judgmentText": " رفض الاستئناف وتاييد الحكم المستانف",
+          "judgmentDate": "2026-06-30",
+          "judgmentId": "1782846648638",
+          "notes": "",
+          "recordedDate": "2026-06-30T19:10:48.940Z"
+        }
+      ]
+    },
+    {
+      "id": "1783418050006",
+      "caseId": "1774093649332",
+      "caseNumber": "11/2024",
+      "plaintiff": "محسن بدر عبد المجيد",
+      "defendant": "الوحدة المحلية باتليدم",
+      "subject": "منع تعرض",
+      "department": "العاشرة مدني كلي حكومة ",
+      "sessionDate": "2026-06-30",
+      "text": "حكمت المحكمة برفض الدعوي بحالتها ",
+      "date": "2026-06-30",
+      "appealType": "عدم طعن",
+      "appeal": "",
+      "notes": "",
+      "type": "favorable",
+      "createdAt": "2026-07-07T09:54:10.006Z",
+      "printNotes": "",
+      "sessionHistory": [
+        {
+          "date": "2026-03-25",
+          "type": "initial",
+          "reason": "الجلسة المبدئية",
+          "recordedDate": "2026-03-21T11:47:29.332Z",
+          "notes": ""
+        },
+        {
+          "date": "2026-03-25",
+          "newDate": "2026-05-13",
+          "type": "postponement",
+          "reason": "للتقرير ",
+          "notes": "",
+          "recordedDate": "2026-03-25T19:58:06.009Z"
+        },
+        {
+          "date": "2026-05-13",
+          "newDate": "2026-06-30",
+          "type": "reserved",
+          "reason": "حجز للحكم",
+          "notes": "",
+          "recordedDate": "2026-05-18T11:12:57.014Z"
+        },
+        {
+          "date": "2026-06-30",
+          "type": "judgment",
+          "judgmentType": "favorable",
+          "reason": "حكم مؤيد",
+          "judgmentText": "حكمت المحكمة برفض الدعوي بحالتها ",
+          "judgmentDate": "2026-06-30",
+          "judgmentId": "1783418050006",
+          "notes": "",
+          "recordedDate": "2026-07-07T09:54:10.013Z"
+        }
+      ]
+    },
+    {
+      "id": "1783418162124",
+      "caseId": "1775901894748",
+      "caseNumber": "8/2026",
+      "plaintiff": "عادل محمد سليمان درويش",
+      "defendant": "مهندس الري ",
+      "subject": "توصيل كهرباء مسقي مطور ",
+      "department": "العاشرة مدني كلي حكومة ",
+      "sessionDate": "2026-06-30",
+      "text": "حكمت المحكمة اولا : بسقوط الحق في التمسك بالحكم التمهيدي \nثانيا:  رفض الدعوي بحالتها ",
+      "date": "2026-06-30",
+      "appealType": "عدم طعن",
+      "appeal": "",
+      "notes": "",
+      "type": "favorable",
+      "createdAt": "2026-07-07T09:56:02.124Z",
+      "printNotes": "",
+      "sessionHistory": [
+        {
+          "date": "2026-04-15",
+          "type": "initial",
+          "reason": "الجلسة المبدئية",
+          "recordedDate": "2026-04-11T10:04:54.748Z",
+          "notes": ""
+        },
+        {
+          "date": "2026-04-15",
+          "newDate": "2026-04-29",
+          "type": "reserved",
+          "reason": "حجز للحكم",
+          "notes": "",
+          "recordedDate": "2026-04-27T20:54:11.342Z"
+        },
+        {
+          "date": "2026-04-29",
+          "type": "judgment",
+          "judgmentType": "favorable",
+          "reason": "حكم مؤيد",
+          "judgmentText": "خبير 20/5/2026 لسداد الامانة وجلسة 17/6/2026 للتقرير",
+          "judgmentDate": "2026-04-29",
+          "judgmentId": "1777627985932",
+          "notes": "",
+          "recordedDate": "2026-05-01T09:33:05.932Z"
+        },
+        {
+          "date": "2026-04-29",
+          "type": "judgment",
+          "reason": "حكم صالح",
+          "judgmentText": "خبير 20/5/2026 لسداد الامانة وجلسة 17/6/2026 للتقرير",
+          "judgmentType": "favorable",
+          "recordedDate": "2026-05-01T09:33:24.676Z",
+          "notes": ""
+        },
+        {
+          "date": "2026-05-20",
+          "type": "returned",
+          "reason": "لسداد الامانه",
+          "recordedDate": "2026-05-01T09:33:24.676Z",
+          "notes": "لسداد الامانه"
+        },
+        {
+          "date": "2026-05-20",
+          "newDate": "2026-06-30",
+          "type": "reserved",
+          "reason": "حجز للحكم",
+          "notes": "",
+          "recordedDate": "2026-05-25T01:02:32.992Z"
+        },
+        {
+          "date": "2026-06-30",
+          "type": "judgment",
+          "judgmentType": "favorable",
+          "reason": "حكم مؤيد",
+          "judgmentText": "حكمت المحكمة اولا : بسقوط الحق في التمسك بالحكم التمهيدي \nثانيا:  رفض الدعوي بحالتها ",
+          "judgmentDate": "2026-06-30",
+          "judgmentId": "1783418162124",
+          "notes": "",
+          "recordedDate": "2026-07-07T09:56:02.130Z"
+        }
+      ]
+    }
+  ],
+  "againstJudgments": [
+    {
+      "id": "1775421338406",
+      "caseId": "1774775475389",
+      "caseNumber": "15/2026",
+      "plaintiff": "ابراهيم مسعد جميل ",
+      "defendant": "وزير العدل ",
+      "subject": "استئناف الحكم رقم 387 لسنة 2025",
+      "department": "العاشرة مدني مستانف ",
+      "sessionDate": "2026-03-31",
+      "text": "حكمت المحكمة بالغاء الحكم المستانف والقضاء مجددا بالغاء قائمتي الرسوم ",
+      "date": "2026-03-31",
+      "appealType": "",
+      "appeal": "",
+      "notes": "",
+      "type": "against",
+      "createdAt": "2026-04-05T20:35:38.406Z",
+      "printNotes": "",
+      "sessionHistory": [
+        {
+          "date": "2026-03-18",
+          "type": "initial",
+          "reason": "الجلسة المبدئية",
+          "recordedDate": "2026-03-29T09:11:15.389Z",
+          "notes": ""
+        },
+        {
+          "date": "2026-03-18",
+          "newDate": "2026-03-31",
+          "type": "reserved",
+          "reason": "حجز للحكم",
+          "notes": "",
+          "recordedDate": "2026-03-31T10:21:39.077Z"
+        }
+      ]
+    },
+    {
+      "id": "1777626987822",
+      "caseId": "1774949963236",
+      "caseNumber": "3/2023",
+      "plaintiff": "فوزي شنيف فرج ",
+      "defendant": "محافظ المنيا",
+      "subject": "براءة ذمة مقابل انتفاع",
+      "department": "العاشرة مدني كلي ",
+      "sessionDate": "2026-03-31",
+      "text": "حكمت المحكمة ببراءة زمة المدعي وكف المنازعة ورفض الطلب العارض ",
+      "date": "2026-03-31",
+      "appealType": "طعن",
+      "appeal": "",
+      "notes": "",
+      "type": "against",
+      "createdAt": "2026-05-01T09:16:27.822Z",
+      "printNotes": "",
+      "sessionHistory": [
+        {
+          "date": "2026-02-18",
+          "type": "initial",
+          "reason": "الجلسة المبدئية",
+          "recordedDate": "2026-03-31T09:39:23.236Z",
+          "notes": ""
+        },
+        {
+          "date": "2026-02-18",
+          "newDate": "2026-03-31",
+          "type": "reserved",
+          "reason": "حجز للحكم",
+          "notes": "",
+          "recordedDate": "2026-03-31T10:01:59.261Z"
+        },
+        {
+          "date": "2026-03-31",
+          "type": "judgment",
+          "judgmentType": "against",
+          "reason": "حكم معارض",
+          "judgmentText": "حكمت المحكمة ببراءة زمة المدعي وكف المنازعة ورفض الطلب العارض ",
+          "judgmentDate": "2026-03-31",
+          "judgmentId": "1777626987822",
+          "notes": "",
+          "recordedDate": "2026-05-01T09:16:27.822Z"
+        }
+      ]
+    },
+    {
+      "id": "1777627110731",
+      "caseId": "1774949590384",
+      "caseNumber": "140/2023",
+      "plaintiff": "ابراهيم عزمي محمود ",
+      "defendant": "محافظ المنيا",
+      "subject": "استئناف الحكم رقم 367 لسنة 2023",
+      "department": "العاشرة مدني مستانف",
+      "sessionDate": "2026-03-31",
+      "text": "الغاء حكم اول درجة والقضاء مجددا بعدم تعرض المستانف ضدهم للمستانف وبراءة ذمته من مقابل الانتفاع ",
+      "date": "2026-03-31",
+      "appealType": "طعن",
+      "appeal": "",
+      "notes": "",
+      "type": "against",
+      "createdAt": "2026-05-01T09:18:30.731Z",
+      "printNotes": "",
+      "sessionHistory": [
+        {
+          "date": "2026-02-25",
+          "type": "initial",
+          "reason": "الجلسة المبدئية",
+          "recordedDate": "2026-03-31T09:33:10.384Z",
+          "notes": ""
+        },
+        {
+          "date": "2026-02-25",
+          "newDate": "2026-03-31",
+          "type": "reserved",
+          "reason": "حجز للحكم",
+          "notes": "",
+          "recordedDate": "2026-03-31T10:02:34.990Z"
+        },
+        {
+          "date": "2026-03-31",
+          "type": "judgment",
+          "judgmentType": "against",
+          "reason": "حكم معارض",
+          "judgmentText": "الغاء حكم اول درجة والقضاء مجددا بعدم تعرض المستانف ضدهم للمستانف وبراءة ذمته من مقابل الانتفاع ",
+          "judgmentDate": "2026-03-31",
+          "judgmentId": "1777627110731",
+          "notes": "",
+          "recordedDate": "2026-05-01T09:18:30.731Z"
+        }
+      ]
+    },
+    {
+      "id": "1779671308269",
+      "caseId": "1777316833517",
+      "caseNumber": "897/2023",
+      "plaintiff": "حسين محمد عبد الباسط",
+      "defendant": "وزير التنمية المحلية",
+      "subject": "تعويض",
+      "department": "العاشرة مدني كلي حكومة",
+      "sessionDate": "2026-05-20",
+      "text": "اولا :- قبول إدخال وزير التنمية المحلية بصفته ، محافظ المنيا بصفته رئيس مجلس مدينة أبو قرقاص بصفتة, رئيس الوحدة المحلية ببنى موسى بصفته.\nثانيا :- بإلزام المدعي عليهما / رئيس مجلس مدينة أبو قرقاص ، رئيس الوحدة المحلية ببني موسى بصفتهما بأن يؤدي للمدعي مبلغ وقدره ۳۰۰۰۰۰ جنيه (ثلاثمائة ألف جنية تعويضا ماديا وأدبيا عما لحق بنجل المدعى من أصابه وألزمتهما المصروفات ومبلغ خمسة وسبعون جنيهاً مقابل أتعاب المحاماة.",
+      "date": "2026-05-20",
+      "appealType": "طعن",
+      "appeal": "",
+      "notes": "",
+      "type": "against",
+      "createdAt": "2026-05-25T01:08:28.269Z",
+      "printNotes": "",
+      "sessionHistory": [
+        {
+          "date": "2026-04-27",
+          "type": "initial",
+          "reason": "الجلسة المبدئية",
+          "recordedDate": "2026-04-27T19:07:13.518Z",
+          "notes": ""
+        },
+        {
+          "date": "2026-04-15",
+          "newDate": "2026-04-29",
+          "type": "postponement",
+          "reason": "اعادة للمرافعة ",
+          "notes": "",
+          "recordedDate": "2026-04-27T19:08:35.685Z"
+        },
+        {
+          "date": "2026-04-29",
+          "newDate": "2026-05-06",
+          "type": "postponement",
+          "reason": "للمذكرات ",
+          "notes": "",
+          "recordedDate": "2026-05-01T08:49:38.779Z"
+        },
+        {
+          "date": "2026-05-06",
+          "newDate": "2026-05-20",
+          "type": "reserved",
+          "reason": "حجز للحكم",
+          "notes": "",
+          "recordedDate": "2026-05-09T08:01:22.142Z"
+        },
+        {
+          "date": "2026-05-20",
+          "type": "judgment",
+          "judgmentType": "against",
+          "reason": "حكم معارض",
+          "judgmentText": "قبول",
+          "judgmentDate": "2026-05-20",
+          "judgmentId": "1779671308269",
+          "notes": "",
+          "recordedDate": "2026-05-25T01:08:28.270Z"
+        }
+      ]
+    }
+  ],
+  "reservedCases": [
+    {
+      "id": "1774094366989",
+      "subject": "تعويض",
+      "plaintiff": "احمد محمد منتصر عبد الظاهر ",
+      "defendant": "الوحدة المحلية ",
+      "number": "10",
+      "year": "2025",
+      "circulationNumber": "2025/602/1942/26",
+      "sessionDate": "2026-06-03",
+      "department": "العاشرة مدني كلي حكومة ",
+      "notes": "",
+      "status": "pending",
+      "createdAt": "2026-03-21T11:59:26.989Z",
+      "sessionHistory": [
+        {
+          "date": "2026-03-25",
+          "type": "initial",
+          "reason": "الجلسة المبدئية",
+          "recordedDate": "2026-03-21T11:59:26.989Z",
+          "notes": ""
+        },
+        {
+          "date": "2026-03-25",
+          "newDate": "2026-05-13",
+          "type": "postponement",
+          "reason": "للتقرير ",
+          "notes": "",
+          "recordedDate": "2026-03-25T19:58:06.009Z"
+        },
+        {
+          "date": "2026-05-13",
+          "newDate": "2026-06-03",
+          "type": "postponement",
+          "reason": "للاعلان بالتدخل الهجومي ",
+          "notes": "",
+          "recordedDate": "2026-05-18T11:14:31.269Z"
+        },
+        {
+          "date": "2026-06-03",
+          "newDate": "2026-06-30",
+          "type": "reserved",
+          "reason": "حجز للحكم",
+          "notes": "",
+          "recordedDate": "2026-06-03T19:54:19.174Z"
+        }
+      ],
+      "reserveDate": "2026-06-30",
+      "originalDate": "2026-06-03",
+      "reserveReason": "حجز للحكم"
+    },
+    {
+      "id": "1778141899402",
+      "subject": "فسخ عقد ايجار ",
+      "plaintiff": "محمود فتحي سلامة عبد الله",
+      "defendant": "وزير المالية ",
+      "number": "11",
+      "year": "2026",
+      "circulationNumber": "2026/105/205/27",
+      "sessionDate": "2026-06-03",
+      "department": "العاشرة مدني كلي حكومة ",
+      "notes": "",
+      "status": "pending",
+      "createdAt": "2026-05-07T08:18:19.402Z",
+      "sessionHistory": [
+        {
+          "date": "2026-06-03",
+          "type": "initial",
+          "reason": "الجلسة المبدئية",
+          "recordedDate": "2026-05-07T08:18:19.402Z",
+          "notes": ""
+        },
+        {
+          "date": "2026-06-03",
+          "newDate": "2026-06-30",
+          "type": "reserved",
+          "reason": "حجز للحكم",
+          "notes": "",
+          "recordedDate": "2026-06-03T19:54:19.174Z"
+        }
+      ],
+      "reserveDate": "2026-06-30",
+      "originalDate": "2026-06-03",
+      "reserveReason": "حجز للحكم"
+    },
+    {
+      "id": "1776507734623",
+      "subject": "براءة ذمةرسوم قضائية",
+      "plaintiff": "هاني خيري رياض ابو الحسن ",
+      "defendant": "وزير العدل ",
+      "number": "389",
+      "year": "2025",
+      "circulationNumber": "2026/35/84/26",
+      "sessionDate": "2026-06-10",
+      "department": "العاشرة مدني كلي حكومة ",
+      "notes": "",
+      "status": "pending",
+      "createdAt": "2026-04-18T10:22:14.623Z",
+      "sessionHistory": [
+        {
+          "date": "2026-04-08",
+          "type": "initial",
+          "reason": "الجلسة المبدئية",
+          "recordedDate": "2026-04-18T10:22:14.623Z",
+          "notes": ""
+        },
+        {
+          "date": "2026-04-08",
+          "newDate": "2026-04-29",
+          "type": "postponement",
+          "reason": "للمستندات",
+          "notes": "",
+          "recordedDate": "2026-04-18T10:22:35.376Z"
+        },
+        {
+          "date": "2026-04-29",
+          "newDate": "2026-05-20",
+          "type": "reserved",
+          "reason": "حجز للحكم",
+          "notes": "",
+          "recordedDate": "2026-05-01T08:49:15.749Z"
+        },
+        {
+          "date": "2026-05-20",
+          "newDate": "2026-06-10",
+          "type": "returned",
+          "reason": "إعادة من الحجز للحكم",
+          "notes": "",
+          "recordedDate": "2026-05-25T01:07:44.053Z"
+        },
+        {
+          "date": "2026-06-10",
+          "newDate": "2026-06-30",
+          "type": "reserved",
+          "reason": "حجز للحكم",
+          "notes": "",
+          "recordedDate": "2026-06-15T22:01:20.685Z"
+        }
+      ],
+      "reserveDate": "2026-06-30",
+      "originalDate": "2026-06-10",
+      "reserveReason": "حجز للحكم"
+    },
+    {
+      "id": "1781561615540",
+      "subject": "براءة زمة رسوم قضائية ",
+      "plaintiff": "أمال مشرف حسن احمد                                                  ",
+      "defendant": "وزر العدل",
+      "number": "675",
+      "year": "2025",
+      "circulationNumber": "675 لسنة 2025",
+      "sessionDate": "2026-06-11",
+      "department": "العاشرة مدني كلي الخميس ",
+      "notes": "",
+      "status": "pending",
+      "createdAt": "2026-06-15T22:13:35.540Z",
+      "sessionHistory": [
+        {
+          "date": "2026-06-11",
+          "type": "initial",
+          "reason": "الجلسة المبدئية",
+          "recordedDate": "2026-06-15T22:13:35.540Z",
+          "notes": ""
+        },
+        {
+          "date": "2026-06-11",
+          "newDate": "2026-06-30",
+          "type": "reserved",
+          "reason": "حجز للحكم",
+          "notes": "",
+          "recordedDate": "2026-06-15T22:14:13.532Z"
+        }
+      ],
+      "reserveDate": "2026-06-30",
+      "originalDate": "2026-06-11",
+      "reserveReason": "حجز للحكم"
+    },
+    {
+      "id": "1779102344117",
+      "subject": "حصة ميراثية ",
+      "plaintiff": "مديحة عبد البديع أبو السباع إسماعيل ",
+      "defendant": "وكيل نيابة مركز المنيا لشئون الاسرة ",
+      "number": "228",
+      "year": "2026",
+      "circulationNumber": "2026/280/781/26",
+      "sessionDate": "2026-05-21",
+      "department": "العاشرة مدني كلي الخميس ",
+      "notes": "",
+      "status": "pending",
+      "createdAt": "2026-05-18T11:05:44.117Z",
+      "sessionHistory": [
+        {
+          "date": "2026-05-07",
+          "type": "initial",
+          "reason": "الجلسة المبدئية",
+          "recordedDate": "2026-05-18T11:05:44.117Z",
+          "notes": ""
+        },
+        {
+          "date": "2026-05-07",
+          "newDate": "2026-05-21",
+          "type": "postponement",
+          "reason": "اداري",
+          "notes": "",
+          "recordedDate": "2026-05-18T11:08:06.044Z"
+        },
+        {
+          "date": "2026-05-21",
+          "newDate": "2026-06-30",
+          "type": "reserved",
+          "reason": "حجز للحكم",
+          "notes": "",
+          "recordedDate": "2026-06-16T07:31:49.858Z"
+        }
+      ],
+      "reserveDate": "2026-06-30",
+      "originalDate": "2026-05-21",
+      "reserveReason": "حجز للحكم"
+    },
+    {
+      "id": "1775903337204",
+      "subject": "استئناف الحكم رقم 499 لسنة 2025 جزئي ",
+      "plaintiff": "وزير العدل ",
+      "defendant": "بركه سالم احمد ",
+      "number": "30",
+      "year": "2026",
+      "circulationNumber": "2026/89/760/26",
+      "sessionDate": "2026-06-17",
+      "department": "العاشرة مدني مستانف ",
+      "notes": "",
+      "status": "pending",
+      "createdAt": "2026-04-11T10:28:57.204Z",
+      "sessionHistory": [
+        {
+          "date": "2026-05-13",
+          "type": "initial",
+          "reason": "الجلسة المبدئية",
+          "recordedDate": "2026-04-11T10:28:57.204Z",
+          "notes": ""
+        },
+        {
+          "date": "2026-05-13",
+          "newDate": "2026-06-03",
+          "type": "postponement",
+          "reason": "للتحري عن محل الاقامة والاعلان علي ضوء التحري ",
+          "notes": "",
+          "recordedDate": "2026-05-18T11:11:02.536Z"
+        },
+        {
+          "date": "2026-06-03",
+          "newDate": "2026-06-17",
+          "type": "postponement",
+          "reason": "لاعادة الاعلان \n",
+          "notes": "",
+          "recordedDate": "2026-06-03T19:55:09.188Z"
+        },
+        {
+          "date": "2026-06-17",
+          "newDate": "2026-06-30",
+          "type": "reserved",
+          "reason": "حجز للحكم",
+          "notes": "",
+          "recordedDate": "2026-06-18T16:50:34.966Z"
+        }
+      ],
+      "reserveDate": "2026-06-30",
+      "originalDate": "2026-06-17",
+      "reserveReason": "حجز للحكم"
+    },
+    {
+      "id": "1775901809272",
+      "subject": " سد مطل ",
+      "plaintiff": "اسامة رضا يسي مينا ",
+      "defendant": "محافظ المنيا ",
+      "number": "176",
+      "year": "2026",
+      "circulationNumber": "2026/290/789/26",
+      "sessionDate": "2026-06-04",
+      "department": "العاشرة مدني كلي الخميس ",
+      "notes": "",
+      "status": "pending",
+      "createdAt": "2026-04-11T10:03:29.273Z",
+      "sessionHistory": [
+        {
+          "date": "2026-04-11",
+          "type": "initial",
+          "reason": "الجلسة المبدئية",
+          "recordedDate": "2026-04-11T10:03:29.273Z",
+          "notes": ""
+        },
+        {
+          "date": "2026-05-07",
+          "newDate": "2026-05-21",
+          "type": "postponement",
+          "reason": "اداري",
+          "notes": "",
+          "recordedDate": "2026-05-18T11:08:06.044Z"
+        },
+        {
+          "date": "2026-05-21",
+          "newDate": "2026-06-04",
+          "type": "postponement",
+          "reason": "اعادة الاعلان ",
+          "notes": "",
+          "recordedDate": "2026-06-16T07:30:52.698Z"
+        },
+        {
+          "date": "2026-06-04",
+          "newDate": "2026-06-30",
+          "type": "reserved",
+          "reason": "حجز للحكم",
+          "notes": "",
+          "recordedDate": "2026-06-30T10:00:32.900Z"
+        }
+      ],
+      "reserveDate": "2026-06-30",
+      "originalDate": "2026-06-04",
+      "reserveReason": "حجز للحكم"
+    },
+    {
+      "id": "1775903613494",
+      "subject": "نقل حيازة",
+      "plaintiff": "صبحي صلاح ملك ",
+      "defendant": "الادارة الزراعية ",
+      "number": "143",
+      "year": "2026",
+      "circulationNumber": "2026/253/692/26",
+      "sessionDate": "2026-05-14",
+      "department": "العاشرة مدني كلي الخميس ",
+      "notes": "",
+      "status": "pending",
+      "createdAt": "2026-04-11T10:33:33.494Z",
+      "sessionHistory": [
+        {
+          "date": "2026-04-23",
+          "type": "initial",
+          "reason": "الجلسة المبدئية",
+          "recordedDate": "2026-04-11T10:33:33.494Z",
+          "notes": ""
+        },
+        {
+          "date": "2026-04-23",
+          "newDate": "2026-05-14",
+          "type": "postponement",
+          "reason": "لاعادة الاعلان ",
+          "notes": "",
+          "recordedDate": "2026-04-27T20:49:29.484Z"
+        },
+        {
+          "date": "2026-05-14",
+          "newDate": "2026-06-30",
+          "type": "reserved",
+          "reason": "حجز للحكم",
+          "notes": "",
+          "recordedDate": "2026-06-30T10:02:35.883Z"
+        }
+      ],
+      "reserveDate": "2026-06-30",
+      "originalDate": "2026-05-14",
+      "reserveReason": "حجز للحكم"
+    },
+    {
+      "id": "1774782483421",
+      "subject": "نقل حيازه ",
+      "plaintiff": "عيد ملاك كامل ",
+      "defendant": "الجمعية الزراعية ",
+      "number": "703",
+      "year": "2025",
+      "circulationNumber": "2025/595/1937/26",
+      "sessionDate": "2026-06-25",
+      "department": "العاشرة مدني كلي",
+      "notes": "",
+      "status": "pending",
+      "createdAt": "2026-03-29T11:08:03.421Z",
+      "sessionHistory": [
+        {
+          "date": "2026-05-07",
+          "type": "initial",
+          "reason": "الجلسة المبدئية",
+          "recordedDate": "2026-03-29T11:08:03.421Z",
+          "notes": ""
+        },
+        {
+          "date": "2026-05-07",
+          "newDate": "2026-05-21",
+          "type": "postponement",
+          "reason": "اداري",
+          "notes": "",
+          "recordedDate": "2026-05-18T11:08:06.044Z"
+        },
+        {
+          "date": "2026-05-21",
+          "newDate": "2026-06-11",
+          "type": "postponement",
+          "reason": "للاعلان بالتقرير ",
+          "notes": "",
+          "recordedDate": "2026-06-16T07:30:04.081Z"
+        },
+        {
+          "date": "2026-06-11",
+          "newDate": "2026-06-25",
+          "type": "postponement",
+          "reason": "لورود الاعلان",
+          "notes": "",
+          "recordedDate": "2026-06-16T07:34:43.206Z"
+        },
+        {
+          "date": "2026-06-25",
+          "newDate": "2026-07-30",
+          "type": "reserved",
+          "reason": "حجز للحكم",
+          "notes": "",
+          "recordedDate": "2026-06-30T10:04:14.579Z"
+        }
+      ],
+      "reserveDate": "2026-07-30",
+      "originalDate": "2026-06-25",
+      "reserveReason": "حجز للحكم"
+    },
+    {
+      "id": "1780432373088",
+      "subject": "براءة ذمة رسوم قضائية",
+      "plaintiff": "دميانه امتزاز لمعي جورجي ",
+      "defendant": "وزير العدل ",
+      "number": "208",
+      "year": "2024",
+      "circulationNumber": "2026/434/1176/26",
+      "sessionDate": "2026-06-25",
+      "department": "العاشرة مدني كلي الخميس ",
+      "notes": "",
+      "status": "pending",
+      "createdAt": "2026-06-02T20:32:53.089Z",
+      "sessionHistory": [
+        {
+          "date": "2026-06-11",
+          "type": "initial",
+          "reason": "الجلسة المبدئية",
+          "recordedDate": "2026-06-02T20:32:53.089Z",
+          "notes": ""
+        },
+        {
+          "date": "2026-06-11",
+          "newDate": "2026-06-25",
+          "type": "postponement",
+          "reason": "للاعلان بالتظلم ",
+          "notes": "",
+          "recordedDate": "2026-06-15T22:15:11.702Z"
+        },
+        {
+          "date": "2026-06-25",
+          "newDate": "2026-07-30",
+          "type": "reserved",
+          "reason": "حجز للحكم",
+          "notes": "",
+          "recordedDate": "2026-06-30T10:04:14.579Z"
+        }
+      ],
+      "reserveDate": "2026-07-30",
+      "originalDate": "2026-06-25",
+      "reserveReason": "حجز للحكم"
+    },
+    {
+      "id": "1782811209536",
+      "subject": "سد مطلات ",
+      "plaintiff": "بيشوي غالي حنس ",
+      "defendant": "الوحدة المحلية ",
+      "number": "269",
+      "year": "2026",
+      "circulationNumber": "2026/527/1466/26",
+      "sessionDate": "2026-06-25",
+      "department": "العاشرة مدني كلي ",
+      "notes": "",
+      "status": "pending",
+      "createdAt": "2026-06-30T09:20:09.536Z",
+      "sessionHistory": [
+        {
+          "date": "2026-06-25",
+          "type": "initial",
+          "reason": "الجلسة المبدئية",
+          "recordedDate": "2026-06-30T09:20:09.536Z",
+          "notes": ""
+        },
+        {
+          "date": "2026-06-25",
+          "newDate": "2026-07-30",
+          "type": "reserved",
+          "reason": "حجز للحكم",
+          "notes": "",
+          "recordedDate": "2026-06-30T10:04:14.579Z"
+        }
+      ],
+      "reserveDate": "2026-07-30",
+      "originalDate": "2026-06-25",
+      "reserveReason": "حجز للحكم"
+    }
+  ],
+  "cancelledCases": [
+    {
+      "id": "1774784162177",
+      "subject": "استئناف الحكم رقم 219 لسنة 2023",
+      "plaintiff": "وائل محمد طلعت",
+      "defendant": "الوحدة المحلية ",
+      "number": "17",
+      "year": "2026",
+      "circulationNumber": "2026/54/480/26",
+      "sessionDate": "2026-03-18",
+      "department": "العاشرة مدني مستانف ",
+      "notes": "",
+      "status": "pending",
+      "createdAt": "2026-03-29T11:36:02.177Z",
+      "sessionHistory": [
+        {
+          "date": "2026-03-18",
+          "type": "initial",
+          "reason": "الجلسة المبدئية",
+          "recordedDate": "2026-03-29T11:36:02.177Z",
+          "notes": ""
+        }
+      ],
+      "cancelDate": "2026-03-18",
+      "originalDate": "2026-03-18",
+      "cancelReason": "شطب الدعوي"
+    },
+    {
+      "id": "1774090775852",
+      "subject": "تعويض ",
+      "plaintiff": "عبد المجيد محمد عبد المجيد قاسم ",
+      "defendant": "محافظ المنيا ",
+      "number": "12",
+      "year": "2025",
+      "circulationNumber": "25/807/2574/26",
+      "sessionDate": "2026-05-06",
+      "department": "العاشرة مدني كلي حكومة ",
+      "notes": "",
+      "status": "pending",
+      "createdAt": "2026-03-21T10:59:35.852Z",
+      "sessionHistory": [
+        {
+          "date": "2026-03-11",
+          "type": "initial",
+          "reason": "الجلسة المبدئية",
+          "recordedDate": "2026-03-21T10:59:35.852Z",
+          "notes": ""
+        },
+        {
+          "date": "2026-03-11",
+          "newDate": "2026-03-25",
+          "type": "postponement",
+          "reason": "للاعلان",
+          "notes": "",
+          "recordedDate": "2026-03-23T12:21:31.664Z"
+        },
+        {
+          "date": "2026-03-25",
+          "newDate": "2026-04-01",
+          "type": "postponement",
+          "reason": "لورود اعلان باصل الصحيفة ",
+          "notes": "",
+          "recordedDate": "2026-03-25T20:03:32.980Z"
+        },
+        {
+          "date": "2026-04-01",
+          "newDate": "2026-04-22",
+          "type": "postponement",
+          "reason": "لادخال خصم جديد  ",
+          "notes": "",
+          "recordedDate": "2026-04-05T19:04:14.357Z"
+        },
+        {
+          "date": "2026-04-22",
+          "newDate": "2026-05-06",
+          "type": "postponement",
+          "reason": "لورود الاعلان ",
+          "notes": "",
+          "recordedDate": "2026-04-27T20:45:25.718Z"
+        },
+        {
+          "date": "2026-05-06",
+          "newDate": "2026-05-06",
+          "type": "cancelled",
+          "reason": "شطب الدعوي",
+          "notes": "",
+          "recordedDate": "2026-05-09T08:01:39.268Z"
+        }
+      ],
+      "cancelDate": "2026-05-06",
+      "originalDate": "2026-05-06",
+      "cancelReason": "شطب الدعوي"
+    },
+    {
+      "id": "1777703654451",
+      "subject": "استئناف الحكم رقم 148 لسنة 2025 جزئي ابوقرقاص ",
+      "plaintiff": "شرف سهم محمود السرجاني ",
+      "defendant": "وكيل وزارة  الري ",
+      "number": "31",
+      "year": "2026",
+      "circulationNumber": "2026/106/950/26",
+      "sessionDate": "2026-05-20",
+      "department": "العاشرة مدني مستانف +",
+      "notes": "",
+      "status": "pending",
+      "createdAt": "2026-05-02T06:34:14.451Z",
+      "sessionHistory": [
+        {
+          "date": "2026-05-20",
+          "type": "initial",
+          "reason": "الجلسة المبدئية",
+          "recordedDate": "2026-05-02T06:34:14.451Z",
+          "notes": ""
+        },
+        {
+          "date": "2026-05-20",
+          "newDate": "2026-05-20",
+          "type": "cancelled",
+          "reason": "شطب الدعوي",
+          "notes": "",
+          "recordedDate": "2026-05-25T01:00:57.251Z"
+        }
+      ],
+      "cancelDate": "2026-05-20",
+      "originalDate": "2026-05-20",
+      "cancelReason": "شطب الدعوي"
+    }
+  ],
+  "archivedCases": [],
+  "notifications": [
+    {
+      "id": "1783418162130",
+      "message": "تم تسجيل حكم صالح للقضية: 8/2026",
+      "type": "success",
+      "timestamp": "2026-07-07T09:56:02.130Z",
+      "read": false
+    },
+    {
+      "id": "1783418050014",
+      "message": "تم تسجيل حكم صالح للقضية: 11/2024",
+      "type": "success",
+      "timestamp": "2026-07-07T09:54:10.014Z",
+      "read": false
+    },
+    {
+      "id": "1782846649069",
+      "message": "تم تسجيل حكم صالح للقضية: 25/2026",
+      "type": "success",
+      "timestamp": "2026-06-30T19:10:49.069Z",
+      "read": false
+    },
+    {
+      "id": "1782813952625",
+      "message": "تم ترحيل 1 قضية بنجاح",
+      "type": "success",
+      "timestamp": "2026-06-30T10:05:52.625Z",
+      "read": false
+    },
+    {
+      "id": "1782813917232",
+      "message": "تم ترحيل 1 قضية بنجاح",
+      "type": "success",
+      "timestamp": "2026-06-30T10:05:17.232Z",
+      "read": false
+    },
+    {
+      "id": "1782813883012",
+      "message": "تم ترحيل 1 قضية بنجاح",
+      "type": "success",
+      "timestamp": "2026-06-30T10:04:43.012Z",
+      "read": false
+    },
+    {
+      "id": "1782813854609",
+      "message": "تم ترحيل 3 قضية بنجاح",
+      "type": "success",
+      "timestamp": "2026-06-30T10:04:14.609Z",
+      "read": false
+    },
+    {
+      "id": "1782813796436",
+      "message": "تم ترحيل 1 قضية بنجاح",
+      "type": "success",
+      "timestamp": "2026-06-30T10:03:16.436Z",
+      "read": false
+    },
+    {
+      "id": "1782813755911",
+      "message": "تم ترحيل 1 قضية بنجاح",
+      "type": "success",
+      "timestamp": "2026-06-30T10:02:35.911Z",
+      "read": false
+    },
+    {
+      "id": "1782813730903",
+      "message": "تم ترحيل 1 قضية بنجاح",
+      "type": "success",
+      "timestamp": "2026-06-30T10:02:10.903Z",
+      "read": false
+    },
+    {
+      "id": "1782813632923",
+      "message": "تم ترحيل 1 قضية بنجاح",
+      "type": "success",
+      "timestamp": "2026-06-30T10:00:32.923Z",
+      "read": false
+    },
+    {
+      "id": "1782811209542",
+      "message": "تم إضافة قضية جديدة: 269/2026",
+      "type": "success",
+      "timestamp": "2026-06-30T09:20:09.542Z",
+      "read": false
+    },
+    {
+      "id": "1782811099294",
+      "message": "تم إضافة قضية جديدة: 12/2026",
+      "type": "success",
+      "timestamp": "2026-06-30T09:18:19.294Z",
+      "read": false
+    },
+    {
+      "id": "1782810970201",
+      "message": "تم إضافة قضية جديدة: 14/2026",
+      "type": "success",
+      "timestamp": "2026-06-30T09:16:10.201Z",
+      "read": false
+    },
+    {
+      "id": "1782549201713",
+      "message": "تم ترحيل 1 قضية بنجاح",
+      "type": "success",
+      "timestamp": "2026-06-27T08:33:21.713Z",
+      "read": false
+    },
+    {
+      "id": "1782549079247",
+      "message": "تم إعادة القضية المشطوبة: 1061/2025 للرول",
+      "type": "success",
+      "timestamp": "2026-06-27T08:31:19.247Z",
+      "read": false
+    },
+    {
+      "id": "1782548679766",
+      "message": "تم ترحيل 1 قضية بنجاح",
+      "type": "success",
+      "timestamp": "2026-06-27T08:24:39.766Z",
+      "read": false
+    },
+    {
+      "id": "1782548635443",
+      "message": "تم ترحيل 9 قضية بنجاح",
+      "type": "success",
+      "timestamp": "2026-06-27T08:23:55.443Z",
+      "read": false
+    },
+    {
+      "id": "1781801435006",
+      "message": "تم ترحيل 1 قضية بنجاح",
+      "type": "success",
+      "timestamp": "2026-06-18T16:50:35.006Z",
+      "read": false
+    },
+    {
+      "id": "1781595324419",
+      "message": "تم ترحيل 1 قضية بنجاح",
+      "type": "success",
+      "timestamp": "2026-06-16T07:35:24.419Z",
+      "read": false
+    },
+    {
+      "id": "1781595283242",
+      "message": "تم ترحيل 1 قضية بنجاح",
+      "type": "success",
+      "timestamp": "2026-06-16T07:34:43.242Z",
+      "read": false
+    },
+    {
+      "id": "1781595109881",
+      "message": "تم ترحيل 1 قضية بنجاح",
+      "type": "success",
+      "timestamp": "2026-06-16T07:31:49.881Z",
+      "read": false
+    },
+    {
+      "id": "1781595052725",
+      "message": "تم ترحيل 1 قضية بنجاح",
+      "type": "success",
+      "timestamp": "2026-06-16T07:30:52.725Z",
+      "read": false
+    },
+    {
+      "id": "1781595004101",
+      "message": "تم ترحيل 2 قضية بنجاح",
+      "type": "success",
+      "timestamp": "2026-06-16T07:30:04.101Z",
+      "read": false
+    },
+    {
+      "id": "1781562080001",
+      "message": "تم ترحيل جلسة القضية: 165/2026",
+      "type": "warning",
+      "timestamp": "2026-06-15T22:21:20.001Z",
+      "read": false
+    },
+    {
+      "id": "1781561982227",
+      "message": "تم ترحيل 1 قضية بنجاح",
+      "type": "success",
+      "timestamp": "2026-06-15T22:19:42.227Z",
+      "read": false
+    },
+    {
+      "id": "1781561920075",
+      "message": "تم ترحيل 1 قضية بنجاح",
+      "type": "success",
+      "timestamp": "2026-06-15T22:18:40.075Z",
+      "read": false
+    },
+    {
+      "id": "1781561711744",
+      "message": "تم ترحيل 1 قضية بنجاح",
+      "type": "success",
+      "timestamp": "2026-06-15T22:15:11.744Z",
+      "read": false
+    },
+    {
+      "id": "1781561653578",
+      "message": "تم ترحيل 1 قضية بنجاح",
+      "type": "success",
+      "timestamp": "2026-06-15T22:14:13.578Z",
+      "read": false
+    },
+    {
+      "id": "1781561615558",
+      "message": "تم إضافة قضية جديدة: 675/2025",
+      "type": "success",
+      "timestamp": "2026-06-15T22:13:35.558Z",
+      "read": false
+    },
+    {
+      "id": "1781561422136",
+      "message": "تم ترحيل 1 قضية بنجاح",
+      "type": "success",
+      "timestamp": "2026-06-15T22:10:22.136Z",
+      "read": false
+    },
+    {
+      "id": "1781561389743",
+      "message": "تم ترحيل 1 قضية بنجاح",
+      "type": "success",
+      "timestamp": "2026-06-15T22:09:49.743Z",
+      "read": false
+    },
+    {
+      "id": "1781561146122",
+      "message": "تم ترحيل 1 قضية بنجاح",
+      "type": "success",
+      "timestamp": "2026-06-15T22:05:46.122Z",
+      "read": false
+    },
+    {
+      "id": "1781560999566",
+      "message": "تم تعديل القضية: 208/2024",
+      "type": "success",
+      "timestamp": "2026-06-15T22:03:19.566Z",
+      "read": false
+    },
+    {
+      "id": "1781560880741",
+      "message": "تم ترحيل 1 قضية بنجاح",
+      "type": "success",
+      "timestamp": "2026-06-15T22:01:20.741Z",
+      "read": false
+    },
+    {
+      "id": "1781257397515",
+      "message": "تم تعديل القضية: 2/2026",
+      "type": "success",
+      "timestamp": "2026-06-12T09:43:17.515Z",
+      "read": false
+    },
+    {
+      "id": "1781256230279",
+      "message": "تم تعديل القضية: 2/2026",
+      "type": "success",
+      "timestamp": "2026-06-12T09:23:50.279Z",
+      "read": false
+    },
+    {
+      "id": "1781256162547",
+      "message": "تم حذف القضية: 625/2025",
+      "type": "danger",
+      "timestamp": "2026-06-12T09:22:42.547Z",
+      "read": false
+    },
+    {
+      "id": "1781256147241",
+      "message": "تم استيراد البيانات من ملف النسخ الاحتياطي",
+      "type": "info",
+      "timestamp": "2026-06-12T09:22:27.241Z",
+      "read": false
+    },
+    {
+      "id": "1780987739129",
+      "message": "تم إضافة قضية جديدة: 913/2025",
+      "type": "success",
+      "timestamp": "2026-06-09T06:48:59.129Z",
+      "read": false
+    },
+    {
+      "id": "1780516711819",
+      "message": "تم تسجيل حكم صالح للقضية: 97/2025",
+      "type": "success",
+      "timestamp": "2026-06-03T19:58:31.819Z",
+      "read": false
+    },
+    {
+      "id": "1780516509216",
+      "message": "تم ترحيل 1 قضية بنجاح",
+      "type": "success",
+      "timestamp": "2026-06-03T19:55:09.216Z",
+      "read": false
+    },
+    {
+      "id": "1780516459195",
+      "message": "تم ترحيل 3 قضية بنجاح",
+      "type": "success",
+      "timestamp": "2026-06-03T19:54:19.195Z",
+      "read": false
+    },
+    {
+      "id": "1780432649592",
+      "message": "تم إضافة القضية والمستند بنجاح: 287/2026",
+      "type": "success",
+      "timestamp": "2026-06-02T20:37:29.592Z",
+      "read": false
+    },
+    {
+      "id": "1780432373457",
+      "message": "تم إضافة القضية والمستند بنجاح: 208/2024",
+      "type": "success",
+      "timestamp": "2026-06-02T20:32:53.457Z",
+      "read": false
+    },
+    {
+      "id": "1779672121618",
+      "message": "تم إعادة الدعوى للرول بنجاح - جلسة الحكم مضافة لسجل الجلسات",
+      "type": "success",
+      "timestamp": "2026-05-25T01:22:01.618Z",
+      "read": false
+    },
+    {
+      "id": "1779672105662",
+      "message": "تم إعادة الدعوى للرول بنجاح - جلسة الحكم مضافة لسجل الجلسات",
+      "type": "success",
+      "timestamp": "2026-05-25T01:21:45.662Z",
+      "read": false
+    },
+    {
+      "id": "1779672080434",
+      "message": "تم إعادة الدعوى للرول بنجاح - جلسة الحكم مضافة لسجل الجلسات",
+      "type": "success",
+      "timestamp": "2026-05-25T01:21:20.434Z",
+      "read": false
+    },
+    {
+      "id": "1779672037769",
+      "message": "تم تسجيل حكم صالح للقضية: 165/2026",
+      "type": "success",
+      "timestamp": "2026-05-25T01:20:37.769Z",
+      "read": false
+    },
+    {
+      "id": "1779671888773",
+      "message": "تم تسجيل حكم صالح للقضية: 192/2022",
+      "type": "success",
+      "timestamp": "2026-05-25T01:18:08.773Z",
+      "read": false
+    }
+  ],
+  "programmerName": "المستشار محمود العوابدي - هيئة قضايا الدولة - أحد رواد العدالة الرقمية - جميع الحقوق محفوظة للمطور 2025",
+  "exportDate": "2026-07-13T19:39:33.549Z"
+}
