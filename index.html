@@ -3431,17 +3431,30 @@
                 }
 
                 async function docSet(caseId, fileId, value) {
-                    await fetch(`${FIREBASE_DB_BASE}/documentsIndex/${encodeURIComponent(caseId)}/${encodeURIComponent(fileId)}.json`, {
+                    const res = await fetch(`${FIREBASE_DB_BASE}/documentsIndex/${encodeURIComponent(caseId)}/${encodeURIComponent(fileId)}.json`, {
                         method: 'PUT',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(value)
                     });
+                    if (!res.ok) {
+                        let detail = '';
+                        try { detail = await res.text(); } catch (e) {}
+                        throw new Error(`فشل حفظ المستند في قاعدة البيانات (HTTP ${res.status})${detail ? ': ' + detail : ''}`);
+                    }
+                    // نتأكد إن القراءة فورًا بعد الكتابة بترجع نفس البيانات فعلاً
+                    // (بيكشف حالات نادرة زي رفض الحجم الكبير من غير ما الـ HTTP status يبين ده بوضوح)
+                    const verify = await fetch(`${FIREBASE_DB_BASE}/documentsIndex/${encodeURIComponent(caseId)}/${encodeURIComponent(fileId)}.json`);
+                    const verifyJson = verify.ok ? await verify.json() : null;
+                    if (!verifyJson || verifyJson.id !== value.id) {
+                        throw new Error('لم يتم التأكد من حفظ المستند بعد الرفع (قد يكون حجم الملف كبيرًا جدًا)');
+                    }
                 }
 
                 async function docDelete(caseId, fileId) {
-                    await fetch(`${FIREBASE_DB_BASE}/documentsIndex/${encodeURIComponent(caseId)}/${encodeURIComponent(fileId)}.json`, {
+                    const res = await fetch(`${FIREBASE_DB_BASE}/documentsIndex/${encodeURIComponent(caseId)}/${encodeURIComponent(fileId)}.json`, {
                         method: 'DELETE'
                     });
+                    if (!res.ok) throw new Error(`فشل حذف المستند (HTTP ${res.status})`);
                 }
 
                 window.electronAPI = {
@@ -8069,7 +8082,7 @@
                         // clear input
                         fileInput.value = '';
                     } else {
-                        showAlert('فشل رفع المستند', 'error');
+                        showAlert('فشل رفع المستند' + (res && res.error ? (': ' + res.error) : ''), 'error');
                         console.error(res && res.error);
                     }
                 };
@@ -8165,7 +8178,7 @@
                         currentFileNameForCustomDoc = null;
                         currentCaseDataForCustomDoc = null;
                     } else {
-                        showAlert('فشل رفع المستند', 'error');
+                        showAlert('فشل رفع المستند' + (res && res.error ? (': ' + res.error) : ''), 'error');
                         console.error(res && res.error);
                     }
                 };
@@ -8245,27 +8258,54 @@
         }
 
         async function viewDocument(caseId, id) {
+            // مهم: لازم نفتح النافذة فورًا وبشكل متزامن (قبل أي await) وإلا متصفحات
+            // الموبايل هتمنعها كـ"نافذة منبثقة" لأنها بقت بعيدة عن ضغطة المستخدم المباشرة.
+            const w = window.open('', '_blank');
+            if (!w) { showAlert('تعذر فتح نافذة العرض، تحقق من إعدادات النوافذ المنبثقة/الحظر في المتصفح', 'warning'); return; }
+            w.document.write('<html dir="rtl"><head><title>جارٍ التحميل...</title></head><body style="font-family:sans-serif;padding:20px;">جارٍ تحميل المستند...</body></html>');
+
             try {
                 const res = await window.electronAPI.readFile({ caseId, id });
-                if (!res || !res.success) { showAlert('تعذر فتح الملف', 'error'); return; }
-                const dataUrl = `data:${res.mime};base64,${res.dataBase64}`;
-                // Open in new window/tab
-                const w = window.open('','_blank');
-                if (!w) { showAlert('تعذر فتح نافذة العرض، تحقق من إعدادات النوافذ المنبثقة', 'warning'); return; }
-                // For images, open in a new tab; for other file types (PDF, DOCX, DOC, etc.) open with the system default app
-                if (res.mime && res.mime.startsWith('image/')) {
-                    w.document.write(`<html dir="rtl"><head><title>${res.name}</title></head><body style="margin:0"><img src="${dataUrl}" style="max-width:100%;height:auto;display:block;margin:0 auto"></body></html>`);
-                } else {
-                    // ask main process to open with default OS program (writes temp file and opens it)
-                    const op = await window.electronAPI.openFileNative({ caseId, id });
-                    if (!op || !op.success) {
-                        // fallback: show download link in new tab
-                        w.document.write(`<html dir="rtl"><head><title>${res.name}</title></head><body style="padding:20px;font-family:sans-serif;"><h3>${res.name}</h3><a id="dl" href="${dataUrl}" download="${res.name}">تحميل الملف</a></body></html>`);
-                    }
-                    // close the blank window we opened (since system app handles display)
-                    try { w.close(); } catch(e){}
+                if (!res || !res.success) {
+                    w.document.open();
+                    w.document.write('<html dir="rtl"><head><title>خطأ</title></head><body style="font-family:sans-serif;padding:20px;">تعذر فتح الملف</body></html>');
+                    w.document.close();
+                    showAlert('تعذر فتح الملف', 'error');
+                    return;
                 }
-            } catch (e) { console.error(e); showAlert('خطأ عرض المستند', 'error'); }
+                const dataUrl = `data:${res.mime};base64,${res.dataBase64}`;
+
+                if (res.mime && res.mime.startsWith('image/')) {
+                    w.document.open();
+                    w.document.write(`<html dir="rtl"><head><title>${res.name}</title></head><body style="margin:0"><img src="${dataUrl}" style="max-width:100%;height:auto;display:block;margin:0 auto"></body></html>`);
+                    w.document.close();
+                } else if (res.mime === 'application/pdf') {
+                    // عرض ملفات PDF مباشرة داخل النافذة
+                    w.document.open();
+                    w.document.write(`<html dir="rtl"><head><title>${res.name}</title></head><body style="margin:0"><embed src="${dataUrl}" type="application/pdf" style="width:100%;height:100vh;border:none;"></body></html>`);
+                    w.document.close();
+                } else {
+                    // ask main process to open with default OS program (Electron desktop only)
+                    const op = await window.electronAPI.openFileNative({ caseId, id });
+                    if (op && op.success) {
+                        // نجح فتح الملف بالبرنامج الافتراضي على سطح المكتب - نقفل النافذة الفارغة
+                        try { w.close(); } catch (e) {}
+                    } else {
+                        // على الموبايل/المتصفح: اعرض رابط تحميل/عرض داخل نفس النافذة (بدون إغلاقها)
+                        w.document.open();
+                        w.document.write(`<html dir="rtl"><head><title>${res.name}</title></head><body style="padding:20px;font-family:sans-serif;"><h3>${res.name}</h3><p>هذا النوع من الملفات لا يمكن عرضه مباشرة داخل المتصفح.</p><a id="dl" href="${dataUrl}" download="${res.name}" style="display:inline-block;padding:10px 18px;background:#0b3d91;color:#fff;border-radius:6px;text-decoration:none;">تحميل الملف</a></body></html>`);
+                        w.document.close();
+                    }
+                }
+            } catch (e) {
+                console.error(e);
+                try {
+                    w.document.open();
+                    w.document.write('<html dir="rtl"><head><title>خطأ</title></head><body style="font-family:sans-serif;padding:20px;">حدث خطأ أثناء عرض المستند</body></html>');
+                    w.document.close();
+                } catch (_) {}
+                showAlert('خطأ عرض المستند', 'error');
+            }
         }
 
         async function downloadDocument(caseId, id) {
