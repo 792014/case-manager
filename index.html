@@ -3335,23 +3335,22 @@
 
     <script>
         // ==================== إعدادات المزامنة عبر Firebase ====================
-        // بيانات القضايا بتتخزن في قاعدة بيانات Firebase Realtime Database
-        // تحت المسار caseData، وده بيسمح بمزامنة حقيقية بين اللاب توب والموبايل
-        // من أي مكان عبر الإنترنت (مش بس نفس الواي فاي).
+        // بيانات القضايا بتتخزن في جذر قاعدة بيانات Firebase Realtime Database مباشرة
+        // (cases, favorableJudgments, againstJudgments... في المستوى الأول)، وده
+        // بيسمح بمزامنة حقيقية بين اللاب توب والموبايل من أي مكان عبر الإنترنت.
         const FIREBASE_DB_BASE = 'https://case-manager-32abd-default-rtdb.firebaseio.com';
-        const FIREBASE_DATA_PATH = 'caseData';
         // ملحوظة: مفتاح الـ apiKey هنا خاص بإعدادات مشروع Firebase على الويب
         // وليس سرًّا حساسًا (هذا طبيعي في تطبيقات Firebase من جهة العميل)، لكن
         // الحماية الفعلية للبيانات بتتحدد من "Rules" قاعدة البيانات في لوحة تحكم Firebase.
-        const API_BASE_URL = `${FIREBASE_DB_BASE}/${FIREBASE_DATA_PATH}`;
+        const API_BASE_URL = FIREBASE_DB_BASE;
 
         // دوال API — بتتكلم مع Firebase Realtime Database عن طريق REST مباشرة
-        // (GET لجلب البيانات، PUT للكتابة/الاستبدال الكامل لنفس المسار)
+        // (GET لجلب البيانات، PUT للكتابة/الاستبدال الكامل لجذر القاعدة)
         async function apiRequest(endpoint, options = {}) {
             try {
                 const method = (options.method || 'GET').toUpperCase();
-                // Firebase REST يتطلب لاحقة .json على المسار
-                const url = `${API_BASE_URL}.json`;
+                // Firebase REST يتطلب لاحقة .json على المسار (هنا: جذر القاعدة)
+                const url = `${API_BASE_URL}/.json`;
 
                 const response = await fetch(url, {
                     // أي حفظ (كان في الأصل POST) لازم يبقى PUT عشان يستبدل نفس
@@ -3378,6 +3377,168 @@
                 // Fallback to localStorage if API fails
                 return null;
             }
+        }
+
+        // ==================== تخزين المستندات على الموبايل/الويب ====================
+        // في نسخة سطح المكتب (Electron)، الملفات بتتحفظ في مجلد على اللاب توب عن
+        // طريق window.electronAPI. الكائن ده مش موجود في المتصفح (موبايل أو ويب)،
+        // فبنعمل نسخة بديلة منه بنفس الأسماء والشكل بالظبط، لكن بتخزن الملفات
+        // مباشرة في نفس قاعدة بيانات Firebase Realtime Database المستخدمة للبيانات
+        // (مجانية بالكامل على خطة Spark، من غير أي حاجة لبطاقة ائتمان أو خطة Blaze).
+        // ملحوظة: كل مستند بيتحفظ كنص Base64 داخل قاعدة البيانات نفسها، فيُفضّل
+        // إبقاء حجم كل مستند معقول (أقل من ٥ ميجا تقريبًا) لأفضل أداء.
+
+        if (!window.electronAPI) {
+            (function setupWebDocumentStorage() {
+                function guessMimeType(filename) {
+                    const ext = (filename.split('.').pop() || '').toLowerCase();
+                    const map = {
+                        pdf: 'application/pdf',
+                        doc: 'application/msword',
+                        docx: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                        xls: 'application/vnd.ms-excel',
+                        xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                        png: 'image/png',
+                        jpg: 'image/jpeg',
+                        jpeg: 'image/jpeg',
+                        gif: 'image/gif',
+                        webp: 'image/webp',
+                        txt: 'text/plain'
+                    };
+                    return map[ext] || 'application/octet-stream';
+                }
+
+                function base64ToBlob(base64, mime) {
+                    const binary = atob(base64);
+                    const bytes = new Uint8Array(binary.length);
+                    for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+                    return new Blob([bytes], { type: mime });
+                }
+
+                async function docGet(caseId, fileId) {
+                    const res = await fetch(`${FIREBASE_DB_BASE}/documentsIndex/${encodeURIComponent(caseId)}/${encodeURIComponent(fileId)}.json`);
+                    if (!res.ok) return null;
+                    return await res.json();
+                }
+
+                async function docListMeta(caseId) {
+                    // بنجيب كل مستندات القضية دي (بما فيها محتوى الملف Base64) لأن
+                    // Firebase REST البسيط مش بيدعم استرجاع حقول جزئية فقط.
+                    const res = await fetch(`${FIREBASE_DB_BASE}/documentsIndex/${encodeURIComponent(caseId)}.json`);
+                    if (!res.ok) return {};
+                    const json = await res.json();
+                    return json || {};
+                }
+
+                async function docSet(caseId, fileId, value) {
+                    await fetch(`${FIREBASE_DB_BASE}/documentsIndex/${encodeURIComponent(caseId)}/${encodeURIComponent(fileId)}.json`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(value)
+                    });
+                }
+
+                async function docDelete(caseId, fileId) {
+                    await fetch(`${FIREBASE_DB_BASE}/documentsIndex/${encodeURIComponent(caseId)}/${encodeURIComponent(fileId)}.json`, {
+                        method: 'DELETE'
+                    });
+                }
+
+                window.electronAPI = {
+                    async saveFile({ caseId, filename, dataBase64, docType, caseData }) {
+                        try {
+                            const mime = guessMimeType(filename);
+                            const fileId = `${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+
+                            await docSet(caseId, fileId, {
+                                id: fileId,
+                                originalName: filename,
+                                type: docType || '',
+                                uploadedAt: Date.now(),
+                                mime,
+                                dataBase64,
+                                caseData: caseData || null
+                            });
+
+                            return { success: true };
+                        } catch (e) {
+                            console.error('saveFile (web) error:', e);
+                            return { success: false, error: e.message };
+                        }
+                    },
+
+                    async listFiles({ caseId }) {
+                        try {
+                            const meta = await docListMeta(caseId);
+                            // بنشيل حقل dataBase64 الثقيل من القائمة، وبنجيبه بس وقت
+                            // العرض/التحميل الفعلي عن طريق readFile/downloadFile
+                            const files = Object.values(meta || {})
+                                .map(f => ({ id: f.id, originalName: f.originalName, type: f.type, uploadedAt: f.uploadedAt }))
+                                .sort((a, b) => (a.uploadedAt || 0) - (b.uploadedAt || 0));
+                            return { success: true, files };
+                        } catch (e) {
+                            console.error('listFiles (web) error:', e);
+                            return { success: false, files: [] };
+                        }
+                    },
+
+                    async readFile({ caseId, id }) {
+                        try {
+                            const f = await docGet(caseId, id);
+                            if (!f) throw new Error('file-not-found');
+                            return { success: true, mime: f.mime, dataBase64: f.dataBase64, name: f.originalName };
+                        } catch (e) {
+                            console.error('readFile (web) error:', e);
+                            return { success: false, error: e.message };
+                        }
+                    },
+
+                    async deleteFile({ caseId, id }) {
+                        try {
+                            await docDelete(caseId, id);
+                            return { success: true };
+                        } catch (e) {
+                            console.error('deleteFile (web) error:', e);
+                            return { success: false, error: e.message };
+                        }
+                    },
+
+                    async downloadFile({ caseId, id }) {
+                        try {
+                            const f = await docGet(caseId, id);
+                            if (!f) throw new Error('file-not-found');
+                            const blob = base64ToBlob(f.dataBase64, f.mime);
+                            const objectUrl = URL.createObjectURL(blob);
+                            const a = document.createElement('a');
+                            a.href = objectUrl;
+                            a.download = f.originalName || 'document';
+                            document.body.appendChild(a);
+                            a.click();
+                            a.remove();
+                            setTimeout(() => URL.revokeObjectURL(objectUrl), 5000);
+                            return { success: true };
+                        } catch (e) {
+                            console.error('downloadFile (web) error:', e);
+                            return { success: false, error: e.message };
+                        }
+                    },
+
+                    // فتح الملف بتطبيق النظام الافتراضي مش متاح من داخل المتصفح؛
+                    // بيرجع success:false عشان الكود الأصلي يعرض رابط تحميل بديل تلقائيًا
+                    async openFileNative() {
+                        return { success: false, error: 'not-applicable-web' };
+                    },
+
+                    async chooseStorageFolder() {
+                        showAlert('على الموبايل/المتصفح، المستندات بتتخزن تلقائيًا في قاعدة البيانات السحابية، مفيش داعي لاختيار مجلد', 'info');
+                        return { success: false, error: 'not-applicable-web' };
+                    },
+
+                    async getStoragePath() {
+                        return { success: true, path: 'التخزين السحابي (قاعدة البيانات)' };
+                    }
+                };
+            })();
         }
 
         async function loadDataFromAPI() {
