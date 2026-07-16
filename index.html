@@ -2152,8 +2152,9 @@
                     </div>
                 </div>
 
-                <div style="display:flex;gap:8px;align-items:center;margin-top:6px;">
+                <div style="display:flex;gap:8px;align-items:center;margin-top:6px;flex-wrap:wrap;">
                     <button type="button" id="choose-storage-btn" class="btn-info">اختيار مجلد التخزين</button>
+                    <button type="button" id="scan-import-btn" class="btn-info" style="background:#0b3d91;">مسح ومطابقة المستندات الموجودة</button>
                     <div id="storage-path-display" style="font-size:12px;color:#444;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:600px;"></div>
                 </div>
                 
@@ -8584,6 +8585,270 @@
                 }
             } catch (e) { if (display) display.textContent = '(خطأ في جلب مسار التخزين)'; }
         })();
+
+        // مسح مجلد التخزين ومطابقة المجلدات الموجودة بالفعل مع القضايا المسجلة
+        (function initScanImportUI(){
+            const scanBtn = document.getElementById('scan-import-btn');
+            if (!scanBtn) return;
+
+            scanBtn.addEventListener('click', async () => {
+                if (!window.electronAPI || !window.electronAPI.scanStorageFolders) {
+                    showAlert('هذه الميزة متاحة فقط في نسخة اللاب توب (سطح المكتب)', 'warning');
+                    return;
+                }
+
+                scanBtn.disabled = true;
+                const originalText = scanBtn.textContent;
+                scanBtn.textContent = 'جارٍ المسح...';
+
+                try {
+                    // نجبر إعادة تحميل أحدث بيانات القضايا الأول، عشان نضمن
+                    // إن المطابقة بتتم على بيانات كاملة ومحدثة مهما كان
+                    // توقيت الضغط على الزرار (حتى لو البرنامج لسه بيحمّل)
+                    try { await loadDataFromAPI(); } catch (e) { console.warn('تعذر تحديث بيانات القضايا قبل المسح:', e); }
+
+                    const scanRes = await window.electronAPI.scanStorageFolders();
+                    if (!scanRes || !scanRes.success) {
+                        showAlert('فشل مسح مجلد التخزين: ' + (scanRes && scanRes.error ? scanRes.error : ''), 'danger');
+                        return;
+                    }
+
+                    const folders = scanRes.folders || [];
+                    if (folders.length === 0) {
+                        showAlert('لم يتم العثور على أي مجلدات داخل مجلد التخزين المختار', 'warning');
+                        return;
+                    }
+
+                    // كل القضايا المتاحة للمطابقة (الحالية والمؤرشفة)
+                    const allCases = [...(cases || []), ...(archivedCases || [])];
+
+                    // مقارنة رقمية مرنة: بتتجاهل المسافات والأصفار الزيادة
+                    // في البداية (مثلاً "08" هتتطابق مع "8")
+                    function numbersMatch(a, b) {
+                        const sa = String(a || '').trim();
+                        const sb = String(b || '').trim();
+                        if (!sa || !sb) return false;
+                        if (sa === sb) return true;
+                        const na = parseInt(sa, 10);
+                        const nb = parseInt(sb, 10);
+                        return !isNaN(na) && !isNaN(nb) && na === nb;
+                    }
+
+                    function normalizeForMatch(s) {
+                        return String(s || '').trim().replace(/\s+/g, ' ');
+                    }
+
+                    // بيدور على القضية المطابقة لاسم مجلد معين. المرحلة 1:
+                    // مطابقة بادئة اسم المدعي + المدعي عليه (الأسلوب الثابت
+                    // اللي بتتسمى بيه كل المجلدات يدويًا). المرحلة 2 (لو
+                    // مالقيناش): مطابقة مرنة برقم وسنة الدعوى في أي مكان
+                    // داخل اسم المجلد، سواء قبل بعض أو بعد بعض.
+                    function findCaseForFolder(folderName) {
+                        for (const c of allCases) {
+                            const plaintiff = normalizeForMatch(c.plaintiff);
+                            const defendant = normalizeForMatch(c.defendant);
+                            if (!plaintiff || !defendant) continue;
+                            const prefix = `${plaintiff}_${defendant}`;
+                            if (folderName.indexOf(prefix) === 0) return c;
+                        }
+
+                        const tokens = folderName.split(/[_\-\s]+/);
+                        for (let i = 0; i < tokens.length; i++) {
+                            if (!/^\d{4}$/.test(tokens[i])) continue;
+                            const yearCandidate = tokens[i];
+                            const before = tokens[i - 1];
+                            const after = tokens[i + 1];
+                            const numberCandidate = (before && /^\d+$/.test(before)) ? before
+                                : ((after && /^\d+$/.test(after)) ? after : null);
+                            if (!numberCandidate) continue;
+                            const match = allCases.find(c =>
+                                numbersMatch(c.number || c.caseNumber, numberCandidate) &&
+                                numbersMatch(c.year || c.caseYear, yearCandidate)
+                            );
+                            if (match) return match;
+                        }
+                        return null;
+                    }
+
+                    let matchedCount = 0;
+                    let importedFilesCount = 0;
+                    let unmatchedFolders = [];
+
+                    for (const folder of folders) {
+                        const matchedCase = findCaseForFolder(folder.folderName);
+
+                        if (!matchedCase) {
+                            unmatchedFolders.push(folder.folderName);
+                            continue;
+                        }
+
+                        const importRes = await window.electronAPI.importCaseFolder({
+                            caseId: matchedCase.id,
+                            folderName: folder.folderName
+                        });
+
+                        if (importRes && importRes.success) {
+                            matchedCount++;
+                            importedFilesCount += (importRes.addedCount || 0);
+                        }
+                    }
+
+                    let summary = `تم فحص ${folders.length} مجلد. تمت مطابقة واستيراد مستندات ${matchedCount} قضية (${importedFilesCount} مستند جديد).`;
+
+                    if (unmatchedFolders.length > 0) {
+                        showAlert(matchedCount > 0 ? 'تم الاستيراد بنجاح، وهناك مجلدات تحتاج مطابقة يدوية' : 'لم يتم إيجاد مطابقة تلقائية لبعض المجلدات', 'warning');
+
+                        const wantsManual = confirm(
+                            summary + `\n\nهل تريد فتح شاشة لمطابقة الـ ${unmatchedFolders.length} مجلد المتبقية يدويًا الآن؟`
+                        );
+
+                        if (wantsManual) {
+                            const selections = await showManualMatchModal(unmatchedFolders, allCases);
+                            let manualMatchedCount = 0;
+                            let manualImportedFilesCount = 0;
+
+                            for (const sel of selections) {
+                                const importRes = await window.electronAPI.importCaseFolder({
+                                    caseId: sel.caseId,
+                                    folderName: sel.folderName
+                                });
+                                if (importRes && importRes.success) {
+                                    manualMatchedCount++;
+                                    manualImportedFilesCount += (importRes.addedCount || 0);
+                                }
+                            }
+
+                            if (manualMatchedCount > 0) {
+                                showAlert(`تم استيراد مستندات ${manualMatchedCount} قضية إضافية يدويًا (${manualImportedFilesCount} مستند)`, 'success');
+                            }
+
+                            const stillUnmatched = unmatchedFolders.filter(f => !selections.find(s => s.folderName === f));
+                            if (stillUnmatched.length > 0) {
+                                alert(`تم تجاهل أو عدم مطابقة ${stillUnmatched.length} مجلد:\n` + stillUnmatched.slice(0, 20).join('\n'));
+                            }
+                        }
+                    } else {
+                        showAlert('تم الاستيراد بنجاح', 'success');
+                        alert(summary);
+                    }
+
+                } catch (e) {
+                    console.error(e);
+                    showAlert('حدث خطأ أثناء المسح والاستيراد: ' + e.message, 'danger');
+                } finally {
+                    scanBtn.disabled = false;
+                    scanBtn.textContent = originalText;
+                }
+            });
+        })();
+
+        // شاشة مطابقة يدوية: بتعرض كل مجلد ملقاش قضية مطابقة تلقائيًا،
+        // مع قائمة منسدلة لاختيار القضية الصحيحة يدويًا (أو تجاهله)
+        function showManualMatchModal(unmatchedFolders, allCases) {
+            return new Promise((resolve) => {
+                const overlay = document.createElement('div');
+                overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:99999;display:flex;align-items:center;justify-content:center;padding:20px;';
+
+                const box = document.createElement('div');
+                box.style.cssText = 'background:#fff;border-radius:10px;padding:20px;max-width:750px;width:100%;max-height:85vh;overflow:auto;direction:rtl;';
+
+                const title = document.createElement('h3');
+                title.style.cssText = 'margin-top:0;';
+                title.textContent = `مطابقة يدوية لـ ${unmatchedFolders.length} مجلد`;
+                box.appendChild(title);
+
+                const desc = document.createElement('p');
+                desc.style.cssText = 'font-size:13px;color:#555;margin-top:-8px;';
+                desc.textContent = 'البرنامج بيقترح تلقائيًا أقرب قضية محتملة لكل مجلد (معلّمة بـ ⭐ ومختارة مسبقًا) — راجعها وأكدها أو غيّرها لو غلط، أو اختر "تجاهل" لو مفيش قضية مناسبة.';
+                box.appendChild(desc);
+
+                const rows = [];
+                unmatchedFolders.forEach((folderName) => {
+                    const row = document.createElement('div');
+                    row.style.cssText = 'margin-bottom:12px;padding:10px;border:1px solid #eee;border-radius:6px;background:#fafafa;';
+
+                    const label = document.createElement('div');
+                    label.style.cssText = 'font-weight:bold;margin-bottom:6px;word-break:break-all;font-size:13px;';
+                    label.textContent = folderName;
+                    row.appendChild(label);
+
+                    // اقتراح تلقائي: بندور على أقرب قضية محتملة بعدد الكلمات
+                    // المشتركة بين اسم المجلد واسم المدعي/المدعى عليه، عشان
+                    // نساعد المستخدم بدل ما يدور من الصفر في قائمة طويلة
+                    const folderWords = new Set(folderName.replace(/[_\-]/g, ' ').split(/\s+/).filter(w => w.length >= 2));
+                    let bestCase = null;
+                    let bestScore = 0;
+                    allCases.forEach(c => {
+                        const caseWords = `${c.plaintiff || ''} ${c.defendant || ''}`.split(/\s+/).filter(w => w.length >= 2);
+                        let score = 0;
+                        caseWords.forEach(w => { if (folderWords.has(w)) score++; });
+                        if (score > bestScore) { bestScore = score; bestCase = c; }
+                    });
+                    const suggestedCase = bestScore >= 2 ? bestCase : null;
+
+                    const select = document.createElement('select');
+                    select.style.cssText = 'width:100%;padding:7px;border-radius:5px;border:1px solid #ccc;';
+                    const optSkip = document.createElement('option');
+                    optSkip.value = '';
+                    optSkip.textContent = '-- تجاهل هذا المجلد --';
+                    select.appendChild(optSkip);
+
+                    // نحط القضية المقترحة في أول القائمة (لو لقينا واحدة)
+                    // عشان تبقى قدام عين المستخدم على طول
+                    const orderedCases = suggestedCase
+                        ? [suggestedCase, ...allCases.filter(c => c !== suggestedCase)]
+                        : allCases;
+
+                    orderedCases.forEach(c => {
+                        const opt = document.createElement('option');
+                        opt.value = c.id;
+                        const num = c.number || c.caseNumber || '؟';
+                        const yr = c.year || c.caseYear || '؟';
+                        const isSuggested = c === suggestedCase;
+                        opt.textContent = `${isSuggested ? '⭐ ' : ''}${c.plaintiff || '(بدون اسم)'} ضد ${c.defendant || '(بدون اسم)'} - رقم ${num} لسنة ${yr}`;
+                        select.appendChild(opt);
+                    });
+
+                    if (suggestedCase) {
+                        select.value = suggestedCase.id;
+                        row.style.borderColor = '#8bc34a';
+                        row.style.background = '#f5fbf0';
+                    }
+
+                    row.appendChild(select);
+                    box.appendChild(row);
+                    rows.push({ folderName, select });
+                });
+
+                const btnRow = document.createElement('div');
+                btnRow.style.cssText = 'display:flex;gap:8px;justify-content:flex-end;margin-top:10px;position:sticky;bottom:0;background:#fff;padding-top:10px;';
+
+                const btnCancel = document.createElement('button');
+                btnCancel.type = 'button';
+                btnCancel.textContent = 'إلغاء (بدون استيراد)';
+                btnCancel.className = 'btn-danger';
+                btnCancel.onclick = () => { document.body.removeChild(overlay); resolve([]); };
+
+                const btnImport = document.createElement('button');
+                btnImport.type = 'button';
+                btnImport.textContent = 'استيراد المحدد';
+                btnImport.className = 'btn-success';
+                btnImport.onclick = () => {
+                    const selections = rows
+                        .filter(r => r.select.value)
+                        .map(r => ({ folderName: r.folderName, caseId: r.select.value }));
+                    document.body.removeChild(overlay);
+                    resolve(selections);
+                };
+
+                btnRow.appendChild(btnCancel);
+                btnRow.appendChild(btnImport);
+                box.appendChild(btnRow);
+
+                overlay.appendChild(box);
+                document.body.appendChild(overlay);
+            });
+        }
 
         // تمكين اللصق من الحافظة داخل أي حقل نصي حتى لو منعت جهة أخرى الحدث
         document.addEventListener('paste', async function(e){
