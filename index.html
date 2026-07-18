@@ -8266,6 +8266,30 @@
             w.document.write('<html dir="rtl"><head><title>جارٍ التحميل...</title></head><body style="font-family:sans-serif;padding:20px;">جارٍ تحميل المستند...</body></html>');
 
             try {
+                // في نسخة اللاب توب (Electron): نفتح الملف مباشرة من على القرص
+                // برابط file:// بدل ما نحوّله لنص Base64 طويل وندسّه في رابط
+                // data:. الطريقة القديمة كانت بتفشل بصمت مع الملفات الكبيرة
+                // (زي مستندات PDF كبيرة الحجم) لأن رابط الـ data: بيتجاوز
+                // الحد الأقصى لطول الروابط اللي المتصفح بيقبله.
+                if (window.electronAPI && window.electronAPI.getFileUrl) {
+                    const urlRes = await window.electronAPI.getFileUrl({ caseId, id });
+                    if (urlRes && urlRes.success) {
+                        if (urlRes.mime && (urlRes.mime.startsWith('image/') || urlRes.mime === 'application/pdf')) {
+                            w.location.href = urlRes.url;
+                            return;
+                        }
+                        // أنواع الملفات التانية (Word, Excel...): افتحها بالبرنامج
+                        // الافتراضي المثبت على الجهاز
+                        const op = await window.electronAPI.openFileNative({ caseId, id });
+                        if (op && op.success) {
+                            try { w.close(); } catch (e) {}
+                            return;
+                        }
+                        // لو فشلت المحاولتين، نكمل تحت للطريقة الاحتياطية
+                    }
+                }
+
+                // طريقة احتياطية (متصفح/موبايل، أو لو فشلت الطريقة أعلاه لأي سبب)
                 const res = await window.electronAPI.readFile({ caseId, id });
                 if (!res || !res.success) {
                     w.document.open();
@@ -8281,10 +8305,11 @@
                     w.document.write(`<html dir="rtl"><head><title>${res.name}</title></head><body style="margin:0"><img src="${dataUrl}" style="max-width:100%;height:auto;display:block;margin:0 auto"></body></html>`);
                     w.document.close();
                 } else if (res.mime === 'application/pdf') {
-                    // عرض ملفات PDF مباشرة داخل النافذة
-                    w.document.open();
-                    w.document.write(`<html dir="rtl"><head><title>${res.name}</title></head><body style="margin:0"><embed src="${dataUrl}" type="application/pdf" style="width:100%;height:100vh;border:none;"></body></html>`);
-                    w.document.close();
+                    // مهم: التنقل المباشر لرابط الملف (بدل كتابة وسم <embed>)
+                    // هو اللي بيفعّل عارض PDF المدمج جوه Electron/Chromium
+                    // تلقائيًا. وسم <embed> لوحده مابيشتغلش مع عارض PDF
+                    // المدمج، وده اللي كان بيسبب ظهور صفحة بيضاء فاضية.
+                    w.location.href = dataUrl;
                 } else {
                     // ask main process to open with default OS program (Electron desktop only)
                     const op = await window.electronAPI.openFileNative({ caseId, id });
@@ -8619,8 +8644,22 @@
                         return;
                     }
 
-                    // كل القضايا المتاحة للمطابقة (الحالية والمؤرشفة)
-                    const allCases = [...(cases || []), ...(archivedCases || [])];
+                    // كل القضايا المتاحة للمطابقة من كل التصنيفات (مش بس
+                    // الحالية والمؤرشفة) — لازم نضم الأحكام والقضايا
+                    // المحجوزة والملغاة والموقوفة كمان، وإلا هتفضل قضايا
+                    // كتير مش ظاهرة في المطابقة خالص.
+                    // ملحوظة: سجلات الأحكام (لصالح/ضد) بتحتفظ بمعرف القضية
+                    // الأصلية في حقل caseId منفصل عن id بتاعها هي، فلازم
+                    // نستخدمه عشان المستندات تتسجل تحت القضية الصح.
+                    const allCases = [
+                        ...(cases || []),
+                        ...(archivedCases || []),
+                        ...(reservedCases || []),
+                        ...(cancelledCases || []),
+                        ...(suspendedCases || []),
+                        ...(favorableJudgments || []).map(j => ({ ...j, id: j.caseId || j.id })),
+                        ...(againstJudgments || []).map(j => ({ ...j, id: j.caseId || j.id }))
+                    ];
 
                     // مقارنة رقمية مرنة: بتتجاهل المسافات والأصفار الزيادة
                     // في البداية (مثلاً "08" هتتطابق مع "8")
@@ -8774,12 +8813,28 @@
 
                     // اقتراح تلقائي: بندور على أقرب قضية محتملة بعدد الكلمات
                     // المشتركة بين اسم المجلد واسم المدعي/المدعى عليه، عشان
-                    // نساعد المستخدم بدل ما يدور من الصفر في قائمة طويلة
-                    const folderWords = new Set(folderName.replace(/[_\-]/g, ' ').split(/\s+/).filter(w => w.length >= 2));
+                    // نساعد المستخدم بدل ما يدور من الصفر في قائمة طويلة.
+                    // بنستبعد الكلمات الشائعة جدًا في الأسماء العربية (زي
+                    // "عبد"، "محمد"، "احمد"...) من الحساب، عشان متديش نتيجة
+                    // عالية غلط لقضية مالهاش علاقة غير إنها بتشترك في كلمة
+                    // شائعة بس.
+                    const COMMON_NAME_WORDS = new Set([
+                        'عبد', 'محمد', 'احمد', 'أحمد', 'علي', 'حسن', 'حسين',
+                        'محمود', 'ابراهيم', 'إبراهيم', 'عمر', 'يوسف', 'السيد',
+                        'سيد', 'بن', 'بنت', 'عبدالله', 'عبدالرحمن', 'مصطفى',
+                        'خالد', 'سعيد', 'وزير', 'رئيس', 'محافظ', 'ضد', 'وكيل',
+                        'وزارة', 'مجلس', 'الوحدة', 'المحلية', 'العام', 'قسم'
+                    ]);
+
+                    const folderWords = new Set(
+                        folderName.replace(/[_\-]/g, ' ').split(/\s+/)
+                            .filter(w => w.length >= 2 && !COMMON_NAME_WORDS.has(w))
+                    );
                     let bestCase = null;
                     let bestScore = 0;
                     allCases.forEach(c => {
-                        const caseWords = `${c.plaintiff || ''} ${c.defendant || ''}`.split(/\s+/).filter(w => w.length >= 2);
+                        const caseWords = `${c.plaintiff || ''} ${c.defendant || ''}`.split(/\s+/)
+                            .filter(w => w.length >= 2 && !COMMON_NAME_WORDS.has(w));
                         let score = 0;
                         caseWords.forEach(w => { if (folderWords.has(w)) score++; });
                         if (score > bestScore) { bestScore = score; bestCase = c; }
