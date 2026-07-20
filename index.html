@@ -71,6 +71,7 @@
                     'fa-whatsapp': '💬',
                     'fa-code': '💻',
                     'fa-balance-scale': '⚖️',
+                    'fa-scale-balanced': '⚖️',
                     'fa-tachometer-alt': '📊'
                 };
 
@@ -126,9 +127,11 @@
     
     <style>
         :root {
-            --primary-color: #0b3d91; /* deeper professional blue */
+            --primary-color: #0b3d91;
             --secondary-color: #1976d2;
             --accent-color: #29b6f6;
+            --luxury-gold: #0b3d91;
+            --luxury-gold-light: #1976d2;
             --light-color: #f8f9fa;
             --dark-color: #2c3e50;
             --danger-color: #e74c3c;
@@ -161,6 +164,7 @@
             color: var(--dark-color);
             line-height: 1.6;
             position: relative;
+            padding-bottom: 56px; /* حجز مساحة لفوتر المطور الثابت في الأسفل حتى لا يغطي المحتوى */
         }
         
         .container {
@@ -299,15 +303,22 @@
         @keyframes slideUpFade { from { transform: translateY(8px); opacity: 0 } to { transform: translateY(0); opacity: 1 } }
         
         .logo {
-            width: 56px !important;
-            height: 56px !important;
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            border-radius: 12px;
+            width: 82px !important;
+            height: 82px !important;
+            background: #ffffff;
+            border-radius: 14px;
             display: flex;
             align-items: center;
             justify-content: center;
             box-shadow: 0 6px 18px rgba(11,61,145,0.18);
-            border: 1px solid rgba(255,255,255,0.08);
+            border: 1px solid rgba(11,61,145,0.2);
+            padding: 4px;
+        }
+
+        .logo-img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
         }
 
         .logo i {
@@ -918,16 +929,16 @@
         .modal {
             display: none;
             position: fixed;
-            top: 0;
-            left: 0;
+            inset: 0;
             width: 100%;
             height: 100%;
+            height: 100dvh;
             background-color: rgba(0,0,0,0.5);
             z-index: 1000;
-            justify-content: center;
-            align-items: center;
+            align-items: flex-start; /* يمنع تمدد النافذة لملء الشاشة رأسيًا (وهو ما كان يسبب خلل الانكماش) */
             overflow-y: auto;
-            padding: 20px 0;
+            -webkit-overflow-scrolling: touch;
+            box-sizing: border-box;
             animation: fadeIn 0.3s ease;
         }
         
@@ -935,11 +946,15 @@
             background-color: white;
             padding: 25px;
             border-radius: 10px;
-            width: 90%;
-            max-width: 800px;
+            width: min(800px, 92vw) !important;
+            max-width: min(800px, 92vw) !important;
             box-shadow: 0 10px 30px rgba(0,0,0,0.2);
             max-height: 90vh;
+            max-height: 90dvh;
             overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            box-sizing: border-box;
+            margin: 20px auto; /* توسيط أفقي مضمون بطريقة الهوامش التلقائية بدل الاعتماد على flexbox */
             animation: modalSlideIn 0.3s ease;
         }
         
@@ -1564,6 +1579,22 @@
             font-size: 24px;
         }
 
+        /* شارة دائرية فاخرة لأيقونة لوحة التحكم (ميزان العدالة) */
+        .dashboard-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: var(--luxury-gold-light);
+            font-size: 19px;
+            box-shadow: 0 4px 12px rgba(11,61,145,0.2), inset 0 0 0 2px rgba(255,255,255,0);
+            vertical-align: middle;
+            margin-left: 8px;
+        }
+
         /* professional colored icon badges */
         .icon-badge {
             display: inline-flex;
@@ -1772,6 +1803,37 @@
         }
         
         @media (max-width: 768px) {
+            body {
+                padding-bottom: 64px;
+            }
+
+            .modal {
+                padding: 8px 0;
+                align-items: flex-start;
+            }
+
+            .modal-content {
+                width: 94vw !important;
+                max-width: 94vw !important;
+                padding: 14px;
+                max-height: calc(100vh - 24px);
+                max-height: calc(100dvh - 24px); /* يراعي شريط عنوان المتصفح على الموبايل */
+                margin: 8px auto;
+                border-radius: 8px;
+                box-sizing: border-box;
+            }
+
+            .modal-header {
+                padding-bottom: 10px;
+                margin-bottom: 12px;
+            }
+
+            .modal-content table {
+                display: block;
+                overflow-x: auto;
+                white-space: nowrap;
+            }
+
             .form-row {
                 flex-direction: column;
                 gap: 0;
@@ -1843,12 +1905,12 @@
             }
             
             .logo {
-                width: 45px !important;
-                height: 45px !important;
+                width: 62px !important;
+                height: 62px !important;
             }
             
             .logo i {
-                font-size: 22px !important;
+                font-size: 28px !important;
             }
             
             .header-text h1 {
@@ -1874,6 +1936,36 @@
         }
         
         @media (max-width: 480px) {
+            body {
+                padding-bottom: 72px;
+            }
+
+            .modal-content {
+                width: 96vw !important;
+                max-width: 96vw !important;
+                margin: 6px auto;
+                padding: 10px;
+                font-size: 14px;
+                box-sizing: border-box;
+            }
+
+            .modal-header h2, .modal-header h3 {
+                font-size: 16px;
+            }
+
+            .global-developer-footer {
+                padding: 6px 4px;
+            }
+
+            .global-developer-footer .developer-info {
+                font-size: 9.5px;
+                gap: 3px;
+            }
+
+            .global-developer-footer .developer-rights {
+                display: none; /* إخفاء أقل عنصر أهمية على الشاشات الصغيرة جدًا لتفادي تكدس النص */
+            }
+
             .header-text h1 {
                 font-size: 16px !important;
             }
@@ -1883,12 +1975,12 @@
             }
             
             .logo {
-                width: 40px !important;
-                height: 40px !important;
+                width: 52px !important;
+                height: 52px !important;
             }
             
             .logo i {
-                font-size: 20px !important;
+                font-size: 24px !important;
             }
         }
     </style>
@@ -1960,7 +2052,8 @@
             <!-- الشعار في المنتصف -->
             <div class="logo-container">
                 <div class="logo">
-                    <i class="fas fa-balance-scale icon-primary"></i>
+                    <img src="icon-512.png" alt="شعار هيئة قضايا الدولة" class="logo-img"
+                         onerror="this.onerror=null;this.replaceWith(Object.assign(document.createElement('i'),{className:'fas fa-balance-scale icon-primary'}));">
                 </div>
                 <div class="header-text">
                     <h1>نظام إدارة القضايا</h1>
@@ -1972,7 +2065,7 @@
         <!-- باقي كود التطبيق -->
         <nav>
             <ul>
-                <li><a href="#" class="nav-link active" data-section="dashboard"><i class="fas fa-tachometer-alt icon-large icon-primary"></i> لوحة التحكم</a></li>
+                <li><a href="#" class="nav-link active" data-section="dashboard"><i class="fas fa-scale-balanced icon-large icon-primary"></i> لوحة التحكم</a></li>
                 <li><a href="#" class="nav-link" data-section="add-case"><i class="fas fa-plus-circle icon-large icon-green"></i> إضافة قضية</a></li>
                 <li><a href="#" class="nav-link" data-section="cases-list"><i class="fas fa-list-alt icon-large icon-blue"></i> قائمة القضايا</a></li>
                 <li><a href="#" class="nav-link" data-section="bulk-sessions"><i class="fas fa-calendar-check icon-large icon-orange"></i> ترحيل الجلسات</a></li>
@@ -1984,7 +2077,7 @@
         
         <!-- قسم لوحة التحكم -->
         <section id="dashboard" class="section active">
-            <h2><i class="fas fa-tachometer-alt icon-primary"></i> لوحة التحكم</h2>
+            <h2><span class="dashboard-badge"><i class="fas fa-scale-balanced"></i></span> لوحة التحكم</h2>
             
             <div class="stats-cards">
                 <div class="stat-card">
@@ -2004,12 +2097,20 @@
                     <p>أحكام صالح</p>
                 </div>
                 <div class="stat-card">
+                    <h3 id="against-judgments-dash">0</h3>
+                    <p>أحكام ضد</p>
+                </div>
+                <div class="stat-card">
                     <h3 id="reserved-cases-dash">0</h3>
                     <p>قضايا محجوزة</p>
                 </div>
                 <div class="stat-card">
                     <h3 id="suspended-cases-dash">0</h3>
                     <p>قضايا موقوفة</p>
+                </div>
+                <div class="stat-card">
+                    <h3 id="cancelled-cases-dash">0</h3>
+                    <p>قضايا مشطوبة</p>
                 </div>
                 <div class="stat-card">
                     <h3 id="archived-cases-dash">0</h3>
@@ -3977,8 +4078,10 @@
         const upcomingCasesDashElement = document.getElementById('upcoming-cases-dash');
         const expiredCasesDashElement = document.getElementById('expired-cases-dash');
         const favorableJudgmentsDashElement = document.getElementById('favorable-judgments-dash');
+        const againstJudgmentsDashElement = document.getElementById('against-judgments-dash');
         const reservedCasesDashElement = document.getElementById('reserved-cases-dash');
         const suspendedCasesDashElement = document.getElementById('suspended-cases-dash');
+        const cancelledCasesDashElement = document.getElementById('cancelled-cases-dash');
         const archivedCasesDashElement = document.getElementById('archived-cases-dash');
         
         // المتغيرات المؤقتة
@@ -5041,11 +5144,15 @@
             favorableJudgmentsCountElement.textContent = favorableJudgments.length;
             favorableJudgmentsDashElement.textContent = favorableJudgments.length;
             
+            if (againstJudgmentsDashElement) againstJudgmentsDashElement.textContent = againstJudgments.length;
+            
             reservedCasesCountElement.textContent = reservedCases.length;
             reservedCasesDashElement.textContent = reservedCases.length;
             
             suspendedCasesCountElement.textContent = suspendedCases.length;
             suspendedCasesDashElement.textContent = suspendedCases.length;
+            
+            if (cancelledCasesDashElement) cancelledCasesDashElement.textContent = cancelledCases.length;
             
             archivedCasesCountElement.textContent = archivedCases.length;
             archivedCasesDashElement.textContent = archivedCases.length;
