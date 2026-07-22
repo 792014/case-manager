@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="viewport" id="viewport-meta" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>نظام إدارة القضايا - المستشار محمود العوابدي</title>
 
     <!-- PWA: manifest + theme + icons -->
@@ -303,16 +303,16 @@
         @keyframes slideUpFade { from { transform: translateY(8px); opacity: 0 } to { transform: translateY(0); opacity: 1 } }
         
         .logo {
-            width: 82px !important;
-            height: 82px !important;
+            width: 110px !important;
+            height: 110px !important;
             background: #ffffff;
-            border-radius: 14px;
+            border-radius: 16px;
             display: flex;
             align-items: center;
             justify-content: center;
             box-shadow: 0 6px 18px rgba(11,61,145,0.18);
             border: 1px solid rgba(11,61,145,0.2);
-            padding: 4px;
+            padding: 5px;
         }
 
         .logo-img {
@@ -1579,6 +1579,30 @@
             font-size: 24px;
         }
 
+        /* زرار التبديل بين عرض الموبايل وعرض سطح المكتب */
+        #desktop-view-toggle {
+            position: fixed;
+            bottom: 20px;
+            right: 14px;
+            z-index: 9999;
+            width: 46px;
+            height: 46px;
+            border-radius: 50%;
+            border: none;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: #fff;
+            font-size: 18px;
+            box-shadow: 0 4px 14px rgba(11,61,145,0.4);
+            cursor: pointer;
+            display: none; /* يتم التحكم في ظهوره بالجافاسكريبت بناءً على نوع الجهاز الفعلي، مش بعرض الصفحة الحالي (اللي بيتغير لما نبدّل وضع العرض نفسه) */
+            align-items: center;
+            justify-content: center;
+        }
+
+        #desktop-view-toggle.active {
+            background: linear-gradient(135deg, var(--success-color), #27ae60);
+        }
+
         /* شارة دائرية فاخرة لأيقونة لوحة التحكم (ميزان العدالة) */
         .dashboard-badge {
             display: inline-flex;
@@ -1905,12 +1929,12 @@
             }
             
             .logo {
-                width: 62px !important;
-                height: 62px !important;
+                width: 88px !important;
+                height: 88px !important;
             }
             
             .logo i {
-                font-size: 28px !important;
+                font-size: 34px !important;
             }
             
             .header-text h1 {
@@ -1975,17 +1999,21 @@
             }
             
             .logo {
-                width: 52px !important;
-                height: 52px !important;
+                width: 70px !important;
+                height: 70px !important;
             }
             
             .logo i {
-                font-size: 24px !important;
+                font-size: 30px !important;
             }
         }
     </style>
 </head>
 <body>
+    <!-- زرار عائم للتبديل بين عرض الموبايل وعرض سطح المكتب (يساعد على تفادي مشاكل توافق النوافذ المنبثقة مع بعض الأجهزة) -->
+    <button type="button" id="desktop-view-toggle" title="تبديل بين عرض الموبايل وعرض سطح المكتب">
+        <i class="fas fa-desktop"></i>
+    </button>
     <!-- شاشة ترحيبية عند بدء التشغيل - تصميم متحرك واحترافي -->
     <div id="welcome-overlay" aria-hidden="false">
         <div class="welcome-stage">
@@ -9011,6 +9039,125 @@
                 document.body.appendChild(overlay);
             });
         }
+
+        // ============================================================
+        // ============================================================
+        // تبديل بين عرض الموبايل وعرض سطح المكتب (Desktop View) — عشان
+        // نتيح للمستخدم يشوف التطبيق بنفس تخطيط شاشة الكمبيوتر على
+        // الموبايل، وده بيلغي مشاكل توافق النوافذ المنبثقة مع بعض
+        // المتصفحات/الأجهزة تمامًا لأن نفس تخطيط سطح المكتب المضمون
+        // بيشتغل صح هو اللي بيتفعّل، وبعدين المستخدم يقدر يكبّر ويصغّر
+        // ويتنقل باللمس زي أي موقع سطح مكتب عادي.
+        // ============================================================
+        (function initDesktopViewToggle() {
+            const STORAGE_KEY = 'preferDesktopView';
+            const DESKTOP_VIEWPORT = 'width=1280';
+            const MOBILE_VIEWPORT = 'width=device-width, initial-scale=1.0, viewport-fit=cover';
+
+            const viewportMeta = document.getElementById('viewport-meta');
+            const toggleBtn = document.getElementById('desktop-view-toggle');
+            if (!viewportMeta || !toggleBtn) return;
+
+            // نحدد هل الجهاز موبايل فعليًا مرة واحدة بس، بناءً على حجم
+            // شاشة الجهاز الحقيقي (screen.width) ونوع الجهاز (User-Agent)،
+            // مش بعرض الصفحة الحالي (viewport) اللي بيتغير كل ما نبدّل
+            // الوضع. بالطريقة دي الزرار مابيختفيش أبدًا بعد التفعيل.
+            const isMobileDevice = (window.screen && Math.min(window.screen.width, window.screen.height) <= 900)
+                || /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent);
+
+            if (!isMobileDevice) return; // على اللاب توب: الزرار مايتفعلش أصلاً
+
+            // بنفرض ظهور الزرار بأولوية قصوى (inline + !important) بدل
+            // الاعتماد على أي قاعدة CSS ممكن تتعارض مع تغيير الـ viewport
+            toggleBtn.style.setProperty('display', 'flex', 'important');
+
+            function applyMode(isDesktop) {
+                viewportMeta.setAttribute('content', isDesktop ? DESKTOP_VIEWPORT : MOBILE_VIEWPORT);
+                toggleBtn.classList.toggle('active', isDesktop);
+                toggleBtn.innerHTML = isDesktop
+                    ? '<i class="fas fa-mobile-alt"></i>'
+                    : '<i class="fas fa-desktop"></i>';
+                toggleBtn.title = isDesktop
+                    ? 'الرجوع لعرض الموبايل العادي'
+                    : 'عرض التطبيق بشكل سطح المكتب (يفيد لو النوافذ المنبثقة مش ظاهرة صح)';
+                // نعيد فرض الظهور بعد كل تبديل، احتياطًا لأي تعارض جديد
+                toggleBtn.style.setProperty('display', 'flex', 'important');
+            }
+
+            let isDesktop = localStorage.getItem(STORAGE_KEY) === 'true';
+            applyMode(isDesktop);
+
+            toggleBtn.addEventListener('click', () => {
+                isDesktop = !isDesktop;
+                localStorage.setItem(STORAGE_KEY, isDesktop ? 'true' : 'false');
+                applyMode(isDesktop);
+                if (isDesktop) {
+                    showAlert('تم تفعيل عرض سطح المكتب. تقدر تكبّر/تصغّر وتتنقل باللمس زي أي موقع كمبيوتر عادي.', 'info');
+                } else {
+                    showAlert('تم الرجوع لعرض الموبايل العادي.', 'info');
+                }
+            });
+        })();
+
+        // فرض حجم وموضع صحيح للنوافذ المنبثقة عبر JavaScript مباشرة،
+        // بدل الاعتماد على CSS بس. ده حل نهائي بيضمن ظهور أي نافذة صح
+        // مهما كان سبب أي تعارض CSS مش واضح، لأن القيم بتتحسب فعليًا من
+        // حجم الشاشة الحقيقي لحظة الفتح، وبتتفرض بأولوية قصوى (inline
+        // !important) تكسب على أي قاعدة تانية في الصفحة.
+        // ============================================================
+        (function enforceModalSizing() {
+            function applySizing(modalContent) {
+                if (!modalContent) return;
+                const vw = document.documentElement.clientWidth || window.innerWidth;
+                const vh = document.documentElement.clientHeight || window.innerHeight;
+                const targetWidth = Math.min(800, Math.floor(vw * 0.94));
+                modalContent.style.setProperty('width', targetWidth + 'px', 'important');
+                modalContent.style.setProperty('max-width', targetWidth + 'px', 'important');
+                modalContent.style.setProperty('max-height', Math.floor(vh - 20) + 'px', 'important');
+                modalContent.style.setProperty('margin', '10px auto', 'important');
+                modalContent.style.setProperty('box-sizing', 'border-box', 'important');
+                modalContent.style.setProperty('overflow-y', 'auto', 'important');
+                modalContent.style.setProperty('left', '0', 'important');
+                modalContent.style.setProperty('right', '0', 'important');
+                modalContent.style.setProperty('position', 'relative', 'important');
+            }
+
+            function isVisible(modal) {
+                return window.getComputedStyle(modal).display !== 'none';
+            }
+
+            function watchModal(modal) {
+                if (isVisible(modal)) applySizing(modal.querySelector('.modal-content'));
+                const observer = new MutationObserver(() => {
+                    if (isVisible(modal)) applySizing(modal.querySelector('.modal-content'));
+                });
+                observer.observe(modal, { attributes: true, attributeFilter: ['style', 'class'] });
+            }
+
+            function init() {
+                document.querySelectorAll('.modal').forEach(watchModal);
+            }
+
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', init);
+            } else {
+                init();
+            }
+
+            window.addEventListener('resize', () => {
+                document.querySelectorAll('.modal').forEach(modal => {
+                    if (isVisible(modal)) applySizing(modal.querySelector('.modal-content'));
+                });
+            });
+
+            window.addEventListener('orientationchange', () => {
+                setTimeout(() => {
+                    document.querySelectorAll('.modal').forEach(modal => {
+                        if (isVisible(modal)) applySizing(modal.querySelector('.modal-content'));
+                    });
+                }, 200);
+            });
+        })();
 
         // تمكين اللصق من الحافظة داخل أي حقل نصي حتى لو منعت جهة أخرى الحدث
         document.addEventListener('paste', async function(e){
