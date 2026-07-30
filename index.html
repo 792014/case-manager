@@ -261,6 +261,7 @@
 
         .welcome-logo { display:flex; align-items:center; justify-content:center; width:100%; height:100%; }
         .welcome-logo i { font-size:68px; color: #ffffff; opacity:0.98; }
+        .welcome-logo img { max-width:80%; max-height:80%; object-fit:contain; filter: drop-shadow(0 4px 12px rgba(0,0,0,0.35)); }
 
         .welcome-glow {
             position: absolute; inset: 0; pointer-events: none;
@@ -2018,7 +2019,10 @@
     <div id="welcome-overlay" aria-hidden="false">
         <div class="welcome-stage">
             <div class="welcome-media">
-                    <div class="welcome-logo"><i class="fas fa-balance-scale icon-primary"></i></div>
+                    <div class="welcome-logo">
+                        <img src="logo-welcome.png" alt="شعار هيئة قضايا الدولة"
+                             onerror="this.onerror=null;this.replaceWith(Object.assign(document.createElement('i'),{className:'fas fa-balance-scale icon-primary'}));">
+                    </div>
                     <div class="welcome-glow"></div>
                 </div>
 
@@ -2904,7 +2908,9 @@
                         <button id="export-suspended-word" class="btn-word"><i class="fas fa-file-word"></i> تصدير إلى Word</button>
                     </div>
                 </div>
-                <table id="suspended-cases-table">
+
+                <h4 style="margin-top:20px;"><i class="fas fa-pause-circle icon-orange"></i> وقف تعليقي</h4>
+                <table id="suspended-cases-table-suspensive">
                     <thead>
                         <tr>
                             <th>رقم الدعوي</th>
@@ -2916,7 +2922,25 @@
                             <th class="no-print">الإجراءات</th>
                         </tr>
                     </thead>
-                    <tbody id="suspended-cases-body">
+                    <tbody id="suspended-cases-body-suspensive">
+                        <!-- سيتم ملؤها بالبيانات -->
+                    </tbody>
+                </table>
+
+                <h4 style="margin-top:25px;"><i class="fas fa-gavel icon-red"></i> وقف جزائي</h4>
+                <table id="suspended-cases-table-punitive">
+                    <thead>
+                        <tr>
+                            <th>رقم الدعوي</th>
+                            <th>سنة الدعوي</th>
+                            <th>المدعي</th>
+                            <th>المدعى عليه</th>
+                            <th>موضوع الدعوي</th>
+                            <th>تاريخ الوقف</th>
+                            <th class="no-print">الإجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody id="suspended-cases-body-punitive">
                         <!-- سيتم ملؤها بالبيانات -->
                     </tbody>
                 </table>
@@ -3397,14 +3421,80 @@
                     <small style="color: #666; font-size: 12px;">يمكن رفع ملف PDF أو Word أو صورة</small>
                 </div>
                 
-                <div class="form-group">
-                    <label>
-                        <input type="checkbox" id="archive-after-judgment" checked>
-                        أرشفة القضية بعد تسجيل الحكم
-                    </label>
-                </div>
-                
                 <button type="submit" class="btn-success" style="width: 100%;"><i class="fas fa-gavel"></i> تسجيل الحكم</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- نافذة وقف حكم -->
+    <div id="suspend-judgment-modal" class="modal">
+        <div class="modal-content" style="max-width: 700px;">
+            <div class="modal-header">
+                <h3 id="suspend-judgment-modal-title">وقف حكم القضية</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <form id="suspend-judgment-form">
+                <input type="hidden" id="suspend-judgment-case-id">
+
+                <!-- عرض بيانات القضية تلقائياً -->
+                <div class="case-details" style="margin-bottom: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px;">
+                    <h4>بيانات القضية</h4>
+                    <div class="case-details-grid">
+                        <div class="case-detail-item">
+                            <label>رقم وسنة الدعوي:</label>
+                            <p id="suspend-judgment-case-number-year"></p>
+                        </div>
+                        <div class="case-detail-item">
+                            <label>موضوع الدعوي:</label>
+                            <p id="suspend-judgment-subject"></p>
+                        </div>
+                        <div class="case-detail-item">
+                            <label>اسم المدعي:</label>
+                            <p id="suspend-judgment-plaintiff"></p>
+                        </div>
+                        <div class="case-detail-item">
+                            <label>اسم المدعي عليه:</label>
+                            <p id="suspend-judgment-defendant"></p>
+                        </div>
+                        <div class="case-detail-item">
+                            <label>الدائرة:</label>
+                            <p id="suspend-judgment-department"></p>
+                        </div>
+                        <div class="case-detail-item">
+                            <label>تاريخ جلسة الحكم:</label>
+                            <p id="suspend-judgment-session-date"></p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="suspend-judgment-text">منطوق الحكم *</label>
+                    <textarea id="suspend-judgment-text" rows="4" required placeholder="اكتب منطوق حكم الوقف هنا..."></textarea>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="suspend-judgment-type">نوع الوقف *</label>
+                        <select id="suspend-judgment-type" required>
+                            <option value="">-- اختر نوع الوقف --</option>
+                            <option value="تعليقي">وقف تعليقي</option>
+                            <option value="جزائي">وقف جزائي</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="suspend-judgment-date">تاريخ الوقف *</label>
+                        <input type="date" id="suspend-judgment-date" required>
+                        <small style="color: #666; font-size: 12px;">مضبوط تلقائيًا على تاريخ جلسة الحكم، ويمكن تعديله عند الحاجة</small>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="suspend-judgment-notes">ملاحظات إضافية</label>
+                    <textarea id="suspend-judgment-notes" rows="2" placeholder="ملاحظات إضافية..."></textarea>
+                </div>
+
+                <button type="submit" class="btn-warning" style="width: 100%;"><i class="fas fa-pause-circle"></i> تسجيل الوقف</button>
             </form>
         </div>
     </div>
@@ -3927,6 +4017,7 @@
         const editJudgmentModal = document.getElementById('edit-judgment-modal');
         const sessionHistoryModal = document.getElementById('session-history-modal');
         const judgmentModal = document.getElementById('judgment-modal');
+        const suspendJudgmentModal = document.getElementById('suspend-judgment-modal');
         const archiveModal = document.getElementById('archive-modal');
         const postponeForm = document.getElementById('postpone-form');
         const editCaseForm = document.getElementById('edit-case-form');
@@ -6418,16 +6509,40 @@
             document.getElementById('judgment-defendant').textContent = caseItem.defendant || '';
             document.getElementById('judgment-session-date').textContent = formatDate(judgmentSessionDate);
             
-            document.getElementById('judgment-date').value = new Date().toISOString().split('T')[0];
+            document.getElementById('judgment-date').value = getDateKey(judgmentSessionDate);
             document.getElementById('judgment-text').value = '';
             document.getElementById('judgment-appeal-type').value = '';
             document.getElementById('judgment-appeal-details').value = '';
             document.getElementById('judgment-notes').value = '';
             document.getElementById('judgment-type').value = '';
             document.getElementById('judgment-document').value = '';
-            document.getElementById('archive-after-judgment').checked = true;
             
             judgmentModal.style.display = 'flex';
+        }
+
+        // ========== دالة فتح نافذة وقف حكم القضية المحجوزة ==========
+        function openSuspendJudgmentModal(caseId) {
+            const caseItem = reservedCases.find(c => c.id === caseId);
+            if (!caseItem) return;
+
+            document.getElementById('suspend-judgment-case-id').value = caseId;
+            document.getElementById('suspend-judgment-modal-title').textContent = `وقف حكم القضية: ${caseItem.number}/${caseItem.year}`;
+
+            // تاريخ الوقف الافتراضي = تاريخ جلسة الحكم نفسها (نفس منطق نافذة تسجيل الحكم)
+            const judgmentSessionDate = caseItem.reserveDate || caseItem.sessionDate;
+            document.getElementById('suspend-judgment-case-number-year').textContent = `${caseItem.number}/${caseItem.year}`;
+            document.getElementById('suspend-judgment-subject').textContent = caseItem.subject;
+            document.getElementById('suspend-judgment-department').textContent = caseItem.department;
+            document.getElementById('suspend-judgment-plaintiff').textContent = caseItem.plaintiff || '';
+            document.getElementById('suspend-judgment-defendant').textContent = caseItem.defendant || '';
+            document.getElementById('suspend-judgment-session-date').textContent = formatDate(judgmentSessionDate);
+
+            document.getElementById('suspend-judgment-text').value = '';
+            document.getElementById('suspend-judgment-type').value = '';
+            document.getElementById('suspend-judgment-notes').value = '';
+            document.getElementById('suspend-judgment-date').value = getDateKey(judgmentSessionDate);
+
+            suspendJudgmentModal.style.display = 'flex';
         }
         
         // ========== دالة فتح نافذة ترحيل القضية ==========
@@ -6499,7 +6614,6 @@
             const defendant = caseItem.defendant && caseItem.defendant.trim() ? caseItem.defendant : document.getElementById('judgment-defendant').textContent || '';
             
             const judgmentType = document.getElementById('judgment-type').value;
-            const archiveAfter = document.getElementById('archive-after-judgment').checked;
             const judgmentSessionDate = caseItem.reserveDate || caseItem.sessionDate;
             
             const judgmentData = {
@@ -6621,34 +6735,6 @@
                 localStorage.setItem('cases', JSON.stringify(cases));
             }
             
-            if (archiveAfter) {
-                const archivedCase = {
-                    id: Date.now().toString(),
-                    caseId: caseId,
-                    caseNumber: caseItem.number,
-                    caseYear: caseItem.year,
-                    subject: caseItem.subject,
-                    plaintiff: caseItem.plaintiff,
-                    defendant: caseItem.defendant,
-                    department: caseItem.department,
-                    circulationNumber: caseItem.circulationNumber,
-                    sessionHistory: caseItem.sessionHistory || [],
-                    judgmentType: judgmentType,
-                    judgmentText: judgmentData.text,
-                    judgmentDate: judgmentData.date,
-                    judgmentId: judgmentData.id,
-                    archiveDate: new Date().toISOString().split('T')[0],
-                    archiveReason: 'أرشفة تلقائية بعد تسجيل الحكم',
-                    archiveNotes: '',
-                    createdAt: new Date().toISOString()
-                };
-                
-                archivedCases.push(archivedCase);
-                localStorage.setItem('archivedCases', JSON.stringify(archivedCases));
-                
-                addNotification(`تم أرشفة القضية: ${caseItem.number}/${caseItem.year}`, 'info');
-            }
-            
             addNotification(`تم تسجيل حكم ${judgmentType === 'favorable' ? 'صالح' : 'ضد'} للقضية: ${caseItem.number}/${caseItem.year}`, 'success');
             showAlert('تم تسجيل الحكم بنجاح', 'success');
             
@@ -6662,8 +6748,81 @@
             renderArchivedCasesTable();
             updateStats();
         });
-        
-        // ========== عرض القضايا المحجوزة والمشطوبة ==========
+
+        // ========== تسجيل وقف حكم القضية المحجوزة للحكم ==========
+        const suspendJudgmentForm = document.getElementById('suspend-judgment-form');
+        suspendJudgmentForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            const caseId = document.getElementById('suspend-judgment-case-id').value;
+            const caseIndex = reservedCases.findIndex(c => c.id === caseId);
+            if (caseIndex === -1) return;
+
+            const caseItem = reservedCases[caseIndex];
+            const suspendType = document.getElementById('suspend-judgment-type').value;
+            const suspendDate = document.getElementById('suspend-judgment-date').value;
+            const judgmentText = document.getElementById('suspend-judgment-text').value;
+            const suspendNotes = document.getElementById('suspend-judgment-notes').value;
+
+            // نستخدم نفس حقل suspendReason المستخدم بالفعل لتصنيف القضايا
+            // الموقوفة (تعليقي/جزائي) عشان القضية الجديدة تنضم لنفس تصنيف
+            // القضايا الموقوفة الحالية بدون الحاجة لحقل منفصل
+            const suspendedCase = {
+                ...caseItem,
+                suspendDate: suspendDate,
+                suspendReason: suspendType,
+                suspendNotes: suspendNotes,
+                judgmentText: judgmentText,
+                originalDate: caseItem.reserveDate || caseItem.sessionDate,
+                suspendedFromReserved: true
+            };
+
+            // إضافة الوقف لسجل جلسات القضية
+            if (!suspendedCase.sessionHistory) suspendedCase.sessionHistory = [];
+            suspendedCase.sessionHistory.push({
+                date: suspendDate,
+                type: 'suspend',
+                suspendType: suspendType,
+                reason: `وقف ${suspendType === 'تعليقي' ? 'تعليقي' : 'جزائي'} للحكم`,
+                judgmentText: judgmentText,
+                notes: suspendNotes,
+                recordedDate: new Date().toISOString()
+            });
+
+            suspendedCases.push(suspendedCase);
+            localStorage.setItem('suspendedCases', JSON.stringify(suspendedCases));
+
+            reservedCases = reservedCases.filter(c => c.id !== caseId);
+            localStorage.setItem('reservedCases', JSON.stringify(reservedCases));
+
+            // تحديث حالة القضية في القائمة الرئيسية إن وجدت
+            const matchingCase = cases.find(c => c.id === caseId);
+            if (matchingCase) {
+                if (!matchingCase.sessionHistory) matchingCase.sessionHistory = [];
+                matchingCase.sessionHistory.push({
+                    date: suspendDate,
+                    type: 'suspend',
+                    suspendType: suspendType,
+                    reason: `وقف ${suspendType === 'تعليقي' ? 'تعليقي' : 'جزائي'} للحكم`,
+                    judgmentText: judgmentText,
+                    notes: suspendNotes,
+                    recordedDate: new Date().toISOString()
+                });
+                localStorage.setItem('cases', JSON.stringify(cases));
+            }
+
+            addNotification(`تم وقف حكم القضية (وقف ${suspendType}): ${caseItem.number}/${caseItem.year}`, 'warning');
+            showAlert('تم تسجيل وقف الحكم بنجاح', 'success');
+
+            // حفظ البيانات في التخزين الدائم (Electron app-data.json)
+            saveDataToAPI();
+
+            suspendJudgmentModal.style.display = 'none';
+            suspendJudgmentForm.reset();
+            renderReservedAndCancelledCases();
+            renderSuspendedCasesTable();
+            updateStats();
+        });
         function renderReservedAndCancelledCases(filteredReservedCases = null) {
             const reservedBody = document.getElementById('reserved-cases-body');
             const cancelledBody = document.getElementById('cancelled-cases-body');
@@ -6686,6 +6845,7 @@
                         <button class="btn-purple btn-session-history" data-id="${caseItem.id}"><i class="fas fa-history"></i> سجل الجلسات</button>
                         <button class="btn-postpone btn-postpone-case" data-id="${caseItem.id}"><i class="fas fa-calendar-plus"></i> مد أجل الحكم</button>
                         <button class="btn-judgment btn-judge-case" data-id="${caseItem.id}"><i class="fas fa-gavel"></i> الحكم</button>
+                        <button class="btn-warning btn-suspend-judgment" data-id="${caseItem.id}"><i class="fas fa-pause-circle"></i> وقف الدعوي</button>
                         <button class="btn-return btn-return-case" data-id="${caseItem.id}" data-type="reserved"><i class="fas fa-redo"></i> إعادة للرول</button>
                     </td>
                 `;
@@ -6741,11 +6901,15 @@
         
         // ========== عرض القضايا الموقوفة ==========
         function renderSuspendedCasesTable() {
-            const suspendedBody = document.getElementById('suspended-cases-body');
-            
-            suspendedBody.innerHTML = '';
-            
-            suspendedCases.forEach(caseItem => {
+            const suspensiveBody = document.getElementById('suspended-cases-body-suspensive');
+            const punitiveBody = document.getElementById('suspended-cases-body-punitive');
+
+            if (!suspensiveBody || !punitiveBody) return;
+
+            suspensiveBody.innerHTML = '';
+            punitiveBody.innerHTML = '';
+
+            function buildRow(caseItem) {
                 const row = document.createElement('tr');
                 row.innerHTML = `
                     <td>${caseItem.number}</td>
@@ -6760,7 +6924,18 @@
                         <button class="btn-return btn-return-suspended-case" data-id="${caseItem.id}"><i class="fas fa-redo"></i> إعادة للرول</button>
                     </td>
                 `;
-                suspendedBody.appendChild(row);
+                return row;
+            }
+
+            suspendedCases.forEach(caseItem => {
+                // القضايا اللي معندهاش تصنيف محدد (زي أي قضايا موقوفة من
+                // قبل إضافة هذه الميزة) بتتحط افتراضيًا في قسم "تعليقي"
+                // عشان متختفيش من العرض
+                if (caseItem.suspendReason === 'جزائي') {
+                    punitiveBody.appendChild(buildRow(caseItem));
+                } else {
+                    suspensiveBody.appendChild(buildRow(caseItem));
+                }
             });
         }
         
@@ -7440,6 +7615,10 @@
             } else if (button.classList.contains('btn-judge-case')) {
                 e.preventDefault();
                 openJudgmentModal(dataId);
+                handled = true;
+            } else if (button.classList.contains('btn-suspend-judgment')) {
+                e.preventDefault();
+                openSuspendJudgmentModal(dataId);
                 handled = true;
             } else if (button.classList.contains('btn-return-case')) {
                 e.preventDefault();
@@ -9159,120 +9338,46 @@
             });
         })();
 
-        // تمكين اللصق من الحافظة داخل أي حقل نصي حتى لو منعت جهة أخرى الحدث
-        document.addEventListener('paste', async function(e){
-            try {
-                const target = e.target;
-                if (!target) return;
-                const isInput = target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable;
-                if (!isInput) return;
-                // If native event has data, allow it
-                if (e.clipboardData && e.clipboardData.getData('text')) return;
+        // ============================================================
+        // تفعيل النسخ واللصق والقص في كل حقول الإدخال (نسخة واحدة موحدة)
+        // ============================================================
+        // ملحوظة: كان فيه أكتر من نسخة متكررة من نفس المعالجات بتشتغل في
+        // نفس الوقت على نفس الأحداث، وده كان ممكن يسبب تعارضات وسلوك غير
+        // متوقع للنسخ/اللصق في بعض الحقول أو بعض الأجهزة. هنا وحّدناها
+        // في نسخة واحدة نضيفة، بتدي الأولوية دايمًا للسلوك الافتراضي
+        // للمتصفح (الأسرع والأكثر توافقًا)، وبتتدخل يدويًا بس لو المتصفح
+        // منع اللصق/النسخ الطبيعي لأي سبب.
+        (function enableUniversalCopyPaste() {
+            function isEditableTarget(target) {
+                return !!target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable);
+            }
 
-                // Try to read clipboard via Electron first (reliable), fallback to navigator.clipboard
-                let text = '';
-                try {
-                    const r = await window.electronAPI.readClipboard();
-                    if (r && r.success) text = r.text || '';
-                } catch (err) { text = ''; }
-                if (!text) {
-                    try { text = await navigator.clipboard.readText(); } catch (err) { try { text = (window.clipboardData && window.clipboardData.getData && window.clipboardData.getData('Text')) || ''; } catch(e) { text = ''; } }
-                }
-
-                if (text !== undefined && text !== null && text !== '') {
-                    if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') {
-                        const start = target.selectionStart || 0;
-                        const end = target.selectionEnd || 0;
-                        const val = target.value || '';
-                        target.value = val.slice(0, start) + text + val.slice(end);
-                        target.selectionStart = target.selectionEnd = start + text.length;
-                        e.preventDefault();
-                    } else if (target.isContentEditable) {
-                        document.execCommand('insertText', false, text);
-                        e.preventDefault();
-                    }
-                }
-            } catch (ex) { /* ignore */ }
-        });
-
-        // تمكين النسخ (copy) من أي عنصر وظيفي أو نص محدد
-        document.addEventListener('copy', async function(e){
-            try {
-                let selText = window.getSelection ? window.getSelection().toString() : '';
-                if (!selText) {
-                    const target = document.activeElement;
-                    if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA')) {
-                        const start = target.selectionStart || 0;
-                        const end = target.selectionEnd || 0;
-                        selText = (target.value || '').substring(start, end);
-                    }
-                }
-                if (selText) {
-                    // try to write via electron clipboard
-                    try {
-                        await window.electronAPI.writeClipboard({ text: selText });
-                        e.preventDefault();
-                    } catch (err) {
-                        // fallback to event.clipboardData
-                        if (e.clipboardData) {
-                            e.clipboardData.setData('text/plain', selText);
-                            e.preventDefault();
-                        }
-                    }
-                }
-            } catch (ex) { /* ignore */ }
-        });
-        
-        // ========== تفعيل النسخ واللصق لجميع حقول الإدخال (محسّن) ==========
-        (function enableCopyPasteForAllInputs() {
-            // Copy: حاول الكتابة عبر واجهة Electron ثم fallback إلى event.clipboardData
-            document.addEventListener('copy', async function(e) {
+            // اللصق: لو المتصفح وفّر البيانات طبيعيًا (clipboardData) نسيبه
+            // يكمل عادي من غير أي تدخل. لو مافيش (حالات نادرة لبعض
+            // الإعدادات)، نجرب نجيب النص من Electron أو navigator.clipboard
+            // وندخله يدويًا.
+            document.addEventListener('paste', async function (e) {
                 try {
                     const target = e.target;
-                    let selText = '';
-                    if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA')) {
-                        selText = (target.value || '').substring(target.selectionStart || 0, target.selectionEnd || 0);
-                    }
-                    if (!selText) {
-                        selText = window.getSelection ? window.getSelection().toString() : '';
-                    }
-                    if (!selText) return;
+                    if (!isEditableTarget(target)) return;
 
-                    // أفضلية لكتابة الحافظة عبر Electron (إذا متاحة)
-                    if (window.electronAPI && window.electronAPI.writeClipboard) {
-                        try { await window.electronAPI.writeClipboard({ text: selText }); e.preventDefault(); return; } catch(_) { /* fallback */ }
+                    if (e.clipboardData && e.clipboardData.getData) {
+                        const nativeText = e.clipboardData.getData('text') || e.clipboardData.getData('text/plain');
+                        if (nativeText) return; // السلوك الطبيعي هيشتغل لوحده، مفيش داعي نتدخل
                     }
-
-                    if (e.clipboardData) {
-                        e.clipboardData.setData('text/plain', selText);
-                        e.preventDefault();
-                    }
-                } catch (ex) { /* ignore */ }
-            }, true);
-
-            // Paste: دعم عدة مصادر (event.clipboardData, Electron, navigator.clipboard)
-            document.addEventListener('paste', async function(e) {
-                try {
-                    const target = e.target;
-                    if (!target || !(target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable)) return;
 
                     let text = '';
-                    if (e.clipboardData && e.clipboardData.getData) {
-                        text = e.clipboardData.getData('text') || e.clipboardData.getData('text/plain') || '';
-                    }
-
-                    if (!text && window.electronAPI && window.electronAPI.readClipboard) {
+                    if (window.electronAPI && window.electronAPI.readClipboard) {
                         try {
                             const r = await window.electronAPI.readClipboard();
                             if (r && r.success) text = r.text || '';
                         } catch (err) { /* ignore */ }
                     }
-
                     if (!text && navigator.clipboard && navigator.clipboard.readText) {
                         try { text = await navigator.clipboard.readText(); } catch (err) { /* ignore */ }
                     }
 
-                    if (text !== undefined && text !== null && text !== '') {
+                    if (text) {
                         if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') {
                             const start = target.selectionStart || 0;
                             const end = target.selectionEnd || 0;
@@ -9285,10 +9390,30 @@
                         e.preventDefault();
                     }
                 } catch (ex) { /* ignore */ }
-            }, false);
+            });
 
-            // Cut: حاول الكتابة عبر Electron ثم حذف النص محدد
-            document.addEventListener('cut', async function(e) {
+            // النسخ: نسيب السلوك الطبيعي يشتغل أولاً، ونستخدم Electron
+            // كطبقة إضافية بس لضمان وصول النص للحافظة في بيئة سطح المكتب
+            document.addEventListener('copy', async function (e) {
+                try {
+                    if (!window.electronAPI || !window.electronAPI.writeClipboard) return; // خليه على السلوك الطبيعي في المتصفح/الموبايل
+
+                    const target = e.target;
+                    let selText = '';
+                    if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA')) {
+                        selText = (target.value || '').substring(target.selectionStart || 0, target.selectionEnd || 0);
+                    }
+                    if (!selText) {
+                        selText = window.getSelection ? window.getSelection().toString() : '';
+                    }
+                    if (!selText) return;
+
+                    await window.electronAPI.writeClipboard({ text: selText });
+                } catch (ex) { /* ignore */ }
+            });
+
+            // القص: بنسخ النص المحدد للحافظة ثم نحذفه من الحقل
+            document.addEventListener('cut', async function (e) {
                 try {
                     const target = e.target;
                     if (!target || !(target.tagName === 'INPUT' || target.tagName === 'TEXTAREA')) return;
@@ -9299,22 +9424,17 @@
                     if (!selectedText) return;
 
                     if (window.electronAPI && window.electronAPI.writeClipboard) {
-                        try { await window.electronAPI.writeClipboard({ text: selectedText }); } catch(_) { /* ignore */ }
+                        try { await window.electronAPI.writeClipboard({ text: selectedText }); } catch (_) { /* ignore */ }
                     }
-
                     if (e.clipboardData) {
-                        e.clipboardData.setData('text/plain', selectedText);
+                        try { e.clipboardData.setData('text/plain', selectedText); } catch (_) { /* ignore */ }
                     }
 
-                    // إزالة النص المحدد
                     target.value = target.value.substring(0, start) + target.value.substring(end);
                     target.selectionStart = target.selectionEnd = start;
                     e.preventDefault();
                 } catch (ex) { /* ignore */ }
-            }, true);
-
-            // لا نعتمد على اختصارات مخصصة هنا — الاستماع للـ paste/copy/cut أعلاه كافٍ
-            // السماح بقائمة السياق الافتراضية (سيفعل النسخ/لصق بنمط النظام)
+            });
         })();
         
         // ========== حذف القضية ==========
