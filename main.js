@@ -351,8 +351,72 @@ function createWindow() {
         }
     });
 
-    Menu.setApplicationMenu(null);
+    // ملحوظة مهمة: كنا بنعطل القائمة تمامًا (setApplicationMenu(null))، وده كان
+    // بيمنع اختصارات النسخ/اللصق/القص/تحديد الكل (Ctrl+C, Ctrl+V, Ctrl+X, Ctrl+A)
+    // من العمل خالص جوه أي حقل إدخال — لأن Electron (على عكس المتصفح العادي)
+    // بيفعّل الاختصارات دي عن طريق أدوار القائمة (roles)، مش تلقائيًا من النظام.
+    // الحل: نعمل قائمة بسيطة فيها بس أدوار التحرير القياسية، ونسيب autoHideMenuBar
+    // يخفيها بصريًا زي ما هي، فالشكل يفضل نضيف والاختصارات تشتغل.
+    const editMenuTemplate = [
+        {
+            label: 'تحرير',
+            submenu: [
+                { role: 'undo', label: 'تراجع' },
+                { role: 'redo', label: 'إعادة' },
+                { type: 'separator' },
+                { role: 'cut', label: 'قص' },
+                { role: 'copy', label: 'نسخ' },
+                { role: 'paste', label: 'لصق' },
+                { role: 'selectAll', label: 'تحديد الكل' }
+            ]
+        },
+        {
+            label: 'عرض',
+            submenu: [
+                { role: 'reload', label: 'إعادة تحميل' },
+                { role: 'toggleDevTools', label: 'أدوات المطور' }
+            ]
+        }
+    ];
+    Menu.setApplicationMenu(Menu.buildFromTemplate(editMenuTemplate));
     mainWindow.loadFile(path.join(__dirname, 'app', 'index.html'));
+
+    // ==================== ضمان إضافي (احتياطي) لعمل النسخ/اللصق/القص ====================
+    // بالإضافة لأدوار القائمة فوق، بنعترض اختصارات لوحة المفاتيح مباشرة على
+    // مستوى النافذة ونستدعي أوامر التحرير الفعلية (copy/paste/cut/selectAll)
+    // يدويًا على العنصر الذي يملك التركيز حاليًا. ده بيضمن عمل الاختصارات
+    // حتى لو حصلت مشكلة في ربط أدوار القائمة لأي سبب (فروق بين إصدارات
+    // Windows، أو نوافذ فرعية، إلخ).
+    mainWindow.webContents.on('before-input-event', (event, input) => {
+        if (input.type !== 'keyDown') return;
+        const key = (input.key || '').toLowerCase();
+        const ctrlOrCmd = input.control || input.meta;
+        if (!ctrlOrCmd || input.alt) return;
+
+        const wc = mainWindow.webContents;
+        if (key === 'c') { wc.copy(); }
+        else if (key === 'v') { wc.paste(); }
+        else if (key === 'x') { wc.cut(); }
+        else if (key === 'a') { wc.selectAll(); }
+        else if (key === 'z') { input.shift ? wc.redo() : wc.undo(); }
+    });
+
+    // السماح لـ navigator.clipboard (واجهة الحافظة الحديثة في المتصفح) بالعمل
+    // من غير أي رسائل صلاحيات، لأن Electron بيرفضها افتراضيًا لو محدّش سمح بيها.
+    try {
+        const ses = mainWindow.webContents.session;
+        ses.setPermissionRequestHandler((webContents, permission, callback) => {
+            if (permission === 'clipboard-read' || permission === 'clipboard-sanitized-write') {
+                return callback(true);
+            }
+            callback(false);
+        });
+        if (ses.setPermissionCheckHandler) {
+            ses.setPermissionCheckHandler((webContents, permission) => {
+                return permission === 'clipboard-read' || permission === 'clipboard-sanitized-write';
+            });
+        }
+    } catch (e) { /* ignore */ }
 
     // بدون هذا الإعداد، Electron بيمنع أي نافذة جديدة تتفتح بـ window.open()
     // بشكل افتراضي، وده اللي كان بيسبب ظهور نافذة بيضاء فاضية عند محاولة

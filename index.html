@@ -759,6 +759,23 @@
             border-bottom: 1px solid #eee;
             font-size: 13px !important;
         }
+
+        /* أي خلية بيانات (غير عمود الإجراءات) قابلة للنسخ بضغطة واحدة */
+        td:not(.actions) {
+            cursor: copy;
+        }
+        td:not(.actions):hover {
+            background-color: #eef4ff;
+        }
+        .case-detail-item p,
+        .case-detail-item span {
+            cursor: copy;
+        }
+        .case-detail-item p:hover,
+        .case-detail-item span:hover {
+            background-color: #eef4ff;
+            border-radius: 4px;
+        }
         
         th {
             background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
@@ -1661,6 +1678,24 @@
             color: var(--warning-color);
         }
         
+        .icon-teal {
+            color: #0d9488;
+        }
+        
+        .icon-navy {
+            color: #1e3a5f;
+        }
+        
+        .badge-count {
+            display: inline-block;
+            background: #0d9488;
+            color: #fff;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: bold;
+        }
+        
         .icon-primary {
             color: var(--primary-color);
         }
@@ -2097,11 +2132,13 @@
         <nav>
             <ul>
                 <li><a href="#" class="nav-link active" data-section="dashboard"><i class="fas fa-scale-balanced icon-large icon-primary"></i> لوحة التحكم</a></li>
+                <li><a href="#" class="nav-link" data-section="departments-management"><i class="fas fa-building icon-large icon-navy"></i> تسجيل الدوائر</a></li>
                 <li><a href="#" class="nav-link" data-section="add-case"><i class="fas fa-plus-circle icon-large icon-green"></i> إضافة قضية</a></li>
                 <li><a href="#" class="nav-link" data-section="cases-list"><i class="fas fa-list-alt icon-large icon-blue"></i> قائمة القضايا</a></li>
                 <li><a href="#" class="nav-link" data-section="bulk-sessions"><i class="fas fa-calendar-check icon-large icon-orange"></i> ترحيل الجلسات</a></li>
                 <li><a href="#" class="nav-link" data-section="judgments"><i class="fas fa-gavel icon-large icon-gold"></i> الأحكام</a></li>
                 <li><a href="#" class="nav-link" data-section="session-roll"><i class="fas fa-file-alt icon-large icon-purple"></i> رول الجلسة</a></li>
+                <li><a href="#" class="nav-link" data-section="previous-sessions"><i class="fas fa-history icon-large icon-teal"></i> الجلسات السابقة</a></li>
                 <li><a href="#" class="nav-link" data-section="data-management"><i class="fas fa-database icon-large icon-silver"></i> إدارة البيانات</a></li>
             </ul>
         </nav>
@@ -2208,6 +2245,69 @@
             </div>
         </section>
         
+        <!-- قسم تسجيل الدوائر -->
+        <section id="departments-management" class="section">
+            <h2><i class="fas fa-building icon-navy"></i> تسجيل الدوائر</h2>
+            
+            <form id="department-form">
+                <div class="form-row">
+                    <div class="form-group" style="flex:2;">
+                        <label for="department-name-input">اسم الدائرة</label>
+                        <input type="text" id="department-name-input" required placeholder="مثال: الدائرة الأولى">
+                    </div>
+                    
+                    <div class="form-group" style="flex:1;">
+                        <label for="department-day-input">يوم الانعقاد</label>
+                        <select id="department-day-input" required>
+                            <option value="">-- اختر اليوم --</option>
+                            <option value="السبت">السبت</option>
+                            <option value="الأحد">الأحد</option>
+                            <option value="الاثنين">الاثنين</option>
+                            <option value="الثلاثاء">الثلاثاء</option>
+                            <option value="الأربعاء">الأربعاء</option>
+                            <option value="الخميس">الخميس</option>
+                            <option value="الجمعة">الجمعة</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <input type="hidden" id="department-edit-id" value="">
+                
+                <div style="display:flex; gap:8px;">
+                    <button type="submit" id="save-department-btn" class="btn-success"><i class="fas fa-save"></i> حفظ الدائرة</button>
+                    <button type="button" id="cancel-department-edit-btn" class="btn-secondary" style="display:none;"><i class="fas fa-times"></i> إلغاء التعديل</button>
+                </div>
+            </form>
+            
+            <h3 style="margin-top:25px; color:#1e3a5f;">الدوائر المسجلة</h3>
+            <div style="overflow-x:auto;">
+                <table class="print-table" style="width:100%;">
+                    <thead>
+                        <tr>
+                            <th>اسم الدائرة</th>
+                            <th>يوم الانعقاد</th>
+                            <th>عدد القضايا المرتبطة</th>
+                            <th class="no-print">الإجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody id="departments-table-body">
+                        <tr><td colspan="4" style="text-align:center; padding:20px; color:#999;">لا توجد دوائر مسجلة بعد</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div style="margin-top:20px; padding:15px; background:#f0f9f8; border-radius:8px; border:1px solid #0d9488;">
+                <h4 style="margin-top:0; color:#0d9488;"><i class="fas fa-link"></i> ربط القضايا القديمة بالدوائر المسجلة</h4>
+                <p style="color:#555; font-size:14px; margin-bottom:10px;">
+                    عند الضغط على الزر، سيتم البحث في كل القضايا المسجلة مسبقًا (الحالية، المحجوزة للحكم، المشطوبة، الموقوفة، المؤرشفة)
+                    عن اسم الدائرة المكتوب بها، ومطابقته تلقائيًا مع أسماء الدوائر المسجلة أعلاه بالاعتماد على تطابق الاسمين،
+                    وتحديث القضايا المطابقة لتأخذ الاسم الرسمي للدائرة المسجلة — دون الحاجة لتعديل كل قضية يدويًا.
+                </p>
+                <button type="button" id="sync-departments-btn" class="btn-success"><i class="fas fa-sync-alt"></i> ربط القضايا القديمة الآن</button>
+                <div id="sync-departments-result" style="margin-top:12px;"></div>
+            </div>
+        </section>
+        
         <!-- قسم إضافة قضية -->
         <section id="add-case" class="section">
             <h2><i class="fas fa-plus-circle icon-green"></i> إضافة قضية جديدة</h2>
@@ -2255,7 +2355,12 @@
                 
                 <div class="form-group">
                     <label for="department">الدائرة</label>
-                    <input type="text" id="department" required placeholder="أدخل اسم الدائرة">
+                    <select id="department" required>
+                        <option value="">-- اختر الدائرة --</option>
+                    </select>
+                    <small id="department-empty-hint" style="display:none; color:#b45309;">
+                        لا توجد دوائر مسجلة بعد. يرجى تسجيل الدوائر أولاً من أيقونة "تسجيل الدوائر".
+                    </small>
                 </div>
                 
                 <div class="form-group">
@@ -2987,6 +3092,51 @@
             </div>
         </section>
         
+        <!-- قسم الجلسات السابقة للقضايا (مجمعة حسب الدائرة) -->
+        <section id="previous-sessions" class="section">
+            <h2><i class="fas fa-history icon-teal"></i> الجلسات السابقة للقضايا</h2>
+            <div class="advanced-search">
+                <h4><i class="fas fa-filter"></i> اختر الدائرة لعرض قضاياها</h4>
+                <div class="search-filters" style="display:flex; gap:10px; align-items:flex-end; flex-wrap:wrap;">
+                    <div class="form-group" style="flex:1; min-width:220px;">
+                        <label for="prev-sessions-department">الدائرة</label>
+                        <select id="prev-sessions-department">
+                            <option value="">-- اختر الدائرة --</option>
+                        </select>
+                    </div>
+                    <div class="form-group" style="flex:2; min-width:220px;">
+                        <label for="prev-sessions-search">بحث برقم الدعوي / الموضوع / الخصوم</label>
+                        <input type="text" id="prev-sessions-search" placeholder="بحث...">
+                    </div>
+                </div>
+            </div>
+
+            <div id="prev-sessions-summary" style="margin-top:15px; display:none;">
+                <span class="badge-count" id="prev-sessions-count"></span>
+            </div>
+
+            <div style="overflow-x: auto; margin-top:15px;">
+                <table class="print-table" style="width:100%;">
+                    <thead>
+                        <tr>
+                            <th>رقم/سنة الدعوي</th>
+                            <th>الموضوع</th>
+                            <th>المدعي</th>
+                            <th>المدعى عليه</th>
+                            <th>رقم المتداول</th>
+                            <th>الجلسة السابقة</th>
+                            <th>الجلسة الأخيرة</th>
+                            <th>سبب الترحيل / القرار في الجلسة السابقة</th>
+                            <th class="no-print">الإجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody id="prev-sessions-table-body">
+                        <tr><td colspan="9" style="text-align:center; padding:20px; color:#999;">يرجى اختيار الدائرة لعرض القضايا</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+        
         <!-- قسم إدارة البيانات -->
         <section id="data-management" class="section">
             <h2><i class="fas fa-database icon-silver"></i> إدارة البيانات</h2>
@@ -3188,7 +3338,9 @@
                     
                     <div class="form-group">
                         <label for="edit-department">الدائرة</label>
-                        <input type="text" id="edit-department" required placeholder="أدخل اسم الدائرة يدويًا">
+                        <select id="edit-department" required>
+                            <option value="">-- اختر الدائرة --</option>
+                        </select>
                     </div>
                 </div>
                 
@@ -3197,6 +3349,56 @@
                     <textarea id="edit-case-notes" rows="3"></textarea>
                 </div>
                 
+                <button type="submit" class="btn-success" style="width: 100%;"><i class="fas fa-save"></i> حفظ التعديلات</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="edit-archived-case-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>تعديل بيانات القضية المؤرشفة</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <form id="edit-archived-case-form">
+                <input type="hidden" id="edit-archived-case-id">
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="edit-archived-subject">موضوع الدعوي</label>
+                        <input type="text" id="edit-archived-subject">
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-archived-case-number">رقم الدعوى</label>
+                        <input type="text" id="edit-archived-case-number">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="edit-archived-plaintiff">اسم المدعي</label>
+                        <input type="text" id="edit-archived-plaintiff">
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-archived-defendant">اسم المدعي عليه</label>
+                        <input type="text" id="edit-archived-defendant">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="edit-archived-department">الدائرة</label>
+                        <select id="edit-archived-department">
+                            <option value="">-- اختر الدائرة --</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="edit-archived-notes">ملاحظات الأرشفة</label>
+                    <textarea id="edit-archived-notes" rows="3"></textarea>
+                </div>
+
                 <button type="submit" class="btn-success" style="width: 100%;"><i class="fas fa-save"></i> حفظ التعديلات</button>
             </form>
         </div>
@@ -3277,7 +3479,9 @@
                     </div>
                     <div class="form-group">
                         <label for="edit-judgment-department">الدائرة</label>
-                        <input type="text" id="edit-judgment-department">
+                        <select id="edit-judgment-department">
+                            <option value="">-- اختر الدائرة --</option>
+                        </select>
                     </div>
                 </div>
 
@@ -3786,7 +3990,8 @@
                         (Array.isArray(data.cancelledCases) && data.cancelledCases.length > 0) ||
                         (Array.isArray(data.suspendedCases) && data.suspendedCases.length > 0) ||
                         (Array.isArray(data.archivedCases) && data.archivedCases.length > 0) ||
-                        (Array.isArray(data.notifications) && data.notifications.length > 0)
+                        (Array.isArray(data.notifications) && data.notifications.length > 0) ||
+                        (Array.isArray(data.departments) && data.departments.length > 0)
                     );
                     const localStorageDataExists = (
                         (JSON.parse(localStorage.getItem('cases') || '[]') || []).length > 0 ||
@@ -3796,7 +4001,8 @@
                         (JSON.parse(localStorage.getItem('cancelledCases') || '[]') || []).length > 0 ||
                         (JSON.parse(localStorage.getItem('suspendedCases') || '[]') || []).length > 0 ||
                         (JSON.parse(localStorage.getItem('archivedCases') || '[]') || []).length > 0 ||
-                        (JSON.parse(localStorage.getItem('notifications') || '[]') || []).length > 0
+                        (JSON.parse(localStorage.getItem('notifications') || '[]') || []).length > 0 ||
+                        (JSON.parse(localStorage.getItem('departments') || '[]') || []).length > 0
                     );
 
                     if (data && hasElectronData) {
@@ -3814,6 +4020,7 @@
                             suspendedCases = JSON.parse(localStorage.getItem('suspendedCases')) || [];
                             archivedCases = JSON.parse(localStorage.getItem('archivedCases')) || [];
                             notifications = JSON.parse(localStorage.getItem('notifications')) || [];
+                            departments = JSON.parse(localStorage.getItem('departments')) || [];
                             return;
                         }
 
@@ -3825,6 +4032,7 @@
                         suspendedCases = data.suspendedCases || [];
                         archivedCases = data.archivedCases || [];
                         notifications = data.notifications || [];
+                        departments = data.departments || [];
                         return;
                     }
                 } catch (e) {
@@ -3842,6 +4050,7 @@
                 suspendedCases = data.suspendedCases || [];
                 archivedCases = data.archivedCases || [];
                 notifications = data.notifications || [];
+                departments = data.departments || JSON.parse(localStorage.getItem('departments') || '[]') || [];
             } else {
                 // Fallback to localStorage
                 cases = JSON.parse(localStorage.getItem('cases')) || [];
@@ -3852,6 +4061,7 @@
                 suspendedCases = JSON.parse(localStorage.getItem('suspendedCases')) || [];
                 archivedCases = JSON.parse(localStorage.getItem('archivedCases')) || [];
                 notifications = JSON.parse(localStorage.getItem('notifications')) || [];
+                departments = JSON.parse(localStorage.getItem('departments')) || [];
             }
 
             // ========== استيراد النسخة الاحتياطية المرفقة (مرة واحدة فقط) ==========
@@ -3878,6 +4088,7 @@
                         suspendedCases = seed.suspendedCases || [];
                         archivedCases = seed.archivedCases || [];
                         notifications = seed.notifications || [];
+                        departments = seed.departments || [];
 
                         localStorage.setItem('cases', JSON.stringify(cases));
                         localStorage.setItem('favorableJudgments', JSON.stringify(favorableJudgments));
@@ -3887,6 +4098,7 @@
                         localStorage.setItem('suspendedCases', JSON.stringify(suspendedCases));
                         localStorage.setItem('archivedCases', JSON.stringify(archivedCases));
                         localStorage.setItem('notifications', JSON.stringify(notifications));
+                        localStorage.setItem('departments', JSON.stringify(departments));
                         console.log('تم استيراد بيانات النسخة الاحتياطية المرفقة بنجاح');
                     }
                 } catch (e) {
@@ -3910,6 +4122,7 @@
                     suspendedCases,
                     archivedCases,
                     notifications,
+                    departments,
                     // Timestamp to help choose the most recent source on load
                     lastSavedAt: Date.now()
                 };
@@ -3942,6 +4155,7 @@
                     localStorage.setItem('suspendedCases', JSON.stringify(suspendedCases));
                     localStorage.setItem('archivedCases', JSON.stringify(archivedCases));
                     localStorage.setItem('notifications', JSON.stringify(notifications));
+                    localStorage.setItem('departments', JSON.stringify(departments));
                     localStorage.setItem('lastSavedAt', String(data.lastSavedAt));
                 } catch (e) {
                     console.warn('localStorage backup failed', e);
@@ -3956,7 +4170,7 @@
         (function() {
             try {
                 const originalSetItem = localStorage.setItem.bind(localStorage);
-                const keysToAutoPersist = new Set(['cases','favorableJudgments','againstJudgments','reservedCases','cancelledCases','suspendedCases','archivedCases','notifications','programmerName','lastBackup']);
+                const keysToAutoPersist = new Set(['cases','favorableJudgments','againstJudgments','reservedCases','cancelledCases','suspendedCases','archivedCases','notifications','departments','programmerName','lastBackup']);
                 localStorage.setItem = function(key, value) {
                     // always perform the original setItem
                     originalSetItem(key, value);
@@ -3975,6 +4189,7 @@
 
         // بيانات التطبيق
         let cases = [];
+        let departments = [];
         let favorableJudgments = [];
         let againstJudgments = [];
         let reservedCases = [];
@@ -4007,11 +4222,15 @@
         const printRollBtn = document.getElementById('print-roll');
         const shareRollWhatsAppBtn = document.getElementById('share-roll-whatsapp');
         const sortRollBtn = document.getElementById('sort-roll');
+        const prevSessionsDepartmentSelect = document.getElementById('prev-sessions-department');
+        const prevSessionsSearchInput = document.getElementById('prev-sessions-search');
+        const prevSessionsTableBody = document.getElementById('prev-sessions-table-body');
         const tabs = document.querySelectorAll('.tab');
         const judgmentTabs = document.querySelectorAll('.judgment-tab');
         const postponeModal = document.getElementById('postpone-modal');
         const returnToRollModal = document.getElementById('return-to-roll-modal');
         const editCaseModal = document.getElementById('edit-case-modal');
+        const editArchivedCaseModal = document.getElementById('edit-archived-case-modal');
         const caseDetailsModal = document.getElementById('case-details-modal');
         const editJudgmentModal = document.getElementById('edit-judgment-modal');
         const sessionHistoryModal = document.getElementById('session-history-modal');
@@ -4020,6 +4239,7 @@
         const archiveModal = document.getElementById('archive-modal');
         const postponeForm = document.getElementById('postpone-form');
         const editCaseForm = document.getElementById('edit-case-form');
+        const editArchivedCaseForm = document.getElementById('edit-archived-case-form');
         const editJudgmentForm = document.getElementById('edit-judgment-form');
         const judgmentForm = document.getElementById('reserved-judgment-form');
         const archiveForm = document.getElementById('archive-form');
@@ -5524,6 +5744,377 @@
             }
         }
         
+        // ========== أدوات مساعدة لمطابقة أسماء الدوائر ==========
+        // تطبيع اسم الدائرة (إزالة الفراغات الزائدة) حتى تتطابق أسماء الدوائر المسجلة
+        // مع الدائرة المكتوبة مسبقًا في القضايا القديمة تلقائيًا، دون الحاجة لتعديل كل قضية يدويًا
+        function normalizeDeptName(name) {
+            return (name || '').toString().trim().replace(/\s+/g, ' ');
+        }
+        
+        function getDepartmentByName(name) {
+            const normalized = normalizeDeptName(name);
+            if (!normalized) return null;
+            return departments.find(d => normalizeDeptName(d.name) === normalized) || null;
+        }
+        
+        // ========== تسجيل الدوائر ==========
+        function saveDepartments() {
+            localStorage.setItem('departments', JSON.stringify(departments));
+        }
+        
+        // تعبئة قائمة اختيار الدائرة في نماذج القضايا بالدوائر المسجلة رسميًا،
+        // مع الحفاظ على القيمة القديمة لو كانت قضية قديمة مربوطة باسم دائرة لم تُسجل بعد
+        function populateDepartmentSelect(selectEl, currentValue) {
+            if (!selectEl) return;
+            
+            const sortedDepartments = [...departments].sort((a, b) => normalizeDeptName(a.name).localeCompare(normalizeDeptName(b.name), 'ar'));
+            let optionsHTML = '<option value="">-- اختر الدائرة --</option>' +
+                sortedDepartments.map(d => `<option value="${normalizeDeptName(d.name)}">${normalizeDeptName(d.name)} (${d.conveningDay || '-'})</option>`).join('');
+            
+            const normalizedCurrent = normalizeDeptName(currentValue);
+            const existsInList = normalizedCurrent && sortedDepartments.some(d => normalizeDeptName(d.name) === normalizedCurrent);
+            if (normalizedCurrent && !existsInList) {
+                // دائرة قديمة (قضية سابقة) غير مسجلة رسميًا بعد - تُضاف كخيار حتى لا تُفقد قيمتها
+                optionsHTML += `<option value="${normalizedCurrent}">${normalizedCurrent} (غير مسجلة)</option>`;
+            }
+            
+            selectEl.innerHTML = optionsHTML;
+            selectEl.value = normalizedCurrent || '';
+        }
+        
+        function refreshAllDepartmentSelects() {
+            const addCaseDeptSelect = document.getElementById('department');
+            if (addCaseDeptSelect) {
+                populateDepartmentSelect(addCaseDeptSelect, addCaseDeptSelect.value);
+            }
+            
+            const emptyHint = document.getElementById('department-empty-hint');
+            if (emptyHint) {
+                emptyHint.style.display = departments.length === 0 ? 'block' : 'none';
+            }
+            
+            const editDeptSelect = document.getElementById('edit-department');
+            if (editDeptSelect) {
+                populateDepartmentSelect(editDeptSelect, editDeptSelect.value);
+            }
+            
+            if (typeof renderPreviousSessionsDepartments === 'function') {
+                renderPreviousSessionsDepartments();
+            }
+        }
+        
+        function renderDepartmentsTable() {
+            const tbody = document.getElementById('departments-table-body');
+            if (!tbody) return;
+            
+            if (departments.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:20px; color:#999;">لا توجد دوائر مسجلة بعد</td></tr>';
+                return;
+            }
+            
+            const sortedDepartments = [...departments].sort((a, b) => normalizeDeptName(a.name).localeCompare(normalizeDeptName(b.name), 'ar'));
+            
+            tbody.innerHTML = sortedDepartments.map(dept => {
+                const linkedCount = cases.filter(c => normalizeDeptName(c.department) === normalizeDeptName(dept.name)).length;
+                return `
+                    <tr>
+                        <td>${dept.name}</td>
+                        <td style="text-align:center;">${dept.conveningDay || '-'}</td>
+                        <td style="text-align:center;">${linkedCount}</td>
+                        <td class="actions no-print" style="text-align:center;">
+                            <button class="btn-info" style="padding:5px 10px; font-size:12px;" onclick="editDepartment('${dept.id}')"><i class="fas fa-edit"></i> تعديل</button>
+                            <button class="btn-danger" style="padding:5px 10px; font-size:12px;" onclick="deleteDepartment('${dept.id}')"><i class="fas fa-trash"></i> حذف</button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+        
+        function editDepartment(deptId) {
+            const dept = departments.find(d => d.id === deptId);
+            if (!dept) return;
+            
+            document.getElementById('department-name-input').value = dept.name;
+            document.getElementById('department-day-input').value = dept.conveningDay || '';
+            document.getElementById('department-edit-id').value = dept.id;
+            
+            const cancelBtn = document.getElementById('cancel-department-edit-btn');
+            if (cancelBtn) cancelBtn.style.display = 'inline-flex';
+            
+            document.getElementById('department-name-input').focus();
+        }
+        
+        function deleteDepartment(deptId) {
+            const dept = departments.find(d => d.id === deptId);
+            if (!dept) return;
+            
+            const linkedCount = cases.filter(c => normalizeDeptName(c.department) === normalizeDeptName(dept.name)).length;
+            const confirmMsg = linkedCount > 0
+                ? `توجد ${linkedCount} قضية مرتبطة باسم هذه الدائرة. حذف الدائرة من السجل لن يؤثر على بيانات القضايا نفسها. هل تريد المتابعة؟`
+                : 'هل تريد حذف هذه الدائرة؟';
+            
+            if (!confirm(confirmMsg)) return;
+            
+            departments = departments.filter(d => d.id !== deptId);
+            saveDepartments();
+            renderDepartmentsTable();
+            refreshAllDepartmentSelects();
+            showAlert('تم حذف الدائرة من السجل', 'success');
+        }
+        
+        function resetDepartmentForm() {
+            const form = document.getElementById('department-form');
+            if (form) form.reset();
+            document.getElementById('department-edit-id').value = '';
+            const cancelBtn = document.getElementById('cancel-department-edit-btn');
+            if (cancelBtn) cancelBtn.style.display = 'none';
+        }
+        
+        // ========== ربط القضايا القديمة (المسجلة قبل تسجيل الدوائر) بالدوائر المسجلة حسب تطابق الاسم ==========
+        function syncCasesWithRegisteredDepartments() {
+            if (departments.length === 0) {
+                showAlert('يرجى تسجيل الدوائر أولاً قبل تنفيذ عملية الربط', 'warning');
+                return;
+            }
+            
+            const collections = [
+                { list: cases, storageKey: 'cases' },
+                { list: reservedCases, storageKey: 'reservedCases' },
+                { list: cancelledCases, storageKey: 'cancelledCases' },
+                { list: suspendedCases, storageKey: 'suspendedCases' },
+                { list: archivedCases, storageKey: 'archivedCases' }
+            ];
+            
+            const updatedCountByDept = {};
+            let totalUpdated = 0;
+            const unmatchedNames = new Set();
+            
+            collections.forEach(col => {
+                col.list.forEach(item => {
+                    const normalizedCurrent = normalizeDeptName(item.department);
+                    if (!normalizedCurrent) return; // لا توجد دائرة مسجلة بهذه القضية أصلًا
+                    
+                    const matchedDept = getDepartmentByName(normalizedCurrent);
+                    if (matchedDept) {
+                        if (item.department !== matchedDept.name) {
+                            item.department = matchedDept.name;
+                            totalUpdated++;
+                            updatedCountByDept[matchedDept.name] = (updatedCountByDept[matchedDept.name] || 0) + 1;
+                        }
+                    } else {
+                        unmatchedNames.add(normalizedCurrent);
+                    }
+                });
+            });
+            
+            // حفظ كل المجموعات المتأثرة
+            collections.forEach(col => {
+                localStorage.setItem(col.storageKey, JSON.stringify(col.list));
+            });
+            
+            // إعادة عرض كل الجداول المتأثرة
+            renderCasesTable();
+            renderReservedAndCancelledCases();
+            renderSuspendedCasesTable();
+            renderArchivedCasesTable();
+            renderDepartmentsTable();
+            refreshAllDepartmentSelects();
+            updateStats();
+            
+            const resultEl = document.getElementById('sync-departments-result');
+            if (resultEl) {
+                let html = '';
+                if (totalUpdated > 0) {
+                    html += `<div class="alert alert-success">تم تحديث ${totalUpdated} قضية بنجاح لتأخذ الاسم الرسمي للدائرة المطابقة:<ul style="margin:8px 0 0 0; padding-right:20px;">`;
+                    Object.keys(updatedCountByDept).forEach(name => {
+                        html += `<li>${name}: ${updatedCountByDept[name]} قضية</li>`;
+                    });
+                    html += `</ul></div>`;
+                } else {
+                    html += `<div class="alert alert-info">لا توجد قضايا تحتاج تحديث - كل القضايا المطابقة لأسماء الدوائر المسجلة محدثة بالفعل.</div>`;
+                }
+                if (unmatchedNames.size > 0) {
+                    html += `<div class="alert alert-warning">تم العثور على أسماء دوائر مكتوبة في بعض القضايا ولم تُسجل بعد ضمن الدوائر (يرجى تسجيلها إذا كانت صحيحة ثم إعادة الضغط على الزر):<ul style="margin:8px 0 0 0; padding-right:20px;">`;
+                    [...unmatchedNames].forEach(name => {
+                        html += `<li>${name}</li>`;
+                    });
+                    html += `</ul></div>`;
+                }
+                resultEl.innerHTML = html;
+            }
+            
+            if (totalUpdated > 0) {
+                showAlert(`تم ربط ${totalUpdated} قضية بالدوائر المسجلة بنجاح`, 'success');
+            }
+        }
+        
+        const syncDepartmentsBtn = document.getElementById('sync-departments-btn');
+        if (syncDepartmentsBtn) {
+            syncDepartmentsBtn.addEventListener('click', syncCasesWithRegisteredDepartments);
+        }
+        
+        const departmentForm = document.getElementById('department-form');
+        if (departmentForm) {
+            departmentForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                
+                const name = normalizeDeptName(document.getElementById('department-name-input').value);
+                const conveningDay = document.getElementById('department-day-input').value;
+                const editId = document.getElementById('department-edit-id').value;
+                
+                if (!name || !conveningDay) {
+                    showAlert('يرجى إدخال اسم الدائرة واختيار يوم الانعقاد', 'warning');
+                    return;
+                }
+                
+                const duplicate = departments.find(d => normalizeDeptName(d.name) === name && d.id !== editId);
+                if (duplicate) {
+                    showAlert('توجد دائرة مسجلة بالفعل بنفس الاسم', 'danger');
+                    return;
+                }
+                
+                if (editId) {
+                    const dept = departments.find(d => d.id === editId);
+                    if (dept) {
+                        dept.name = name;
+                        dept.conveningDay = conveningDay;
+                    }
+                    showAlert('تم تحديث بيانات الدائرة بنجاح', 'success');
+                } else {
+                    departments.push({
+                        id: Date.now().toString(),
+                        name: name,
+                        conveningDay: conveningDay,
+                        createdAt: new Date().toISOString()
+                    });
+                    showAlert('تم تسجيل الدائرة بنجاح', 'success');
+                }
+                
+                saveDepartments();
+                renderDepartmentsTable();
+                refreshAllDepartmentSelects();
+                resetDepartmentForm();
+            });
+        }
+        
+        const cancelDepartmentEditBtn = document.getElementById('cancel-department-edit-btn');
+        if (cancelDepartmentEditBtn) {
+            cancelDepartmentEditBtn.addEventListener('click', resetDepartmentForm);
+        }
+        
+        // ========== الجلسات السابقة للقضايا (مجمعة حسب الدائرة) ==========
+        function renderPreviousSessionsDepartments() {
+            if (!prevSessionsDepartmentSelect) return;
+            
+            const currentValue = prevSessionsDepartmentSelect.value;
+            
+            // الدوائر المسجلة رسميًا + أي اسم دائرة مكتوب في قضايا قديمة ولم يُسجل بعد (حتى لا تختفي قضية)
+            const registeredNames = departments.map(d => normalizeDeptName(d.name));
+            const legacyNames = cases.map(c => normalizeDeptName(c.department)).filter(d => d !== '');
+            const deptNames = [...new Set([...registeredNames, ...legacyNames])].sort((a, b) => a.localeCompare('ar'));
+            
+            prevSessionsDepartmentSelect.innerHTML = '<option value="">-- اختر الدائرة --</option>' +
+                deptNames.map(d => {
+                    const dept = getDepartmentByName(d);
+                    const label = dept && dept.conveningDay ? `${d} (${dept.conveningDay})` : d;
+                    return `<option value="${d}">${label}</option>`;
+                }).join('');
+            
+            if (currentValue && deptNames.includes(currentValue)) {
+                prevSessionsDepartmentSelect.value = currentValue;
+            }
+        }
+        
+        // تحديد آخر حركة ترحيل/قرار مسجلة لجلسات القضية (الجلسة السابقة، الجلسة الأخيرة، وسبب القرار)
+        function getLastSessionMovement(caseItem) {
+            const history = caseItem.sessionHistory || [];
+            
+            if (history.length === 0) {
+                return {
+                    previousDate: null,
+                    lastDate: caseItem.sessionDate || null,
+                    reason: 'لا يوجد ترحيل سابق مسجل لهذه القضية'
+                };
+            }
+            
+            const sortedHistory = [...history].sort((a, b) => new Date(a.recordedDate || a.date || 0) - new Date(b.recordedDate || b.date || 0));
+            const lastEntry = sortedHistory[sortedHistory.length - 1];
+            
+            return {
+                previousDate: lastEntry.date || null,
+                lastDate: lastEntry.newDate || lastEntry.judgmentDate || caseItem.sessionDate || null,
+                reason: lastEntry.reason || (lastEntry.type === 'judgment' ? (lastEntry.judgmentText || '-') : '-')
+            };
+        }
+        
+        function renderPreviousSessionsTable() {
+            if (!prevSessionsTableBody) return;
+            
+            const selectedDepartment = prevSessionsDepartmentSelect ? normalizeDeptName(prevSessionsDepartmentSelect.value) : '';
+            const searchTerm = prevSessionsSearchInput ? prevSessionsSearchInput.value.trim().toLowerCase() : '';
+            const summaryEl = document.getElementById('prev-sessions-summary');
+            const countEl = document.getElementById('prev-sessions-count');
+            
+            if (!selectedDepartment) {
+                prevSessionsTableBody.innerHTML = '<tr><td colspan="9" style="text-align:center; padding:20px; color:#999;">يرجى اختيار الدائرة لعرض القضايا</td></tr>';
+                if (summaryEl) summaryEl.style.display = 'none';
+                return;
+            }
+            
+            // مطابقة تلقائية بالاسم (بعد التطبيع) بين الدائرة المختارة وحقل الدائرة في كل قضية،
+            // سواء كانت القضية مرتبطة بدائرة مسجلة حديثًا أو قضية قديمة كُتبت فيها الدائرة يدويًا
+            let filteredCases = cases.filter(c => normalizeDeptName(c.department) === selectedDepartment);
+            
+            if (searchTerm) {
+                filteredCases = filteredCases.filter(c => {
+                    const haystack = `${c.number || ''}/${c.year || ''} ${c.subject || ''} ${c.plaintiff || ''} ${c.defendant || ''} ${c.circulationNumber || ''}`.toLowerCase();
+                    return haystack.includes(searchTerm);
+                });
+            }
+            
+            if (summaryEl && countEl) {
+                summaryEl.style.display = 'block';
+                countEl.textContent = `عدد القضايا في الدائرة: ${filteredCases.length}`;
+            }
+            
+            if (filteredCases.length === 0) {
+                prevSessionsTableBody.innerHTML = '<tr><td colspan="9" style="text-align:center; padding:20px; color:#999;">لا توجد قضايا لهذه الدائرة</td></tr>';
+                return;
+            }
+            
+            let rowsHTML = '';
+            filteredCases.forEach(caseItem => {
+                const movement = getLastSessionMovement(caseItem);
+                
+                rowsHTML += `
+                    <tr>
+                        <td style="text-align:center;">${caseItem.number}/${caseItem.year}</td>
+                        <td>${caseItem.subject || '-'}</td>
+                        <td>${caseItem.plaintiff || '-'}</td>
+                        <td>${caseItem.defendant || '-'}</td>
+                        <td style="text-align:center;">${caseItem.circulationNumber || '-'}</td>
+                        <td style="text-align:center;">${movement.previousDate ? formatDate(movement.previousDate) : '-'}</td>
+                        <td style="text-align:center;">${movement.lastDate ? formatDate(movement.lastDate) : '-'}</td>
+                        <td class="session-history-notes">${movement.reason}</td>
+                        <td class="actions no-print" style="text-align:center;">
+                            <button class="btn-purple btn-session-history" data-id="${caseItem.id}" style="padding:5px 10px; font-size:12px;">
+                                <i class="fas fa-history"></i> السجل الكامل
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+            
+            prevSessionsTableBody.innerHTML = rowsHTML;
+        }
+        
+        if (prevSessionsDepartmentSelect) {
+            prevSessionsDepartmentSelect.addEventListener('change', renderPreviousSessionsTable);
+        }
+        if (prevSessionsSearchInput) {
+            prevSessionsSearchInput.addEventListener('input', renderPreviousSessionsTable);
+        }
+        
         function showAlert(message, type) {
             const alert = document.createElement('div');
             alert.className = `alert alert-${type}`;
@@ -5565,6 +6156,7 @@
                         cancelledCases = data.cancelledCases || [];
                         archivedCases = data.archivedCases || [];
                         notifications = data.notifications || [];
+                        departments = data.departments || [];
                         programmerName = data.programmerName || programmerName;
                         
                         localStorage.setItem('cases', JSON.stringify(cases));
@@ -5575,6 +6167,7 @@
                         localStorage.setItem('suspendedCases', JSON.stringify(suspendedCases));
                         localStorage.setItem('archivedCases', JSON.stringify(archivedCases));
                         localStorage.setItem('notifications', JSON.stringify(notifications));
+                        localStorage.setItem('departments', JSON.stringify(departments));
                         localStorage.setItem('programmerName', programmerName);
                         
                         // حفظ البيانات في التخزين الدائم (Electron app-data.json)
@@ -5585,6 +6178,8 @@
                         renderReservedAndCancelledCases();
                         renderSuspendedCasesTable();
                         renderArchivedCasesTable();
+                        renderDepartmentsTable();
+                        refreshAllDepartmentSelects();
                         updateStats();
                         updateDashboard();
                         
@@ -5789,6 +6384,7 @@
                 subject: judgment.text.substring(0, 100) + '...',
                 plaintiff: judgment.plaintiff,
                 defendant: judgment.defendant,
+                department: (originalCase && originalCase.department) || judgment.department || '',
                 judgmentType: type,
                 judgmentText: judgment.text,
                 judgmentDate: judgment.date,
@@ -6029,7 +6625,7 @@
             document.getElementById('edit-judgment-plaintiff').value = (caseItem && caseItem.plaintiff) ? caseItem.plaintiff : (judgment.plaintiff || '');
             document.getElementById('edit-judgment-defendant').value = (caseItem && caseItem.defendant) ? caseItem.defendant : (judgment.defendant || '');
             document.getElementById('edit-judgment-subject').value = (caseItem && caseItem.subject) ? caseItem.subject : (judgment.subject || '');
-            document.getElementById('edit-judgment-department').value = (caseItem && caseItem.department) ? caseItem.department : (judgment.department || '');
+            populateDepartmentSelect(document.getElementById('edit-judgment-department'), (caseItem && caseItem.department) ? caseItem.department : (judgment.department || ''));
             document.getElementById('edit-judgment-notes').value = (caseItem && caseItem.notes) ? caseItem.notes : (judgment.notes || '');
 
             // judgment-specific fields
@@ -6236,6 +6832,14 @@
                 } else if (targetSection === 'dashboard') {
                     updateDashboard();
                     updateStats();
+                } else if (targetSection === 'previous-sessions') {
+                    renderPreviousSessionsDepartments();
+                    renderPreviousSessionsTable();
+                } else if (targetSection === 'departments-management') {
+                    renderDepartmentsTable();
+                    refreshAllDepartmentSelects();
+                } else if (targetSection === 'add-case') {
+                    refreshAllDepartmentSelects();
                 }
             });
         });
@@ -6841,6 +7445,7 @@
                     <td>${formatDate(caseItem.reserveDate)}</td>
                     <td class="actions">
                         <button class="btn-info btn-view-case" data-id="${caseItem.id}"><i class="fas fa-eye"></i> عرض</button>
+                        <button class="btn-warning btn-edit-case" data-id="${caseItem.id}"><i class="fas fa-edit"></i> تعديل</button>
                         <button class="btn-purple btn-session-history" data-id="${caseItem.id}"><i class="fas fa-history"></i> سجل الجلسات</button>
                         <button class="btn-postpone btn-postpone-case" data-id="${caseItem.id}"><i class="fas fa-calendar-plus"></i> مد أجل الحكم</button>
                         <button class="btn-judgment btn-judge-case" data-id="${caseItem.id}"><i class="fas fa-gavel"></i> الحكم</button>
@@ -6862,6 +7467,7 @@
                     <td>${formatDate(caseItem.cancelDate)}</td>
                     <td class="actions">
                         <button class="btn-info btn-view-case" data-id="${caseItem.id}"><i class="fas fa-eye"></i> عرض</button>
+                        <button class="btn-warning btn-edit-case" data-id="${caseItem.id}"><i class="fas fa-edit"></i> تعديل</button>
                         <button class="btn-purple btn-session-history" data-id="${caseItem.id}"><i class="fas fa-history"></i> سجل الجلسات</button>
                         <button class="btn-return btn-return-case" data-id="${caseItem.id}" data-type="cancelled"><i class="fas fa-redo"></i> إعادة للرول</button>
                     </td>
@@ -6889,6 +7495,7 @@
                     <td>${formatDate(caseItem.archiveDate)}</td>
                     <td class="actions">
                         <button class="btn-info btn-view-archived-case" data-id="${caseItem.id}"><i class="fas fa-eye"></i> عرض</button>
+                        <button class="btn-warning btn-edit-archived-case" data-id="${caseItem.id}"><i class="fas fa-edit"></i> تعديل</button>
                         <button class="btn-purple btn-session-history" data-id="${caseItem.id}"><i class="fas fa-history"></i> سجل الجلسات</button>
                         <button class="btn-word btn-export-archived-case" data-id="${caseItem.id}"><i class="fas fa-file-word"></i> Word</button>
                         <button class="btn-danger btn-delete-archived-case" data-id="${caseItem.id}"><i class="fas fa-trash"></i> حذف</button>
@@ -6919,6 +7526,7 @@
                     <td>${formatDate(caseItem.suspendDate)}</td>
                     <td class="actions">
                         <button class="btn-info btn-view-case" data-id="${caseItem.id}"><i class="fas fa-eye"></i> عرض</button>
+                        <button class="btn-warning btn-edit-case" data-id="${caseItem.id}"><i class="fas fa-edit"></i> تعديل</button>
                         <button class="btn-purple btn-session-history" data-id="${caseItem.id}"><i class="fas fa-history"></i> سجل الجلسات</button>
                         <button class="btn-return btn-return-suspended-case" data-id="${caseItem.id}"><i class="fas fa-redo"></i> إعادة للرول</button>
                     </td>
@@ -7076,6 +7684,49 @@
             
             modal.style.display = 'flex';
             try { refreshDocuments(caseItem.caseId); } catch(e) { /* ignore */ }
+        }
+
+        // ========== تعديل بيانات القضية المؤرشفة (بما فيها الدائرة) ==========
+        function openEditArchivedCaseModal(caseId) {
+            const caseItem = archivedCases.find(c => c.id === caseId);
+            if (!caseItem) return;
+
+            document.getElementById('edit-archived-case-id').value = caseId;
+            document.getElementById('edit-archived-subject').value = caseItem.subject || '';
+            document.getElementById('edit-archived-case-number').value = caseItem.caseNumber || '';
+            document.getElementById('edit-archived-plaintiff').value = caseItem.plaintiff || '';
+            document.getElementById('edit-archived-defendant').value = caseItem.defendant || '';
+            populateDepartmentSelect(document.getElementById('edit-archived-department'), caseItem.department || '');
+            document.getElementById('edit-archived-notes').value = caseItem.archiveNotes || '';
+
+            editArchivedCaseModal.style.display = 'flex';
+        }
+
+        if (editArchivedCaseForm) {
+            editArchivedCaseForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+
+                const caseId = document.getElementById('edit-archived-case-id').value;
+                const caseIndex = archivedCases.findIndex(c => c.id === caseId);
+                if (caseIndex === -1) return;
+
+                archivedCases[caseIndex] = {
+                    ...archivedCases[caseIndex],
+                    subject: document.getElementById('edit-archived-subject').value,
+                    caseNumber: document.getElementById('edit-archived-case-number').value,
+                    plaintiff: document.getElementById('edit-archived-plaintiff').value,
+                    defendant: document.getElementById('edit-archived-defendant').value,
+                    department: document.getElementById('edit-archived-department').value,
+                    archiveNotes: document.getElementById('edit-archived-notes').value
+                };
+
+                localStorage.setItem('archivedCases', JSON.stringify(archivedCases));
+                saveDataToAPI();
+
+                showAlert('تم تعديل بيانات القضية المؤرشفة بنجاح', 'success');
+                editArchivedCaseModal.style.display = 'none';
+                renderArchivedCasesTable();
+            });
         }
         
         // ========== تصدير القضية المؤرشفة إلى Word ==========
@@ -7654,6 +8305,10 @@
             } else if (button.classList.contains('btn-view-archived-case')) {
                 e.preventDefault();
                 viewArchivedCase(dataId);
+                handled = true;
+            } else if (button.classList.contains('btn-edit-archived-case')) {
+                e.preventDefault();
+                openEditArchivedCaseModal(dataId);
                 handled = true;
             } else if (button.classList.contains('btn-export-archived-case')) {
                 e.preventDefault();
@@ -8820,8 +9475,22 @@
         }
         
         // ========== فتح نافذة تعديل القضية ==========
+        let currentEditCaseSource = 'cases';
         function openEditCaseModal(caseId) {
-            const caseItem = cases.find(c => c.id === caseId);
+            let caseItem = cases.find(c => c.id === caseId);
+            currentEditCaseSource = 'cases';
+            if (!caseItem) {
+                caseItem = reservedCases.find(c => c.id === caseId);
+                currentEditCaseSource = 'reserved';
+            }
+            if (!caseItem) {
+                caseItem = cancelledCases.find(c => c.id === caseId);
+                currentEditCaseSource = 'cancelled';
+            }
+            if (!caseItem) {
+                caseItem = suspendedCases.find(c => c.id === caseId);
+                currentEditCaseSource = 'suspended';
+            }
             if (!caseItem) return;
             
             currentEditCaseId = caseId;
@@ -8834,28 +9503,37 @@
             document.getElementById('edit-plaintiff').value = caseItem.plaintiff;
             document.getElementById('edit-defendant').value = caseItem.defendant;
             document.getElementById('edit-session-date').value = caseItem.sessionDate;
-            document.getElementById('edit-department').value = caseItem.department || '';
+            populateDepartmentSelect(document.getElementById('edit-department'), caseItem.department || '');
             document.getElementById('edit-case-notes').value = caseItem.notes || '';
             
             editCaseModal.style.display = 'flex';
         }
         
-        // ========== حفظ تعديل القضية ==========
+        // ========== حفظ تعديل القضية (يدعم القضايا النشطة والمحجوزة والمشطوبة والموقوفة) ==========
         editCaseForm.addEventListener('submit', (e) => {
             e.preventDefault();
             
             const caseId = document.getElementById('edit-case-id').value;
-            const caseIndex = cases.findIndex(c => c.id === caseId);
-            const reservedIndex = reservedCases.findIndex(c => c.id === caseId);
-            
+
+            const sourceMap = {
+                cases: { array: cases, storageKey: 'cases', render: renderCasesTable },
+                reserved: { array: reservedCases, storageKey: 'reservedCases', render: renderReservedAndCancelledCases },
+                cancelled: { array: cancelledCases, storageKey: 'cancelledCases', render: renderReservedAndCancelledCases },
+                suspended: { array: suspendedCases, storageKey: 'suspendedCases', render: renderSuspendedCasesTable }
+            };
+
+            const source = sourceMap[currentEditCaseSource] || sourceMap.cases;
+            const targetArray = source.array;
+            const caseIndex = targetArray.findIndex(c => c.id === caseId);
+
             if (caseIndex !== -1) {
-                const originalCase = cases[caseIndex];
+                const originalCase = targetArray[caseIndex];
                 const newCaseNumber = document.getElementById('edit-case-number').value;
                 const newCaseYear = document.getElementById('edit-case-year').value;
                 const newCirculationNumber = document.getElementById('edit-circulation-number').value;
                 
-                // التحقق من عدم تكرار القضية (باستثناء القضية الحالية)
-                const isDuplicate = cases.some((c, index) => 
+                // التحقق من عدم تكرار القضية (باستثناء القضية الحالية) داخل نفس التصنيف
+                const isDuplicate = targetArray.some((c, index) => 
                     index !== caseIndex && 
                     c.number === newCaseNumber && 
                     c.year.toString() === newCaseYear.toString() && 
@@ -8867,7 +9545,7 @@
                     return;
                 }
                 
-                cases[caseIndex] = {
+                targetArray[caseIndex] = {
                     ...originalCase,
                     subject: document.getElementById('edit-case-subject').value,
                     number: newCaseNumber,
@@ -8880,16 +9558,16 @@
                     notes: document.getElementById('edit-case-notes').value
                 };
                 
-                localStorage.setItem('cases', JSON.stringify(cases));
+                localStorage.setItem(source.storageKey, JSON.stringify(targetArray));
                 
                 // حفظ البيانات في التخزين الدائم (Electron app-data.json) لضمان استمرار التعديلات
                 saveDataToAPI();
                 
-                addNotification(`تم تعديل القضية: ${cases[caseIndex].number}/${cases[caseIndex].year}`, 'success');
+                addNotification(`تم تعديل القضية: ${targetArray[caseIndex].number}/${targetArray[caseIndex].year}`, 'success');
                 showAlert('تم تعديل القضية بنجاح', 'success');
                 
                 editCaseModal.style.display = 'none';
-                renderCasesTable();
+                source.render();
                 updateStats();
                 updateDashboard();
             }
@@ -9433,6 +10111,71 @@
                     target.selectionStart = target.selectionEnd = start;
                     e.preventDefault();
                 } catch (ex) { /* ignore */ }
+            });
+        })();
+
+        // ========== نسخ أي بيان معروض بضغطة واحدة (خلايا الجداول وتفاصيل القضية) ==========
+        (function enableClickToCopyAnyDisplayedData() {
+            async function copyTextToClipboard(text) {
+                if (!text) return false;
+                try {
+                    if (window.electronAPI && window.electronAPI.writeClipboard) {
+                        const r = await window.electronAPI.writeClipboard({ text });
+                        if (r && r.success) return true;
+                    }
+                } catch (e) { /* ignore */ }
+                try {
+                    if (navigator.clipboard && navigator.clipboard.writeText) {
+                        await navigator.clipboard.writeText(text);
+                        return true;
+                    }
+                } catch (e) { /* ignore */ }
+                try {
+                    // حل احتياطي أخير يعمل في كل البيئات القديمة
+                    const ta = document.createElement('textarea');
+                    ta.value = text;
+                    ta.style.position = 'fixed';
+                    ta.style.opacity = '0';
+                    ta.style.pointerEvents = 'none';
+                    document.body.appendChild(ta);
+                    ta.focus();
+                    ta.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(ta);
+                    return true;
+                } catch (e) { return false; }
+            }
+
+            function shortPreview(text) {
+                const clean = text.replace(/\s+/g, ' ').trim();
+                return clean.length > 45 ? clean.substring(0, 45) + '…' : clean;
+            }
+
+            document.addEventListener('click', async function (e) {
+                const target = e.target;
+                if (!target) return;
+
+                // نتجاهل الأزرار والروابط والحقول القابلة للتعديل وأعمدة الإجراءات
+                // عشان النسخ متتعارضش مع أي زرار (عرض/تعديل/حذف...) في نفس الخلية
+                if (target.closest('button, a, input, textarea, select, .actions, .quick-action-btn')) return;
+
+                let valueEl = target.closest('td');
+                if (valueEl && (valueEl.closest('.actions') || !valueEl.parentElement || valueEl.parentElement.tagName !== 'TR')) {
+                    valueEl = null;
+                }
+                if (!valueEl) {
+                    valueEl = target.closest('.case-detail-item p, .case-detail-item span, .case-detail-item div:not(.case-detail-item)');
+                }
+
+                if (!valueEl) return;
+
+                const text = (valueEl.innerText || valueEl.textContent || '').trim();
+                if (!text) return;
+
+                const ok = await copyTextToClipboard(text);
+                if (ok && typeof showAlert === 'function') {
+                    showAlert('تم نسخ: ' + shortPreview(text), 'success');
+                }
             });
         })();
         
@@ -11291,6 +12034,7 @@
                 cancelledCases: cancelledCases,
                 archivedCases: archivedCases,
                 notifications: notifications,
+                departments: departments,
                 programmerName: programmerName,
                 exportDate: new Date().toISOString()
             };
@@ -11623,6 +12367,8 @@
             renderJudgmentsTables();
             renderReservedAndCancelledCases();
             renderArchivedCasesTable();
+            renderDepartmentsTable();
+            refreshAllDepartmentSelects();
             updateStats();
             updateDashboard();
             initializeJudgmentsPrintNotes();
