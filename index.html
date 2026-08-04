@@ -3495,6 +3495,17 @@
                 <input type="hidden" id="edit-judgment-id">
                 <input type="hidden" id="edit-judgment-type">
                 
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="edit-judgment-new-type">نوع الحكم</label>
+                        <select id="edit-judgment-new-type">
+                            <option value="favorable">صالح</option>
+                            <option value="against">ضد</option>
+                        </select>
+                        <small style="color:#666;">تغيير هذا الخيار ينقل الحكم بين قائمتي "أحكام الصالح" و"أحكام الضد"</small>
+                    </div>
+                </div>
+                
                 <!-- إضافات: بيانات القضية المرتبطة بالحكم ليتم تعديلها إن لزم -->
                 <div class="form-row">
                     <div class="form-group">
@@ -5513,7 +5524,7 @@
                         <td>${caseItem.subject}</td>
                         <td>${caseItem.plaintiff}</td>
                         <td>${caseItem.defendant}</td>
-                        <td>${caseItem.judgmentType === 'favorable' ? 'صالح' : 'ضد'}</td>
+                        <td>${archivedJudgmentTypeLabel(caseItem.judgmentType)}</td>
                         <td>${formatDate(caseItem.archiveDate)}</td>
                         <td>${caseItem.archiveReason || ''}</td>
                     </tr>
@@ -6494,19 +6505,33 @@
         }
 
         // ========== دالة فتح نافذة الأرشفة ==========
-        function openArchiveModal(judgmentId, type) {
-            const judgment = type === 'favorable' 
-                ? favorableJudgments.find(j => j.id === judgmentId)
-                : againstJudgments.find(j => j.id === judgmentId);
+        // type: 'favorable' | 'against' (أحكام) أو 'cancelled' | 'suspended' (قضايا مباشرة)
+        function openArchiveModal(itemId, type) {
+            let item = null;
+            let caseIdForModal = itemId;
+
+            if (type === 'favorable') {
+                item = favorableJudgments.find(j => j.id === itemId);
+                caseIdForModal = item ? (item.caseId || '') : '';
+            } else if (type === 'against') {
+                item = againstJudgments.find(j => j.id === itemId);
+                caseIdForModal = item ? (item.caseId || '') : '';
+            } else if (type === 'cancelled') {
+                item = cancelledCases.find(c => c.id === itemId);
+                caseIdForModal = itemId;
+            } else if (type === 'suspended') {
+                item = suspendedCases.find(c => c.id === itemId);
+                caseIdForModal = itemId;
+            }
+
+            if (!item) return;
             
-            if (!judgment) return;
-            
-            currentArchiveJudgmentId = judgmentId;
+            currentArchiveJudgmentId = itemId;
             currentArchiveJudgmentType = type;
             
-            document.getElementById('archive-judgment-id').value = judgmentId;
+            document.getElementById('archive-judgment-id').value = itemId;
             document.getElementById('archive-judgment-type').value = type;
-            document.getElementById('archive-case-id').value = judgment.caseId || '';
+            document.getElementById('archive-case-id').value = caseIdForModal;
             document.getElementById('archive-reason').value = '';
             document.getElementById('archive-notes').value = '';
             
@@ -6517,57 +6542,119 @@
         archiveForm.addEventListener('submit', (e) => {
             e.preventDefault();
             
-            const judgmentId = document.getElementById('archive-judgment-id').value;
+            const itemId = document.getElementById('archive-judgment-id').value;
             const type = document.getElementById('archive-judgment-type').value;
             const reason = document.getElementById('archive-reason').value;
             const notes = document.getElementById('archive-notes').value;
             
-            const judgment = type === 'favorable' 
-                ? favorableJudgments.find(j => j.id === judgmentId)
-                : againstJudgments.find(j => j.id === judgmentId);
+            let archivedCase = null;
             
-            if (!judgment) return;
-            
-            // البحث عن القضية الأصلية لنسخ سجل الجلسات
-            let originalCase = cases.find(c => c.id === judgment.caseId);
-            if (!originalCase) {
-                originalCase = reservedCases.find(c => c.id === judgment.caseId);
+            if (type === 'favorable' || type === 'against') {
+                const judgment = type === 'favorable' 
+                    ? favorableJudgments.find(j => j.id === itemId)
+                    : againstJudgments.find(j => j.id === itemId);
+                
+                if (!judgment) return;
+                
+                // البحث عن القضية الأصلية لنسخ سجل الجلسات
+                let originalCase = cases.find(c => c.id === judgment.caseId);
                 if (!originalCase) {
-                    originalCase = cancelledCases.find(c => c.id === judgment.caseId);
+                    originalCase = reservedCases.find(c => c.id === judgment.caseId);
+                    if (!originalCase) {
+                        originalCase = cancelledCases.find(c => c.id === judgment.caseId);
+                        if (!originalCase) {
+                            originalCase = suspendedCases.find(c => c.id === judgment.caseId);
+                        }
+                    }
                 }
+                
+                archivedCase = {
+                    id: Date.now().toString(),
+                    caseId: judgment.caseId,
+                    caseNumber: judgment.caseNumber,
+                    caseYear: judgment.caseNumber ? judgment.caseNumber.split('/')[1] : new Date().getFullYear(),
+                    subject: judgment.text.substring(0, 100) + '...',
+                    plaintiff: judgment.plaintiff,
+                    defendant: judgment.defendant,
+                    department: (originalCase && originalCase.department) || judgment.department || '',
+                    judgmentType: type,
+                    judgmentText: judgment.text,
+                    judgmentDate: judgment.date,
+                    archiveDate: new Date().toISOString().split('T')[0],
+                    archiveReason: reason,
+                    archiveNotes: notes,
+                    sessionHistory: originalCase ? originalCase.sessionHistory || [] : [],
+                    createdAt: new Date().toISOString()
+                };
+                
+                archivedCases.push(archivedCase);
+                
+                // إزالة الحكم من مكانه الأصلي حتى لا يبقى ظاهرًا في أحكام الصالح/الضد بعد الأرشفة
+                if (type === 'favorable') {
+                    favorableJudgments = favorableJudgments.filter(j => j.id !== itemId);
+                    localStorage.setItem('favorableJudgments', JSON.stringify(favorableJudgments));
+                } else {
+                    againstJudgments = againstJudgments.filter(j => j.id !== itemId);
+                    localStorage.setItem('againstJudgments', JSON.stringify(againstJudgments));
+                }
+                
+                renderFavorableJudgmentsTable();
+                renderAgainstJudgmentsTable();
+                
+            } else if (type === 'cancelled' || type === 'suspended') {
+                const sourceArray = type === 'cancelled' ? cancelledCases : suspendedCases;
+                const caseItem = sourceArray.find(c => c.id === itemId);
+                
+                if (!caseItem) return;
+                
+                archivedCase = {
+                    id: Date.now().toString(),
+                    caseId: caseItem.id,
+                    caseNumber: caseItem.number,
+                    caseYear: caseItem.year,
+                    subject: caseItem.subject || '',
+                    plaintiff: caseItem.plaintiff || '',
+                    defendant: caseItem.defendant || '',
+                    department: caseItem.department || '',
+                    judgmentType: '',
+                    judgmentText: '',
+                    judgmentDate: '',
+                    archiveDate: new Date().toISOString().split('T')[0],
+                    archiveReason: reason,
+                    archiveNotes: notes,
+                    sessionHistory: caseItem.sessionHistory || [],
+                    createdAt: new Date().toISOString()
+                };
+                
+                archivedCases.push(archivedCase);
+                
+                // إزالة القضية من قائمة المشطوب/الموقوف حتى تظهر في الأرشيف فقط
+                if (type === 'cancelled') {
+                    cancelledCases = cancelledCases.filter(c => c.id !== itemId);
+                    localStorage.setItem('cancelledCases', JSON.stringify(cancelledCases));
+                } else {
+                    suspendedCases = suspendedCases.filter(c => c.id !== itemId);
+                    localStorage.setItem('suspendedCases', JSON.stringify(suspendedCases));
+                }
+                
+                renderReservedAndCancelledCases();
+                renderSuspendedCasesTable();
             }
             
-            const archivedCase = {
-                id: Date.now().toString(),
-                caseId: judgment.caseId,
-                caseNumber: judgment.caseNumber,
-                caseYear: judgment.caseNumber ? judgment.caseNumber.split('/')[1] : new Date().getFullYear(),
-                subject: judgment.text.substring(0, 100) + '...',
-                plaintiff: judgment.plaintiff,
-                defendant: judgment.defendant,
-                department: (originalCase && originalCase.department) || judgment.department || '',
-                judgmentType: type,
-                judgmentText: judgment.text,
-                judgmentDate: judgment.date,
-                archiveDate: new Date().toISOString().split('T')[0],
-                archiveReason: reason,
-                archiveNotes: notes,
-                sessionHistory: originalCase ? originalCase.sessionHistory || [] : [],
-                createdAt: new Date().toISOString()
-            };
+            if (!archivedCase) return;
             
-            archivedCases.push(archivedCase);
             localStorage.setItem('archivedCases', JSON.stringify(archivedCases));
             
             // حفظ البيانات في التخزين الدائم (Electron app-data.json)
             saveDataToAPI();
             
             showAlert('تم أرشفة القضية بنجاح', 'success');
-            addNotification(`تم أرشفة قضية: ${judgment.caseNumber}`, 'info');
+            addNotification(`تم أرشفة قضية: ${archivedCase.caseNumber}`, 'info');
             
             archiveModal.style.display = 'none';
             renderArchivedCasesTable();
             updateStats();
+            updateDashboard();
         });
 
         // ========== دالة تصدير الحكم إلى Word ==========
@@ -6773,6 +6860,7 @@
             // basic identifiers
             document.getElementById('edit-judgment-id').value = judgment.id || '';
             document.getElementById('edit-judgment-type').value = type || '';
+            document.getElementById('edit-judgment-new-type').value = type || 'favorable';
 
             // if the judgment is linked to a case, prefer case fields so user sees canonical data
             let caseItem = null;
@@ -6821,7 +6909,8 @@
                 e.preventDefault();
 
                 const id = document.getElementById('edit-judgment-id').value;
-                const type = document.getElementById('edit-judgment-type').value;
+                const originalType = document.getElementById('edit-judgment-type').value;
+                const newType = document.getElementById('edit-judgment-new-type').value || originalType;
 
                 // read updated values
                 const caseNumber = document.getElementById('edit-judgment-case-number').value.trim();
@@ -6838,115 +6927,96 @@
                 const appealType = document.getElementById('edit-judgment-appeal-type').value;
                 const appeal = document.getElementById('edit-judgment-appeal').value;
 
-                let judgment = null;
-                if (type === 'favorable') {
-                    judgment = favorableJudgments.find(j => j.id === id);
-                    if (judgment) {
-                        // update case-related fields (also keep original caseId)
-                        judgment.caseNumber = caseNumber || judgment.caseNumber || '';
-                        judgment.sessionDate = sessionDate || judgment.sessionDate || '';
-                        judgment.plaintiff = plaintiff || judgment.plaintiff || '';
-                        judgment.defendant = defendant || judgment.defendant || '';
-                        judgment.subject = subject || judgment.subject || '';
-                        judgment.department = department || judgment.department || '';
-                        judgment.notes = notes || judgment.notes || '';
+                // اعثر على الحكم في مصفوفته الأصلية (قبل أي نقل محتمل)
+                let judgment = originalType === 'favorable'
+                    ? favorableJudgments.find(j => j.id === id)
+                    : againstJudgments.find(j => j.id === id);
 
-                        // judgment-specific (leave existing judgmentNumber/fileNumber unchanged)
-                        judgment.text = text;
-                        judgment.date = date;
-                        judgment.appealType = appealType;
-                        judgment.appeal = appeal;
+                if (!judgment) return;
 
+                const typeChanged = newType !== originalType && (newType === 'favorable' || newType === 'against');
+
+                // إذا تم تغيير نوع الحكم من صالح إلى ضد أو العكس، انقله بين القائمتين
+                if (typeChanged) {
+                    if (originalType === 'favorable') {
+                        favorableJudgments = favorableJudgments.filter(j => j.id !== id);
                         localStorage.setItem('favorableJudgments', JSON.stringify(favorableJudgments));
-
-                        // also try to sync with main cases list if caseId present
-                        if (judgment.caseId) {
-                            const caseItem = cases.find(c => c.id === judgment.caseId);
-                            if (caseItem) {
-                                caseItem.plaintiff = judgment.plaintiff;
-                                caseItem.defendant = judgment.defendant;
-                                caseItem.subject = judgment.subject;
-                                caseItem.department = judgment.department;
-                                caseItem.sessionDate = judgment.sessionDate;
-                                caseItem.notes = judgment.notes;
-                                
-                                // تحديث sessionHistory إذا تم تعديل منطوق الحكم
-                                if (!caseItem.sessionHistory) caseItem.sessionHistory = [];
-                                const existingJudgmentEntry = caseItem.sessionHistory.find(s => s.judgmentId === judgment.id && s.type === 'judgment');
-                                if (existingJudgmentEntry) {
-                                    existingJudgmentEntry.judgmentText = judgment.text;
-                                    existingJudgmentEntry.judgmentDate = judgment.date;
-                                } else {
-                                    caseItem.sessionHistory.push({
-                                        date: caseItem.sessionDate,
-                                        type: 'judgment',
-                                        judgmentType: 'favorable',
-                                        reason: 'حكم مؤيد',
-                                        judgmentText: judgment.text,
-                                        judgmentDate: judgment.date,
-                                        judgmentId: judgment.id,
-                                        notes: '',
-                                        recordedDate: new Date().toISOString()
-                                    });
-                                }
-                                localStorage.setItem('cases', JSON.stringify(cases));
-                                
-                                // حفظ البيانات في التخزين الدائم (Electron app-data.json)
-                                saveDataToAPI();
-                            }
-                        }
-                    }
-                } else if (type === 'against') {
-                    judgment = againstJudgments.find(j => j.id === id);
-                    if (judgment) {
-                        judgment.caseNumber = caseNumber || judgment.caseNumber || '';
-                        judgment.sessionDate = sessionDate || judgment.sessionDate || '';
-                        judgment.plaintiff = plaintiff || judgment.plaintiff || '';
-                        judgment.defendant = defendant || judgment.defendant || '';
-                        judgment.subject = subject || judgment.subject || '';
-                        judgment.department = department || judgment.department || '';
-                        judgment.notes = notes || judgment.notes || '';
-
-                        // judgmentNumber/fileNumber are not edited here; keep existing values
-                        judgment.text = text;
-                        judgment.date = date;
-                        judgment.appealType = appealType;
-                        judgment.appeal = appeal;
-
+                    } else {
+                        againstJudgments = againstJudgments.filter(j => j.id !== id);
                         localStorage.setItem('againstJudgments', JSON.stringify(againstJudgments));
+                    }
+                    judgment.type = newType;
+                }
 
-                        if (judgment.caseId) {
-                            const caseItem = cases.find(c => c.id === judgment.caseId);
-                            if (caseItem) {
-                                caseItem.plaintiff = judgment.plaintiff;
-                                caseItem.defendant = judgment.defendant;
-                                caseItem.subject = judgment.subject;
-                                caseItem.department = judgment.department;
-                                caseItem.sessionDate = judgment.sessionDate;
-                                caseItem.notes = judgment.notes;
-                                
-                                // تحديث sessionHistory إذا تم تعديل منطوق الحكم
-                                if (!caseItem.sessionHistory) caseItem.sessionHistory = [];
-                                const existingJudgmentEntry = caseItem.sessionHistory.find(s => s.judgmentId === judgment.id && s.type === 'judgment');
-                                if (existingJudgmentEntry) {
-                                    existingJudgmentEntry.judgmentText = judgment.text;
-                                    existingJudgmentEntry.judgmentDate = judgment.date;
-                                } else {
-                                    caseItem.sessionHistory.push({
-                                        date: caseItem.sessionDate,
-                                        type: 'judgment',
-                                        judgmentType: 'against',
-                                        reason: 'حكم معارض',
-                                        judgmentText: judgment.text,
-                                        judgmentDate: judgment.date,
-                                        judgmentId: judgment.id,
-                                        notes: '',
-                                        recordedDate: new Date().toISOString()
-                                    });
-                                }
-                                localStorage.setItem('cases', JSON.stringify(cases));
+                // تحديث بيانات القضية والحكم
+                judgment.caseNumber = caseNumber || judgment.caseNumber || '';
+                judgment.sessionDate = sessionDate || judgment.sessionDate || '';
+                judgment.plaintiff = plaintiff || judgment.plaintiff || '';
+                judgment.defendant = defendant || judgment.defendant || '';
+                judgment.subject = subject || judgment.subject || '';
+                judgment.department = department || judgment.department || '';
+                judgment.notes = notes || judgment.notes || '';
+
+                // judgment-specific (leave existing judgmentNumber/fileNumber unchanged)
+                judgment.text = text;
+                judgment.date = date;
+                judgment.appealType = appealType;
+                judgment.appeal = appeal;
+
+                if (newType === 'favorable') {
+                    if (typeChanged) favorableJudgments.push(judgment);
+                    localStorage.setItem('favorableJudgments', JSON.stringify(favorableJudgments));
+                } else {
+                    if (typeChanged) againstJudgments.push(judgment);
+                    localStorage.setItem('againstJudgments', JSON.stringify(againstJudgments));
+                }
+
+                // مزامنة مع القضية الأصلية في الرول إن وُجدت
+                if (judgment.caseId) {
+                    const caseItem = cases.find(c => c.id === judgment.caseId);
+                    if (caseItem) {
+                        caseItem.plaintiff = judgment.plaintiff;
+                        caseItem.defendant = judgment.defendant;
+                        caseItem.subject = judgment.subject;
+                        caseItem.department = judgment.department;
+                        caseItem.sessionDate = judgment.sessionDate;
+                        caseItem.notes = judgment.notes;
+                        
+                        // تحديث sessionHistory إذا تم تعديل منطوق الحكم
+                        if (!caseItem.sessionHistory) caseItem.sessionHistory = [];
+                        const existingJudgmentEntry = caseItem.sessionHistory.find(s => s.judgmentId === judgment.id && s.type === 'judgment');
+                        if (existingJudgmentEntry) {
+                            existingJudgmentEntry.judgmentText = judgment.text;
+                            existingJudgmentEntry.judgmentDate = judgment.date;
+                            existingJudgmentEntry.judgmentType = newType;
+                            if (typeChanged) {
+                                existingJudgmentEntry.reason = newType === 'favorable' ? 'حكم مؤيد' : 'حكم معارض';
                             }
+                        } else {
+                            caseItem.sessionHistory.push({
+                                date: caseItem.sessionDate,
+                                type: 'judgment',
+                                judgmentType: newType,
+                                reason: newType === 'favorable' ? 'حكم مؤيد' : 'حكم معارض',
+                                judgmentText: judgment.text,
+                                judgmentDate: judgment.date,
+                                judgmentId: judgment.id,
+                                notes: '',
+                                recordedDate: new Date().toISOString()
+                            });
                         }
+                        
+                        if (typeChanged) {
+                            caseItem.sessionHistory.push({
+                                date: new Date().toISOString().split('T')[0],
+                                type: 'judgment-type-changed',
+                                reason: `تم تعديل نوع الحكم من ${originalType === 'favorable' ? 'صالح' : 'ضد'} إلى ${newType === 'favorable' ? 'صالح' : 'ضد'}`,
+                                notes: '',
+                                recordedDate: new Date().toISOString()
+                            });
+                        }
+                        
+                        localStorage.setItem('cases', JSON.stringify(cases));
                     }
                 }
 
@@ -6956,7 +7026,7 @@
                 editJudgmentModal.style.display = 'none';
                 renderJudgmentsTables();
                 updateStats();
-                showAlert('تم حفظ تعديلات الحكم', 'success');
+                showAlert(typeChanged ? 'تم تعديل الحكم ونقله بين الصالح والضد بنجاح' : 'تم حفظ تعديلات الحكم', 'success');
             });
         }
 
@@ -7177,6 +7247,12 @@
                     </td>
                 </tr>
             `;
+        }
+        
+        function archivedJudgmentTypeLabel(judgmentType) {
+            if (judgmentType === 'favorable') return 'صالح';
+            if (judgmentType === 'against') return 'ضد';
+            return 'لم يصدر حكم';
         }
         
         function buildDepartmentHeaderRow(colspan, name, count) {
@@ -7718,6 +7794,7 @@
                         <button class="btn-warning btn-edit-case" data-id="${caseItem.id}"><i class="fas fa-edit"></i> تعديل</button>
                         <button class="btn-purple btn-session-history" data-id="${caseItem.id}"><i class="fas fa-history"></i> سجل الجلسات</button>
                         <button class="btn-return btn-return-case" data-id="${caseItem.id}" data-type="cancelled"><i class="fas fa-redo"></i> إعادة للرول</button>
+                        <button class="btn-archive btn-archive-judgment" data-id="${caseItem.id}" data-type="cancelled"><i class="fas fa-archive"></i> أرشفة</button>
                     </td>
                 `;
                 cancelledBody.appendChild(row);
@@ -7738,19 +7815,25 @@
                 }
                 const caseItem = entry.item;
                 const row = document.createElement('tr');
+                const judgmentBadge = caseItem.judgmentType === 'favorable'
+                    ? '<span class="case-status status-completed">صالح</span>'
+                    : caseItem.judgmentType === 'against'
+                        ? '<span class="case-status status-cancelled">ضد</span>'
+                        : '<span class="case-status">لم يصدر حكم</span>';
                 row.innerHTML = `
                     <td>${caseItem.caseNumber}</td>
                     <td>${caseItem.caseYear}</td>
                     <td>${caseItem.subject}</td>
                     <td>${caseItem.plaintiff}</td>
                     <td>${caseItem.defendant}</td>
-                    <td><span class="case-status ${caseItem.judgmentType === 'favorable' ? 'status-completed' : 'status-cancelled'}">${caseItem.judgmentType === 'favorable' ? 'صالح' : 'ضد'}</span></td>
+                    <td>${judgmentBadge}</td>
                     <td>${formatDate(caseItem.archiveDate)}</td>
                     <td class="actions">
                         <button class="btn-info btn-view-archived-case" data-id="${caseItem.id}"><i class="fas fa-eye"></i> عرض</button>
                         <button class="btn-warning btn-edit-archived-case" data-id="${caseItem.id}"><i class="fas fa-edit"></i> تعديل</button>
                         <button class="btn-purple btn-session-history" data-id="${caseItem.id}"><i class="fas fa-history"></i> سجل الجلسات</button>
                         <button class="btn-word btn-export-archived-case" data-id="${caseItem.id}"><i class="fas fa-file-word"></i> Word</button>
+                        <button class="btn-return btn-return-case" data-id="${caseItem.id}" data-type="archived"><i class="fas fa-redo"></i> إعادة للتداول</button>
                         <button class="btn-danger btn-delete-archived-case" data-id="${caseItem.id}"><i class="fas fa-trash"></i> حذف</button>
                     </td>
                 `;
@@ -7782,6 +7865,7 @@
                         <button class="btn-warning btn-edit-case" data-id="${caseItem.id}"><i class="fas fa-edit"></i> تعديل</button>
                         <button class="btn-purple btn-session-history" data-id="${caseItem.id}"><i class="fas fa-history"></i> سجل الجلسات</button>
                         <button class="btn-return btn-return-suspended-case" data-id="${caseItem.id}"><i class="fas fa-redo"></i> إعادة للرول</button>
+                        <button class="btn-archive btn-archive-judgment" data-id="${caseItem.id}" data-type="suspended"><i class="fas fa-archive"></i> أرشفة</button>
                     </td>
                 `;
                 return row;
@@ -7900,7 +7984,7 @@
                         </div>
                         <div class="case-detail-item">
                             <label>نوع الحكم:</label>
-                            <p>${caseItem.judgmentType === 'favorable' ? 'صالح' : 'ضد'}</p>
+                            <p>${archivedJudgmentTypeLabel(caseItem.judgmentType)}</p>
                         </div>
                         <div class="case-detail-item">
                             <label>تاريخ الأرشفة:</label>
@@ -8035,7 +8119,7 @@
                     </tr>
                     <tr>
                         <th>نوع الحكم</th>
-                        <td>${caseItem.judgmentType === 'favorable' ? 'صالح' : 'ضد'}</td>
+                        <td>${archivedJudgmentTypeLabel(caseItem.judgmentType)}</td>
                     </tr>
                     <tr>
                         <th>تاريخ الأرشفة</th>
@@ -8256,7 +8340,7 @@
                 if (type === 'favorable' || type === 'against') {
                     returnJudgmentToRoll(caseId, type, sessionDate, returnReason);
                 } else {
-                    returnCaseToRoll(caseId, type, sessionDate);
+                    returnCaseToRoll(caseId, type, sessionDate, returnReason);
                 }
                 document.getElementById('return-to-roll-modal').style.display = 'none';
             } catch (error) {
@@ -8265,7 +8349,7 @@
         });
         
         // ========== دالة إعادة القضايا الاحتياطية إلى الرول ==========
-        function returnCaseToRoll(caseId, type, newSessionDate) {
+        function returnCaseToRoll(caseId, type, newSessionDate, returnReason) {
             if (type === 'reserved') {
                 const caseIndex = reservedCases.findIndex(c => c.id === caseId);
                 if (caseIndex !== -1) {
@@ -8288,7 +8372,7 @@
                         date: caseItem.reserveDate,
                         newDate: newSessionDate,
                         type: 'returned',
-                        reason: 'إعادة من الحجز للحكم',
+                        reason: returnReason || 'إعادة من الحجز للحكم',
                         notes: '',
                         recordedDate: new Date().toISOString()
                     });
@@ -8332,7 +8416,7 @@
                         date: caseItem.cancelDate,
                         newDate: newSessionDate,
                         type: 'returned',
-                        reason: 'إعادة من الشطب',
+                        reason: returnReason || 'إعادة من الشطب',
                         notes: '',
                         recordedDate: new Date().toISOString()
                     });
@@ -8377,7 +8461,7 @@
                         date: caseItem.suspendDate,
                         newDate: newSessionDate,
                         type: 'returned',
-                        reason: 'إعادة من الوقف',
+                        reason: returnReason || 'إعادة من الوقف',
                         notes: '',
                         recordedDate: new Date().toISOString()
                     });
@@ -8396,6 +8480,51 @@
                     
                     renderCasesTable();
                     renderSuspendedCasesTable();
+                    updateStats();
+                    updateDashboard();
+                }
+            } else if (type === 'archived') {
+                const caseIndex = archivedCases.findIndex(c => c.id === caseId);
+                if (caseIndex !== -1) {
+                    const caseItem = archivedCases[caseIndex];
+                    
+                    const restoredCase = {
+                        id: caseItem.caseId || Date.now().toString(),
+                        number: caseItem.caseNumber || '',
+                        year: caseItem.caseYear || '',
+                        subject: caseItem.subject || '',
+                        plaintiff: caseItem.plaintiff || '',
+                        defendant: caseItem.defendant || '',
+                        department: caseItem.department || '',
+                        sessionDate: newSessionDate,
+                        status: 'pending',
+                        notes: '',
+                        sessionHistory: caseItem.sessionHistory ? [...caseItem.sessionHistory] : []
+                    };
+                    
+                    restoredCase.sessionHistory.push({
+                        date: caseItem.archiveDate,
+                        newDate: newSessionDate,
+                        type: 'returned',
+                        reason: returnReason || 'إعادة من الأرشيف للتداول',
+                        notes: '',
+                        recordedDate: new Date().toISOString()
+                    });
+                    
+                    cases.push(restoredCase);
+                    localStorage.setItem('cases', JSON.stringify(cases));
+                    
+                    archivedCases = archivedCases.filter(c => c.id !== caseId);
+                    localStorage.setItem('archivedCases', JSON.stringify(archivedCases));
+                    
+                    // حفظ البيانات في التخزين الدائم (Electron app-data.json)
+                    saveDataToAPI();
+                    
+                    addNotification(`تم إعادة القضية من الأرشيف: ${restoredCase.number}/${restoredCase.year} للتداول`, 'success');
+                    showAlert('تم إعادة القضية من الأرشيف للتداول بنجاح', 'success');
+                    
+                    renderCasesTable();
+                    renderArchivedCasesTable();
                     updateStats();
                     updateDashboard();
                 }
@@ -11499,7 +11628,7 @@
                         <td>${caseItem.subject}</td>
                         <td>${caseItem.plaintiff}</td>
                         <td>${caseItem.defendant}</td>
-                        <td>${caseItem.judgmentType === 'favorable' ? 'صالح' : 'ضد'}</td>
+                        <td>${archivedJudgmentTypeLabel(caseItem.judgmentType)}</td>
                         <td>${formatDate(caseItem.archiveDate)}</td>
                         <td>${caseItem.archiveReason || ''}</td>
                     </tr>
@@ -12774,22 +12903,9 @@
 
             // Duplicate postponeForm submit handler removed — consolidated handler is used earlier.
             
-            // إضافة event listener لنموذج إعادة القضية للرول
-            const returnToRollForm = document.getElementById('return-to-roll-form');
-            returnToRollForm.addEventListener('submit', function(e) {
-                e.preventDefault();
-                const caseId = document.getElementById('return-case-id').value;
-                const type = document.getElementById('return-case-type').value;
-                const newSessionDate = document.getElementById('return-session-date').value;
-                
-                if (!newSessionDate) {
-                    alert('يرجى إدخال تاريخ جلسة الإعادة');
-                    return;
-                }
-                
-                returnCaseToRoll(caseId, type, newSessionDate);
-                closeModal('return-to-roll-modal');
-            });
+            // ملاحظة: نموذج "إعادة القضية للرول" (return-to-roll-form) مرتبط بالفعل بمعالجه الرئيسي
+            // (الذي يشمل حقل السبب) في مكان تعريفه أعلاه؛ تمت إزالة تسجيل مكرر هنا كان يشير
+            // إلى عناصر غير موجودة في الصفحة (return-case-id / return-case-type).
 
             // ========== طباعة وتصدير القوائم الخاصة (محجوزة/مشطوبة/موقوفة) والنطاق الزمني ==========
             function normalizeCaseForExport(c) {
