@@ -4108,6 +4108,27 @@
                 archivedCases = data.archivedCases || [];
                 notifications = data.notifications || [];
                 departments = data.departments || JSON.parse(localStorage.getItem('departments') || '[]') || [];
+
+                // نخزن نسخة محلية بنفس الطابع الزمني من أول تحميل حتى تكون مقارنات
+                // المزامنة اللاحقة (syncFromServer) صحيحة من البداية. window.__savingToAPI
+                // بيمنع إن هذه الكتابة تُشعل رفعًا جديدًا للبيانات لـ Firebase (مش تعديل حقيقي).
+                window.__savingToAPI = true;
+                try {
+                    localStorage.setItem('cases', JSON.stringify(cases));
+                    localStorage.setItem('favorableJudgments', JSON.stringify(favorableJudgments));
+                    localStorage.setItem('againstJudgments', JSON.stringify(againstJudgments));
+                    localStorage.setItem('reservedCases', JSON.stringify(reservedCases));
+                    localStorage.setItem('cancelledCases', JSON.stringify(cancelledCases));
+                    localStorage.setItem('suspendedCases', JSON.stringify(suspendedCases));
+                    localStorage.setItem('archivedCases', JSON.stringify(archivedCases));
+                    localStorage.setItem('notifications', JSON.stringify(notifications));
+                    localStorage.setItem('departments', JSON.stringify(departments));
+                    if (data.lastSavedAt) {
+                        localStorage.setItem('lastSavedAt', String(data.lastSavedAt));
+                    }
+                } finally {
+                    window.__savingToAPI = false;
+                }
             } else {
                 // Fallback to localStorage
                 cases = JSON.parse(localStorage.getItem('cases')) || [];
@@ -4194,12 +4215,18 @@
                     }
                 }
 
-                if (!stored) {
+                // نحفظ في Firebase دايمًا - سواء نجح الحفظ المحلي على اللاب توب أو لأ -
+                // عشان أي جهاز تاني (الموبايل مثلاً) يشوف آخر تعديل فورًا. قبل هذا
+                // التعديل كان الحفظ في Firebase بيتخطى لما ينجح الحفظ المحلي، فكانت
+                // تعديلات اللاب توب متوصلش للموبايل أبدًا.
+                try {
                     const result = await apiRequest('/data', {
                         method: 'POST',
                         body: JSON.stringify(data)
                     });
-                    stored = result && result.success;
+                    stored = stored || (result && result.success);
+                } catch (e) {
+                    console.warn('Firebase saveData failed', e);
                 }
 
                 // Always keep a localStorage backup copy as well, including timestamp
@@ -12768,15 +12795,25 @@
                         archivedCases = remote.archivedCases || [];
                         notifications = remote.notifications || [];
 
-                        localStorage.setItem('cases', JSON.stringify(cases));
-                        localStorage.setItem('favorableJudgments', JSON.stringify(favorableJudgments));
-                        localStorage.setItem('againstJudgments', JSON.stringify(againstJudgments));
-                        localStorage.setItem('reservedCases', JSON.stringify(reservedCases));
-                        localStorage.setItem('cancelledCases', JSON.stringify(cancelledCases));
-                        localStorage.setItem('suspendedCases', JSON.stringify(suspendedCases));
-                        localStorage.setItem('archivedCases', JSON.stringify(archivedCases));
-                        localStorage.setItem('notifications', JSON.stringify(notifications));
-                        localStorage.setItem('lastSavedAt', String(remoteTS));
+                        // نمنع أن تُشعل كتابة localStorage هنا حفظًا جديدًا عبر Firebase
+                        // (window.__savingToAPI) لأن هذه البيانات نازلة من السيرفر أصلاً
+                        // وليست تعديلاً جديدًا؛ إعادة رفعها كانت بتختم بطابع زمني جديد
+                        // رغم إنها بيانات قديمة، وده كان يخلي جهاز تاني (اللاب توب) يفتكر
+                        // إنها الأحدث ويستبدل بيها تعديلاته الحقيقية الأحدث.
+                        window.__savingToAPI = true;
+                        try {
+                            localStorage.setItem('cases', JSON.stringify(cases));
+                            localStorage.setItem('favorableJudgments', JSON.stringify(favorableJudgments));
+                            localStorage.setItem('againstJudgments', JSON.stringify(againstJudgments));
+                            localStorage.setItem('reservedCases', JSON.stringify(reservedCases));
+                            localStorage.setItem('cancelledCases', JSON.stringify(cancelledCases));
+                            localStorage.setItem('suspendedCases', JSON.stringify(suspendedCases));
+                            localStorage.setItem('archivedCases', JSON.stringify(archivedCases));
+                            localStorage.setItem('notifications', JSON.stringify(notifications));
+                            localStorage.setItem('lastSavedAt', String(remoteTS));
+                        } finally {
+                            window.__savingToAPI = false;
+                        }
 
                         refreshAllViews();
                     }
