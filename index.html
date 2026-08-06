@@ -3418,6 +3418,10 @@
                         <label for="edit-archived-case-number">رقم الدعوى</label>
                         <input type="text" id="edit-archived-case-number">
                     </div>
+                    <div class="form-group">
+                        <label for="edit-archived-case-year">سنة الدعوى</label>
+                        <input type="text" id="edit-archived-case-year">
+                    </div>
                 </div>
 
                 <div class="form-row">
@@ -3438,6 +3442,35 @@
                             <option value="">-- اختر الدائرة --</option>
                         </select>
                     </div>
+                    <div class="form-group">
+                        <label for="edit-archived-circulation-number">رقم المتداول</label>
+                        <input type="text" id="edit-archived-circulation-number">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="edit-archived-judgment-type">نوع الحكم</label>
+                        <select id="edit-archived-judgment-type">
+                            <option value="">لا يوجد / لم يصدر حكم</option>
+                            <option value="favorable">صالح</option>
+                            <option value="against">ضد</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-archived-judgment-date">تاريخ الحكم</label>
+                        <input type="date" id="edit-archived-judgment-date">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="edit-archived-judgment-text">منطوق الحكم</label>
+                    <textarea id="edit-archived-judgment-text" rows="3"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="edit-archived-reason">سبب الأرشفة</label>
+                    <input type="text" id="edit-archived-reason">
                 </div>
 
                 <div class="form-group">
@@ -3511,6 +3544,10 @@
                     <div class="form-group">
                         <label for="edit-judgment-case-number">رقم الدعوي/السنة</label>
                         <input type="text" id="edit-judgment-case-number" placeholder="مثال: 123/2024">
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-judgment-circulation-number">رقم المتداول</label>
+                        <input type="text" id="edit-judgment-circulation-number">
                     </div>
                     <div class="form-group">
                         <label for="edit-judgment-session-date">تاريخ الجلسة</label>
@@ -5441,6 +5478,25 @@
             showAlert('تم تصدير الرول إلى ملف Word', 'success');
         }
 
+        // ========== دالة موحدة لتوحيد بيانات القضية أيًا كانت مرحلتها (عادية/محجوزة/موقوفة/مشطوبة/حكم/مؤرشفة) ==========
+        // تُستخدم في كل من الطباعة والتصدير إلى Word حتى تظهر نفس البيانات (رقم الدعوي، السنة، رقم المتداول، التاريخ...)
+        // بغض النظر عن المرحلة التي وصلت إليها القضية، وحتى لا تُفقد أي بيانات مسجلة بها.
+        function normalizeCaseRowForDisplay(caseItem) {
+            const number = caseItem.number || caseItem.caseNumber || '';
+            const year = caseItem.year || caseItem.caseYear || '';
+            const subject = caseItem.subject || caseItem.judgmentText || '';
+            const plaintiff = caseItem.plaintiff || '';
+            const defendant = caseItem.defendant || '';
+            const circulation = caseItem.circulationNumber || caseItem.circulation || '';
+            const department = caseItem.department || '';
+            const date = (Array.isArray(caseItem.sessionHistory) && caseItem.sessionHistory.length)
+                ? caseItem.sessionHistory[0].date
+                : (caseItem.sessionDate || caseItem.date || caseItem.reserveDate || caseItem.cancelDate || caseItem.suspendDate || caseItem.archiveDate || caseItem.judgmentDate || '');
+            const notes = caseItem.notes || caseItem.archiveNotes || caseItem.suspendNotes || '';
+
+            return { number, year, subject, plaintiff, defendant, circulation, department, date, notes };
+        }
+
         // ========== دالة لتصدير قائمة القضايا إلى Word ==========
         function exportCasesToWord(showCirculationNumber = true, casesToExport = null, department = '') {
             let casesData = casesToExport || cases;
@@ -5470,25 +5526,26 @@
                 
                 const caseItem = entry.item;
                 exportRowIndex++;
+                const row = normalizeCaseRowForDisplay(caseItem);
                 
                 tableRows += `
                     <tr>
                         <td>${exportRowIndex}</td>
-                        <td>${caseItem.number}</td>
-                        <td>${caseItem.year}</td>
-                        <td>${caseItem.subject}</td>
-                        <td>${caseItem.plaintiff}</td>
-                        <td>${caseItem.defendant}</td>
+                        <td>${row.number}</td>
+                        <td>${row.year}</td>
+                        <td>${row.subject}</td>
+                        <td>${row.plaintiff}</td>
+                        <td>${row.defendant}</td>
                 `;
                 
                 if (showCirculationNumber) {
-                    tableRows += `<td>${caseItem.circulationNumber}</td>`;
+                    tableRows += `<td>${row.circulation}</td>`;
                 }
                 
                 tableRows += `
-                        <td>${formatDate(caseItem.sessionDate)}</td>
-                        <td>${caseItem.department || ''}</td>
-                        <td>${caseItem.notes || ''}</td>
+                        <td>${formatDate(row.date)}</td>
+                        <td>${row.department}</td>
+                        <td>${row.notes}</td>
                     </tr>
                 `;
             });
@@ -6400,6 +6457,11 @@
             
             if (!judgment) return;
             
+            // نبحث عن القضية الأصلية لاستكمال أي بيانات ناقصة (رقم المتداول/الدائرة) في الأحكام القديمة
+            const linkedCase = findCaseAnywhereById(judgment.caseId);
+            const displayCirculationNumber = judgment.circulationNumber || (linkedCase && linkedCase.circulationNumber) || '';
+            const displayDepartment = judgment.department || (linkedCase && linkedCase.department) || '';
+            
             let sessionHistoryHTML = '';
             if (judgment.sessionHistory && judgment.sessionHistory.length > 0) {
                 sessionHistoryHTML = `
@@ -6449,6 +6511,14 @@
                         <div class="case-detail-item">
                             <label>رقم وسنة الدعوي:</label>
                             <p>${judgment.caseNumber || 'غير معروف'}</p>
+                        </div>
+                        <div class="case-detail-item">
+                            <label>رقم المتداول:</label>
+                            <p>${displayCirculationNumber || 'غير معروف'}</p>
+                        </div>
+                        <div class="case-detail-item">
+                            <label>الدائرة:</label>
+                            <p>${displayDepartment || 'غير معروف'}</p>
                         </div>
                         <div class="case-detail-item">
                             <label>المدعي:</label>
@@ -6598,12 +6668,13 @@
                 archivedCase = {
                     id: Date.now().toString(),
                     caseId: judgment.caseId,
-                    caseNumber: judgment.caseNumber,
-                    caseYear: judgment.caseNumber ? judgment.caseNumber.split('/')[1] : new Date().getFullYear(),
-                    subject: judgment.text.substring(0, 100) + '...',
+                    caseNumber: judgment.caseNumber ? judgment.caseNumber.split('/')[0] : ((originalCase && originalCase.number) || ''),
+                    caseYear: judgment.caseNumber && judgment.caseNumber.includes('/') ? judgment.caseNumber.split('/')[1] : ((originalCase && originalCase.year) || new Date().getFullYear()),
+                    subject: (originalCase && originalCase.subject) || judgment.subject || '',
                     plaintiff: judgment.plaintiff,
                     defendant: judgment.defendant,
                     department: (originalCase && originalCase.department) || judgment.department || '',
+                    circulationNumber: (originalCase && originalCase.circulationNumber) || judgment.circulationNumber || '',
                     judgmentType: type,
                     judgmentText: judgment.text,
                     judgmentDate: judgment.date,
@@ -6643,6 +6714,7 @@
                     plaintiff: caseItem.plaintiff || '',
                     defendant: caseItem.defendant || '',
                     department: caseItem.department || '',
+                    circulationNumber: caseItem.circulationNumber || '',
                     judgmentType: '',
                     judgmentText: '',
                     judgmentDate: '',
@@ -6890,13 +6962,11 @@
             document.getElementById('edit-judgment-new-type').value = type || 'favorable';
 
             // if the judgment is linked to a case, prefer case fields so user sees canonical data
-            let caseItem = null;
-            if (judgment.caseId) {
-                caseItem = cases.find(c => c.id === judgment.caseId) || null;
-            }
+            const caseItem = findCaseAnywhereById(judgment.caseId);
 
             // case-related data (editable) - prefer caseItem values when available
             document.getElementById('edit-judgment-case-number').value = (caseItem && (caseItem.number && caseItem.year)) ? `${caseItem.number}/${caseItem.year}` : (judgment.caseNumber || '');
+            document.getElementById('edit-judgment-circulation-number').value = (caseItem && caseItem.circulationNumber) ? caseItem.circulationNumber : (judgment.circulationNumber || '');
             document.getElementById('edit-judgment-session-date').value = (caseItem && caseItem.sessionDate) ? caseItem.sessionDate : (judgment.sessionDate || '');
             document.getElementById('edit-judgment-plaintiff').value = (caseItem && caseItem.plaintiff) ? caseItem.plaintiff : (judgment.plaintiff || '');
             document.getElementById('edit-judgment-defendant').value = (caseItem && caseItem.defendant) ? caseItem.defendant : (judgment.defendant || '');
@@ -6914,7 +6984,7 @@
             document.getElementById('edit-judgment-appeal').value = judgment.appeal || '';
 
             // ensure inputs are visible and editable
-            const inputs = ['edit-judgment-case-number','edit-judgment-session-date','edit-judgment-plaintiff','edit-judgment-defendant','edit-judgment-subject','edit-judgment-department','edit-judgment-notes','edit-judgment-text','edit-judgment-date','edit-judgment-appeal-type','edit-judgment-appeal'];
+            const inputs = ['edit-judgment-case-number','edit-judgment-circulation-number','edit-judgment-session-date','edit-judgment-plaintiff','edit-judgment-defendant','edit-judgment-subject','edit-judgment-department','edit-judgment-notes','edit-judgment-text','edit-judgment-date','edit-judgment-appeal-type','edit-judgment-appeal'];
             inputs.forEach(id => {
                 const el = document.getElementById(id);
                 if (el) {
@@ -6941,6 +7011,7 @@
 
                 // read updated values
                 const caseNumber = document.getElementById('edit-judgment-case-number').value.trim();
+                const circulationNumber = document.getElementById('edit-judgment-circulation-number').value.trim();
                 const sessionDate = document.getElementById('edit-judgment-session-date').value;
                 const plaintiff = document.getElementById('edit-judgment-plaintiff').value.trim();
                 const defendant = document.getElementById('edit-judgment-defendant').value.trim();
@@ -6977,6 +7048,7 @@
 
                 // تحديث بيانات القضية والحكم
                 judgment.caseNumber = caseNumber || judgment.caseNumber || '';
+                judgment.circulationNumber = circulationNumber || judgment.circulationNumber || '';
                 judgment.sessionDate = sessionDate || judgment.sessionDate || '';
                 judgment.plaintiff = plaintiff || judgment.plaintiff || '';
                 judgment.defendant = defendant || judgment.defendant || '';
@@ -6998,14 +7070,15 @@
                     localStorage.setItem('againstJudgments', JSON.stringify(againstJudgments));
                 }
 
-                // مزامنة مع القضية الأصلية في الرول إن وُجدت
+                // مزامنة مع القضية الأصلية أينما كانت (الرول/المحجوزة/المشطوبة/الموقوفة)
                 if (judgment.caseId) {
-                    const caseItem = cases.find(c => c.id === judgment.caseId);
+                    const caseItem = findCaseAnywhereById(judgment.caseId);
                     if (caseItem) {
                         caseItem.plaintiff = judgment.plaintiff;
                         caseItem.defendant = judgment.defendant;
                         caseItem.subject = judgment.subject;
                         caseItem.department = judgment.department;
+                        caseItem.circulationNumber = judgment.circulationNumber;
                         caseItem.sessionDate = judgment.sessionDate;
                         caseItem.notes = judgment.notes;
                         
@@ -7043,7 +7116,12 @@
                             });
                         }
                         
+                        // caseItem قد يكون في أي من القوائم، فنحفظ الكل لضمان استقرار البيانات
                         localStorage.setItem('cases', JSON.stringify(cases));
+                        localStorage.setItem('reservedCases', JSON.stringify(reservedCases));
+                        localStorage.setItem('cancelledCases', JSON.stringify(cancelledCases));
+                        localStorage.setItem('suspendedCases', JSON.stringify(suspendedCases));
+                        localStorage.setItem('archivedCases', JSON.stringify(archivedCases));
                     }
                 }
 
@@ -7280,6 +7358,17 @@
             if (judgmentType === 'favorable') return 'صالح';
             if (judgmentType === 'against') return 'ضد';
             return 'لم يصدر حكم';
+        }
+        
+        // يبحث عن قضية بمعرفها في كل القوائم (الرول، المحجوزة، المشطوبة، الموقوفة، المؤرشفة)
+        function findCaseAnywhereById(caseId) {
+            if (!caseId) return null;
+            return cases.find(c => c.id === caseId) ||
+                   reservedCases.find(c => c.id === caseId) ||
+                   cancelledCases.find(c => c.id === caseId) ||
+                   suspendedCases.find(c => c.id === caseId) ||
+                   archivedCases.find(c => c.id === caseId || c.caseId === caseId) ||
+                   null;
         }
         
         function buildDepartmentHeaderRow(colspan, name, count) {
@@ -7568,6 +7657,7 @@
                 defendant: defendant,
                 subject: caseItem.subject,
                 department: caseItem.department,
+                circulationNumber: caseItem.circulationNumber || '',
                 sessionDate: judgmentSessionDate,
                 text: document.getElementById('judgment-text').value,
                 date: document.getElementById('judgment-date').value,
@@ -7939,6 +8029,11 @@
             
             title.textContent = `تفاصيل القضية المؤرشفة: ${caseItem.caseNumber}`;
             
+            // نبحث عن القضية الأصلية لاستكمال أي بيانات ناقصة في السجلات القديمة (رقم المتداول/الدائرة)
+            const linkedCase = findCaseAnywhereById(caseItem.caseId);
+            const displayCirculationNumber = caseItem.circulationNumber || (linkedCase && linkedCase.circulationNumber) || '';
+            const displayDepartment = caseItem.department || (linkedCase && linkedCase.department) || '';
+            
             let sessionHistoryHTML = '';
             if (caseItem.sessionHistory && caseItem.sessionHistory.length > 0) {
                 sessionHistoryHTML = `
@@ -7995,7 +8090,11 @@
                         </div>
                         <div class="case-detail-item">
                             <label>رقم المتداول:</label>
-                            <p>${caseItem.circulationNumber || ''}</p>
+                            <p>${displayCirculationNumber || 'غير معروف'}</p>
+                        </div>
+                        <div class="case-detail-item">
+                            <label>الدائرة:</label>
+                            <p>${displayDepartment || 'غير معروف'}</p>
                         </div>
                         <div class="case-detail-item">
                             <label>موضوع الدعوي:</label>
@@ -8072,13 +8171,22 @@
         function openEditArchivedCaseModal(caseId) {
             const caseItem = archivedCases.find(c => c.id === caseId);
             if (!caseItem) return;
+            
+            // نستكمل أي بيانات ناقصة في السجلات القديمة من القضية الأصلية إن وُجدت
+            const linkedCase = findCaseAnywhereById(caseItem.caseId);
 
             document.getElementById('edit-archived-case-id').value = caseId;
             document.getElementById('edit-archived-subject').value = caseItem.subject || '';
             document.getElementById('edit-archived-case-number').value = caseItem.caseNumber || '';
+            document.getElementById('edit-archived-case-year').value = caseItem.caseYear || '';
             document.getElementById('edit-archived-plaintiff').value = caseItem.plaintiff || '';
             document.getElementById('edit-archived-defendant').value = caseItem.defendant || '';
-            populateDepartmentSelect(document.getElementById('edit-archived-department'), caseItem.department || '');
+            populateDepartmentSelect(document.getElementById('edit-archived-department'), caseItem.department || (linkedCase && linkedCase.department) || '');
+            document.getElementById('edit-archived-circulation-number').value = caseItem.circulationNumber || (linkedCase && linkedCase.circulationNumber) || '';
+            document.getElementById('edit-archived-judgment-type').value = caseItem.judgmentType || '';
+            document.getElementById('edit-archived-judgment-date').value = caseItem.judgmentDate || '';
+            document.getElementById('edit-archived-judgment-text').value = caseItem.judgmentText || '';
+            document.getElementById('edit-archived-reason').value = caseItem.archiveReason || '';
             document.getElementById('edit-archived-notes').value = caseItem.archiveNotes || '';
 
             editArchivedCaseModal.style.display = 'flex';
@@ -8096,9 +8204,15 @@
                     ...archivedCases[caseIndex],
                     subject: document.getElementById('edit-archived-subject').value,
                     caseNumber: document.getElementById('edit-archived-case-number').value,
+                    caseYear: document.getElementById('edit-archived-case-year').value,
                     plaintiff: document.getElementById('edit-archived-plaintiff').value,
                     defendant: document.getElementById('edit-archived-defendant').value,
                     department: document.getElementById('edit-archived-department').value,
+                    circulationNumber: document.getElementById('edit-archived-circulation-number').value,
+                    judgmentType: document.getElementById('edit-archived-judgment-type').value,
+                    judgmentDate: document.getElementById('edit-archived-judgment-date').value,
+                    judgmentText: document.getElementById('edit-archived-judgment-text').value,
+                    archiveReason: document.getElementById('edit-archived-reason').value,
                     archiveNotes: document.getElementById('edit-archived-notes').value
                 };
 
@@ -11380,37 +11494,28 @@
                 const caseItem = entry.item;
                 printRowIndex++;
 
-                // Normalize common fields across different lists (archived items use caseNumber/caseYear)
-                const number = caseItem.number || caseItem.caseNumber || '';
-                const year = caseItem.year || caseItem.caseYear || '';
-                const subject = caseItem.subject || caseItem.judgmentText || '';
-                const plaintiff = caseItem.plaintiff || '';
-                const defendant = caseItem.defendant || '';
-                const circulation = caseItem.circulationNumber || caseItem.circulation || '';
-                const rowDepartment = caseItem.department || '';
-                const firstSessionDate = (Array.isArray(caseItem.sessionHistory) && caseItem.sessionHistory.length)
-                    ? caseItem.sessionHistory[0].date
-                    : (caseItem.sessionDate || caseItem.reserveDate || caseItem.cancelDate || caseItem.suspendDate || caseItem.archiveDate || '');
+                // توحيد الحقول عبر مختلف القوائم (عادية/محجوزة/موقوفة/مشطوبة/أحكام/مؤرشفة) حتى تحتفظ القضية بكل بياناتها أيًا كانت مرحلتها
+                const row = normalizeCaseRowForDisplay(caseItem);
 
                 content += `
                     <tr>
                         <td>${printRowIndex}</td>
-                        <td>${number}</td>
-                        <td>${year}</td>
-                        <td>${subject}</td>
-                        <td>${plaintiff}</td>
-                        <td>${defendant}</td>
+                        <td>${row.number}</td>
+                        <td>${row.year}</td>
+                        <td>${row.subject}</td>
+                        <td>${row.plaintiff}</td>
+                        <td>${row.defendant}</td>
                 `;
 
                 if (showCirculationNumber) {
-                    content += `<td>${circulation}</td>`;
+                    content += `<td>${row.circulation}</td>`;
                 }
 
                 content += `
-                        <td>${formatDate(firstSessionDate)}</td>
-                        <td>${rowDepartment}</td>
+                        <td>${formatDate(row.date)}</td>
+                        <td>${row.department}</td>
                         <td class="editable-notes-cell">
-                            <textarea class="editable-notes" placeholder="اكتب ملاحظاتك هنا..." data-case-id="${caseItem.id}">${caseItem.notes || ''}</textarea>
+                            <textarea class="editable-notes" placeholder="اكتب ملاحظاتك هنا..." data-case-id="${caseItem.id}">${row.notes}</textarea>
                         </td>
                     </tr>
                 `;
@@ -11508,13 +11613,15 @@
                     return;
                 }
                 
-                // جمع جميع القوائم من جميع الفئات
+                // جمع جميع القوائم من جميع الفئات (بما فيها الأحكام) حتى تحتفظ القضية بجميع بياناتها في كل مراحلها
                 const allCandidates = []
                     .concat(cases || [])
                     .concat(reservedCases || [])
                     .concat(cancelledCases || [])
                     .concat(suspendedCases || [])
-                    .concat(archivedCases || []);
+                    .concat(archivedCases || [])
+                    .concat((favorableJudgments || []).map(j => ({...j, caseNumber: j.caseNumber, caseYear: j.caseNumber ? j.caseNumber.split('/')[1] : ''})))
+                    .concat((againstJudgments || []).map(j => ({...j, caseNumber: j.caseNumber, caseYear: j.caseNumber ? j.caseNumber.split('/')[1] : ''})));
 
                 const s = new Date(startDate);
                 const e = new Date(endDate);
@@ -11529,8 +11636,8 @@
                         });
                     }
 
-                    // تحقق من الحقول المحتملة للتاريخ
-                    const possibleDates = [c.sessionDate, c.reserveDate, c.cancelDate, c.suspendDate, c.archiveDate];
+                    // تحقق من الحقول المحتملة للتاريخ (تشمل الأحكام أيضاً)
+                    const possibleDates = [c.sessionDate, c.date, c.reserveDate, c.cancelDate, c.suspendDate, c.archiveDate];
                     for (const ds of possibleDates) {
                         if (!ds) continue;
                         const d = new Date(ds);
