@@ -5478,25 +5478,6 @@
             showAlert('تم تصدير الرول إلى ملف Word', 'success');
         }
 
-        // ========== دالة موحدة لتوحيد بيانات القضية أيًا كانت مرحلتها (عادية/محجوزة/موقوفة/مشطوبة/حكم/مؤرشفة) ==========
-        // تُستخدم في كل من الطباعة والتصدير إلى Word حتى تظهر نفس البيانات (رقم الدعوي، السنة، رقم المتداول، التاريخ...)
-        // بغض النظر عن المرحلة التي وصلت إليها القضية، وحتى لا تُفقد أي بيانات مسجلة بها.
-        function normalizeCaseRowForDisplay(caseItem) {
-            const number = caseItem.number || caseItem.caseNumber || '';
-            const year = caseItem.year || caseItem.caseYear || '';
-            const subject = caseItem.subject || caseItem.judgmentText || '';
-            const plaintiff = caseItem.plaintiff || '';
-            const defendant = caseItem.defendant || '';
-            const circulation = caseItem.circulationNumber || caseItem.circulation || '';
-            const department = caseItem.department || '';
-            const date = (Array.isArray(caseItem.sessionHistory) && caseItem.sessionHistory.length)
-                ? caseItem.sessionHistory[0].date
-                : (caseItem.sessionDate || caseItem.date || caseItem.reserveDate || caseItem.cancelDate || caseItem.suspendDate || caseItem.archiveDate || caseItem.judgmentDate || '');
-            const notes = caseItem.notes || caseItem.archiveNotes || caseItem.suspendNotes || '';
-
-            return { number, year, subject, plaintiff, defendant, circulation, department, date, notes };
-        }
-
         // ========== دالة لتصدير قائمة القضايا إلى Word ==========
         function exportCasesToWord(showCirculationNumber = true, casesToExport = null, department = '') {
             let casesData = casesToExport || cases;
@@ -5526,26 +5507,31 @@
                 
                 const caseItem = entry.item;
                 exportRowIndex++;
-                const row = normalizeCaseRowForDisplay(caseItem);
+                
+                // نفس منطق التوحيد المستخدم في الطباعة: التعامل مع قوائم مختلفة الشكل
+                // (قضايا عادية، أحكام، أرشيف) بدون ظهور "undefined" في الحقول الناقصة
+                const number = caseItem.number || (caseItem.caseNumber ? caseItem.caseNumber.split('/')[0] : '') || '';
+                const year = caseItem.year || caseItem.caseYear || (caseItem.caseNumber && caseItem.caseNumber.includes('/') ? caseItem.caseNumber.split('/')[1] : '') || '';
+                const rowSessionDate = caseItem.sessionDate || caseItem.date || caseItem.judgmentDate || caseItem.archiveDate || '';
                 
                 tableRows += `
                     <tr>
                         <td>${exportRowIndex}</td>
-                        <td>${row.number}</td>
-                        <td>${row.year}</td>
-                        <td>${row.subject}</td>
-                        <td>${row.plaintiff}</td>
-                        <td>${row.defendant}</td>
+                        <td>${number}</td>
+                        <td>${year}</td>
+                        <td>${caseItem.subject || ''}</td>
+                        <td>${caseItem.plaintiff || ''}</td>
+                        <td>${caseItem.defendant || ''}</td>
                 `;
                 
                 if (showCirculationNumber) {
-                    tableRows += `<td>${row.circulation}</td>`;
+                    tableRows += `<td>${caseItem.circulationNumber || ''}</td>`;
                 }
                 
                 tableRows += `
-                        <td>${formatDate(row.date)}</td>
-                        <td>${row.department}</td>
-                        <td>${row.notes}</td>
+                        <td>${formatDate(rowSessionDate)}</td>
+                        <td>${caseItem.department || ''}</td>
+                        <td>${caseItem.notes || ''}</td>
                     </tr>
                 `;
             });
@@ -6666,6 +6652,7 @@
                 }
                 
                 archivedCase = {
+                    ...judgment,
                     id: Date.now().toString(),
                     caseId: judgment.caseId,
                     caseNumber: judgment.caseNumber ? judgment.caseNumber.split('/')[0] : ((originalCase && originalCase.number) || ''),
@@ -6681,9 +6668,14 @@
                     archiveDate: new Date().toISOString().split('T')[0],
                     archiveReason: reason,
                     archiveNotes: notes,
-                    sessionHistory: originalCase ? originalCase.sessionHistory || [] : [],
+                    sessionHistory: originalCase ? originalCase.sessionHistory || [] : (judgment.sessionHistory || []),
                     createdAt: new Date().toISOString()
                 };
+                // تنظيف حقول خاصة بشكل "الحكم" لا تنتمي لشكل سجل الأرشيف
+                delete archivedCase.text;
+                delete archivedCase.date;
+                delete archivedCase.type;
+                delete archivedCase.printNotes;
                 
                 archivedCases.push(archivedCase);
                 
@@ -6706,6 +6698,7 @@
                 if (!caseItem) return;
                 
                 archivedCase = {
+                    ...caseItem,
                     id: Date.now().toString(),
                     caseId: caseItem.id,
                     caseNumber: caseItem.number,
@@ -7650,6 +7643,7 @@
             const judgmentSessionDate = caseItem.reserveDate || caseItem.sessionDate;
             
             const judgmentData = {
+                ...caseItem,
                 id: Date.now().toString(),
                 caseId: caseId,
                 caseNumber: `${caseItem.number}/${caseItem.year}`,
@@ -8383,8 +8377,11 @@
                 } else {
                     // إنشاء قضية جديدة من بيانات الحكم إذا لم توجد القضية الأصلية
                     // إنشاء قضية جديدة من بيانات الحكم (آمنة - تتعامل مع قيم ناقصة)
+                    // نبدأ بنسخ كل بيانات الحكم (والتي تحمل بدورها كل بيانات القضية الأصلية
+                    // بما فيها رقم المتداول) حتى لا تُفقد أي بيانات مسجلة سابقًا
                     const parts = (judgment.caseNumber || '').split('/');
                     const newCase = {
+                        ...judgment,
                         id: judgment.caseId || Date.now().toString(),
                         number: parts[0] || '',
                         year: parts[1] || new Date().getFullYear().toString(),
@@ -8393,7 +8390,7 @@
                         subject: judgment.subject || '',
                         department: judgment.department || '',
                         sessionDate: newSessionDate,
-                        circulationNumber: '',
+                        circulationNumber: judgment.circulationNumber || '',
                         notes: `تم استرجاع الدعوى من الحكم ${judgmentType === 'favorable' ? 'الصالح' : 'الالضد'}`,
                         status: 'pending',
                         createdAt: new Date().toISOString(),
@@ -8417,6 +8414,15 @@
                             }
                         ]
                     };
+                    // تنظيف الحقول الخاصة بشكل "الحكم" التي لا تنتمي لشكل "القضية" العادي
+                    delete newCase.caseId;
+                    delete newCase.caseNumber;
+                    delete newCase.text;
+                    delete newCase.date;
+                    delete newCase.appealType;
+                    delete newCase.appeal;
+                    delete newCase.type;
+                    delete newCase.printNotes;
                     cases.push(newCase);
                     localStorage.setItem('cases', JSON.stringify(cases));
                 }
@@ -8630,6 +8636,7 @@
                     const caseItem = archivedCases[caseIndex];
                     
                     const restoredCase = {
+                        ...caseItem,
                         id: caseItem.caseId || Date.now().toString(),
                         number: caseItem.caseNumber || '',
                         year: caseItem.caseYear || '',
@@ -8637,11 +8644,23 @@
                         plaintiff: caseItem.plaintiff || '',
                         defendant: caseItem.defendant || '',
                         department: caseItem.department || '',
+                        circulationNumber: caseItem.circulationNumber || '',
                         sessionDate: newSessionDate,
                         status: 'pending',
                         notes: '',
                         sessionHistory: caseItem.sessionHistory ? [...caseItem.sessionHistory] : []
                     };
+                    // تنظيف حقول خاصة بشكل سجل "الأرشيف" لا تنتمي لشكل "القضية" العادي
+                    delete restoredCase.caseId;
+                    delete restoredCase.caseNumber;
+                    delete restoredCase.caseYear;
+                    delete restoredCase.judgmentType;
+                    delete restoredCase.judgmentText;
+                    delete restoredCase.judgmentDate;
+                    delete restoredCase.archiveDate;
+                    delete restoredCase.archiveReason;
+                    delete restoredCase.archiveNotes;
+                    delete restoredCase.createdAt;
                     
                     restoredCase.sessionHistory.push({
                         date: caseItem.archiveDate,
@@ -11494,28 +11513,37 @@
                 const caseItem = entry.item;
                 printRowIndex++;
 
-                // توحيد الحقول عبر مختلف القوائم (عادية/محجوزة/موقوفة/مشطوبة/أحكام/مؤرشفة) حتى تحتفظ القضية بكل بياناتها أيًا كانت مرحلتها
-                const row = normalizeCaseRowForDisplay(caseItem);
+                // Normalize common fields across different lists (archived items use caseNumber/caseYear)
+                const number = caseItem.number || caseItem.caseNumber || '';
+                const year = caseItem.year || caseItem.caseYear || '';
+                const subject = caseItem.subject || caseItem.judgmentText || '';
+                const plaintiff = caseItem.plaintiff || '';
+                const defendant = caseItem.defendant || '';
+                const circulation = caseItem.circulationNumber || caseItem.circulation || '';
+                const rowDepartment = caseItem.department || '';
+                const firstSessionDate = (Array.isArray(caseItem.sessionHistory) && caseItem.sessionHistory.length)
+                    ? caseItem.sessionHistory[0].date
+                    : (caseItem.sessionDate || caseItem.reserveDate || caseItem.cancelDate || caseItem.suspendDate || caseItem.archiveDate || '');
 
                 content += `
                     <tr>
                         <td>${printRowIndex}</td>
-                        <td>${row.number}</td>
-                        <td>${row.year}</td>
-                        <td>${row.subject}</td>
-                        <td>${row.plaintiff}</td>
-                        <td>${row.defendant}</td>
+                        <td>${number}</td>
+                        <td>${year}</td>
+                        <td>${subject}</td>
+                        <td>${plaintiff}</td>
+                        <td>${defendant}</td>
                 `;
 
                 if (showCirculationNumber) {
-                    content += `<td>${row.circulation}</td>`;
+                    content += `<td>${circulation}</td>`;
                 }
 
                 content += `
-                        <td>${formatDate(row.date)}</td>
-                        <td>${row.department}</td>
+                        <td>${formatDate(firstSessionDate)}</td>
+                        <td>${rowDepartment}</td>
                         <td class="editable-notes-cell">
-                            <textarea class="editable-notes" placeholder="اكتب ملاحظاتك هنا..." data-case-id="${caseItem.id}">${row.notes}</textarea>
+                            <textarea class="editable-notes" placeholder="اكتب ملاحظاتك هنا..." data-case-id="${caseItem.id}">${caseItem.notes || ''}</textarea>
                         </td>
                     </tr>
                 `;
@@ -11613,7 +11641,8 @@
                     return;
                 }
                 
-                // جمع جميع القوائم من جميع الفئات (بما فيها الأحكام) حتى تحتفظ القضية بجميع بياناتها في كل مراحلها
+                // جمع جميع القوائم من جميع الفئات (شامل الأحكام حتى تظهر القضايا التي صدر
+                // فيها حكم ضمن النطاق الزمني برقم متداولها، بنفس منطق الطباعة حسب النطاق الزمني)
                 const allCandidates = []
                     .concat(cases || [])
                     .concat(reservedCases || [])
@@ -11636,7 +11665,7 @@
                         });
                     }
 
-                    // تحقق من الحقول المحتملة للتاريخ (تشمل الأحكام أيضاً)
+                    // تحقق من الحقول المحتملة للتاريخ (تشمل تاريخ الحكم أيضاً)
                     const possibleDates = [c.sessionDate, c.date, c.reserveDate, c.cancelDate, c.suspendDate, c.archiveDate];
                     for (const ds of possibleDates) {
                         if (!ds) continue;
