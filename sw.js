@@ -1,4 +1,4 @@
-const CACHE_NAME = 'case-manager-cache-v3';
+const CACHE_NAME = 'case-manager-cache-v4';
 const APP_SHELL = [
   './',
   './index.html',
