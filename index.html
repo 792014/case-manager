@@ -3147,7 +3147,7 @@
                     <div class="form-group" style="flex:1; min-width:220px;">
                         <label for="prev-sessions-department">الدائرة</label>
                         <select id="prev-sessions-department">
-                            <option value="">-- جميع الدوائر --</option>
+                            <option value="">-- اختر الدائرة --</option>
                         </select>
                     </div>
                     <div class="form-group" style="flex:2; min-width:220px;">
@@ -3155,9 +3155,23 @@
                         <input type="text" id="prev-sessions-search" placeholder="بحث...">
                     </div>
                 </div>
-                <div class="search-actions" style="margin-top:10px;">
-                    <button id="print-prev-sessions" type="button" class="btn-print">
-                        <i class="fas fa-print"></i> طباعة
+            </div>
+
+            <div class="print-controls">
+                <h4><i class="fas fa-print icon-primary"></i> طباعة الجلسات السابقة</h4>
+                <div class="form-group" style="max-width: 320px;">
+                    <label for="prev-sessions-print-department">الدائرة</label>
+                    <select id="prev-sessions-print-department">
+                        <option value="">جميع الدوائر</option>
+                    </select>
+                </div>
+                <p style="color: #666; font-size: 12px; margin: 5px 0 10px;">عند اختيار "جميع الدوائر" سيتم تجميع القضايا في الطباعة كل دائرة على حدة.</p>
+                <div class="share-buttons">
+                    <button id="print-previous-sessions" class="btn-print">
+                        <i class="fas fa-print"></i> طباعة الجلسات السابقة
+                    </button>
+                    <button id="export-previous-sessions-word" class="btn-word">
+                        <i class="fas fa-file-word"></i> تصدير إلى Word
                     </button>
                 </div>
             </div>
@@ -3520,21 +3534,6 @@
                 </div>
                 <button type="submit" class="btn-success" style="width: 100%;"><i class="fas fa-redo"></i> إعادة للرول</button>
             </form>
-        </div>
-    </div>
-
-    <!-- نافذة مراجعة التحديثات الواردة من نسخة أخرى (لاب توب/موبايل) قبل استيرادها -->
-    <div id="sync-review-modal" class="modal">
-        <div class="modal-content" style="max-width: 600px;">
-            <div class="modal-header">
-                <h3><i class="fas fa-sync-alt"></i> تحديثات جديدة من نسخة أخرى</h3>
-            </div>
-            <p style="color: #555; margin: 0 0 10px;">تم إجراء تعديلات على البيانات من جهاز/نسخة أخرى (لاب توب أو موبايل) بينما كانت هذه النسخة تعمل. راجع التفاصيل قبل الموافقة على استيرادها:</p>
-            <div id="sync-review-content" style="max-height: 350px; overflow-y: auto; border: 1px solid #ddd; border-radius: 8px; padding: 12px; margin-bottom: 12px; background: #fafafa; font-size: 13px;"></div>
-            <div style="display: flex; gap: 10px;">
-                <button id="sync-review-accept" class="btn-success" style="flex: 1;"><i class="fas fa-check"></i> قبول واستيراد التحديثات</button>
-                <button id="sync-review-reject" class="btn-danger" style="flex: 1;"><i class="fas fa-times"></i> تجاهل والإبقاء على بياناتي هنا</button>
-            </div>
         </div>
     </div>
 
@@ -4091,42 +4090,8 @@
             })();
         }
 
-        // يخزّن بيانات واردة من السيرفر في الذاكرة و localStorage فقط (بدون إعادة رسم الواجهة) -
-        // يُستخدم في التحميل الأول (bootstrap) قبل ما تجهيزات الواجهة تخلص
-        function storeRemoteDataInMemoryAndCache(remote, remoteTS) {
-            cases = remote.cases || [];
-            favorableJudgments = remote.favorableJudgments || [];
-            againstJudgments = remote.againstJudgments || [];
-            reservedCases = remote.reservedCases || [];
-            cancelledCases = remote.cancelledCases || [];
-            suspendedCases = remote.suspendedCases || [];
-            archivedCases = remote.archivedCases || [];
-            notifications = remote.notifications || [];
-            departments = (remote.departments && remote.departments.length) ? remote.departments : (departments || []);
-
-            window.__savingToAPI = true;
-            try {
-                localStorage.setItem('cases', JSON.stringify(cases));
-                localStorage.setItem('favorableJudgments', JSON.stringify(favorableJudgments));
-                localStorage.setItem('againstJudgments', JSON.stringify(againstJudgments));
-                localStorage.setItem('reservedCases', JSON.stringify(reservedCases));
-                localStorage.setItem('cancelledCases', JSON.stringify(cancelledCases));
-                localStorage.setItem('suspendedCases', JSON.stringify(suspendedCases));
-                localStorage.setItem('archivedCases', JSON.stringify(archivedCases));
-                localStorage.setItem('notifications', JSON.stringify(notifications));
-                localStorage.setItem('departments', JSON.stringify(departments));
-                localStorage.setItem('lastSavedAt', String(remoteTS));
-            } finally {
-                window.__savingToAPI = false;
-            }
-        }
-
         async function loadDataFromAPI() {
-            // ========== الخطوة ١: نجهّز أولاً بيانات هذا الجهاز نفسه (محلية) ========== 
-            // هذه هي البيانات التي ستظل معروضة ومُستخدمة افتراضيًا، ولن تُستبدل ببيانات
-            // نسخة أخرى (لاب توب/موبايل) إلا بعد موافقة صريحة من المستخدم (خطوة ٣).
-            let usedElectronFile = false;
-
+            // Attempt to read from Electron persisted file first
             if (window.electronAPI && window.electronAPI.loadData) {
                 try {
                     const data = await window.electronAPI.loadData();
@@ -4154,7 +4119,8 @@
                     );
 
                     if (data && hasElectronData) {
-                        // بين ملف إلكترون المحلي و localStorage على نفس الجهاز، نفضّل الأحدث زمنيًا (مقارنة محلية بحتة، لا علاقة لها بالمزامنة بين الأجهزة)
+                        // If both electron file and localStorage exist, prefer the most
+                        // recently-saved source by comparing `lastSavedAt` timestamps.
                         const electronTS = data && data.lastSavedAt ? Number(data.lastSavedAt) : 0;
                         const localTS = Number(localStorage.getItem('lastSavedAt') || '0');
 
@@ -4168,26 +4134,59 @@
                             archivedCases = JSON.parse(localStorage.getItem('archivedCases')) || [];
                             notifications = JSON.parse(localStorage.getItem('notifications')) || [];
                             departments = JSON.parse(localStorage.getItem('departments')) || [];
-                        } else {
-                            cases = data.cases || [];
-                            favorableJudgments = data.favorableJudgments || [];
-                            againstJudgments = data.againstJudgments || [];
-                            reservedCases = data.reservedCases || [];
-                            cancelledCases = data.cancelledCases || [];
-                            suspendedCases = data.suspendedCases || [];
-                            archivedCases = data.archivedCases || [];
-                            notifications = data.notifications || [];
-                            departments = data.departments || [];
-                            localStorage.setItem('lastSavedAt', String(electronTS || Date.now()));
+                            return;
                         }
-                        usedElectronFile = true;
+
+                        cases = data.cases || [];
+                        favorableJudgments = data.favorableJudgments || [];
+                        againstJudgments = data.againstJudgments || [];
+                        reservedCases = data.reservedCases || [];
+                        cancelledCases = data.cancelledCases || [];
+                        suspendedCases = data.suspendedCases || [];
+                        archivedCases = data.archivedCases || [];
+                        notifications = data.notifications || [];
+                        departments = data.departments || [];
+                        return;
                     }
                 } catch (e) {
                     console.warn('Electron data load failed', e);
                 }
             }
 
-            if (!usedElectronFile) {
+            const data = await apiRequest('/data');
+            if (data) {
+                cases = data.cases || [];
+                favorableJudgments = data.favorableJudgments || [];
+                againstJudgments = data.againstJudgments || [];
+                reservedCases = data.reservedCases || [];
+                cancelledCases = data.cancelledCases || [];
+                suspendedCases = data.suspendedCases || [];
+                archivedCases = data.archivedCases || [];
+                notifications = data.notifications || [];
+                departments = data.departments || JSON.parse(localStorage.getItem('departments') || '[]') || [];
+
+                // نخزن نسخة محلية بنفس الطابع الزمني من أول تحميل حتى تكون مقارنات
+                // المزامنة اللاحقة (syncFromServer) صحيحة من البداية. window.__savingToAPI
+                // بيمنع إن هذه الكتابة تُشعل رفعًا جديدًا للبيانات لـ Firebase (مش تعديل حقيقي).
+                window.__savingToAPI = true;
+                try {
+                    localStorage.setItem('cases', JSON.stringify(cases));
+                    localStorage.setItem('favorableJudgments', JSON.stringify(favorableJudgments));
+                    localStorage.setItem('againstJudgments', JSON.stringify(againstJudgments));
+                    localStorage.setItem('reservedCases', JSON.stringify(reservedCases));
+                    localStorage.setItem('cancelledCases', JSON.stringify(cancelledCases));
+                    localStorage.setItem('suspendedCases', JSON.stringify(suspendedCases));
+                    localStorage.setItem('archivedCases', JSON.stringify(archivedCases));
+                    localStorage.setItem('notifications', JSON.stringify(notifications));
+                    localStorage.setItem('departments', JSON.stringify(departments));
+                    if (data.lastSavedAt) {
+                        localStorage.setItem('lastSavedAt', String(data.lastSavedAt));
+                    }
+                } finally {
+                    window.__savingToAPI = false;
+                }
+            } else {
+                // Fallback to localStorage
                 cases = JSON.parse(localStorage.getItem('cases')) || [];
                 favorableJudgments = JSON.parse(localStorage.getItem('favorableJudgments')) || [];
                 againstJudgments = JSON.parse(localStorage.getItem('againstJudgments')) || [];
@@ -4197,41 +4196,6 @@
                 archivedCases = JSON.parse(localStorage.getItem('archivedCases')) || [];
                 notifications = JSON.parse(localStorage.getItem('notifications')) || [];
                 departments = JSON.parse(localStorage.getItem('departments')) || [];
-            }
-
-            const localTSNow = Number(localStorage.getItem('lastSavedAt') || '0');
-            const hasLocalData = (
-                (cases && cases.length) || (favorableJudgments && favorableJudgments.length) ||
-                (againstJudgments && againstJudgments.length) || (reservedCases && reservedCases.length) ||
-                (cancelledCases && cancelledCases.length) || (suspendedCases && suspendedCases.length) ||
-                (archivedCases && archivedCases.length) || (notifications && notifications.length)
-            );
-
-            // ========== الخطوة ٢: نجيب نسخة السيرفر للمقارنة فقط - لا نستبدل بها البيانات مباشرة ========== 
-            let remote = null;
-            try {
-                remote = await apiRequest('/data');
-            } catch (e) {
-                remote = null;
-            }
-
-            if (remote) {
-                const remoteTS = Number(remote.lastSavedAt || 0);
-
-                if (!hasLocalData) {
-                    // جهاز جديد تمامًا (أو تم مسح بياناته) - لا يوجد شيء نحميه محليًا، فنأخذ نسخة
-                    // السيرفر مباشرة بأمان (مفيش "تعديلات موجودة" هنقارنها أو نطلب موافقة عليها)
-                    storeRemoteDataInMemoryAndCache(remote, remoteTS || Date.now());
-                } else if (remoteTS && remoteTS > localTSNow) {
-                    // فيه بيانات أحدث على السيرفر (من نسخة تانية) تختلف عن اللي موجود هنا فعلاً.
-                    // لا نستبدلها تلقائيًا؛ نُبقي بيانات هذا الجهاز كما هي الآن، ونعرض نافذة
-                    // المراجعة بعد ما تجهيزات الواجهة تخلص (خطوة ٣) ليقرر المستخدم بنفسه.
-                    const lastRejectedTS = localStorage.getItem('lastRejectedRemoteTS');
-                    if (String(remoteTS) !== lastRejectedTS) {
-                        window.__pendingStartupSyncReview = { remote, remoteTS };
-                    }
-                }
-                // لو remoteTS <= localTSNow: بيانات هذا الجهاز مساوية أو أحدث بالفعل، لا حاجة لأي إجراء
             }
 
             // ========== استيراد النسخة الاحتياطية المرفقة (مرة واحدة فقط) ==========
@@ -4311,22 +4275,14 @@
                 // عشان أي جهاز تاني (الموبايل مثلاً) يشوف آخر تعديل فورًا. قبل هذا
                 // التعديل كان الحفظ في Firebase بيتخطى لما ينجح الحفظ المحلي، فكانت
                 // تعديلات اللاب توب متوصلش للموبايل أبدًا.
-                //
-                // لو فشل الرفع (الأغلب بسبب عدم الاتصال بالإنترنت)، نسجّل علامة
-                // "hasPendingSync" حتى نعرف إن فيه تعديلات محفوظة محليًا لسه ما
-                // وصلتش لـ Firebase، ونحاول نرفعها تلقائيًا بمجرد عودة الاتصال
-                // (راجع pushPendingChangesIfOnline و مستمعي online/offline بالأسفل).
                 try {
                     const result = await apiRequest('/data', {
                         method: 'POST',
                         body: JSON.stringify(data)
                     });
-                    const firebaseOk = result && result.success;
-                    stored = stored || firebaseOk;
-                    localStorage.setItem('hasPendingSync', firebaseOk ? 'false' : 'true');
+                    stored = stored || (result && result.success);
                 } catch (e) {
                     console.warn('Firebase saveData failed', e);
-                    localStorage.setItem('hasPendingSync', 'true');
                 }
 
                 // Always keep a localStorage backup copy as well, including timestamp
@@ -4409,6 +4365,9 @@
         const prevSessionsDepartmentSelect = document.getElementById('prev-sessions-department');
         const prevSessionsSearchInput = document.getElementById('prev-sessions-search');
         const prevSessionsTableBody = document.getElementById('prev-sessions-table-body');
+        const prevSessionsPrintDepartmentSelect = document.getElementById('prev-sessions-print-department');
+        const printPreviousSessionsBtn = document.getElementById('print-previous-sessions');
+        const exportPreviousSessionsWordBtn = document.getElementById('export-previous-sessions-word');
         const tabs = document.querySelectorAll('.tab');
         const judgmentTabs = document.querySelectorAll('.judgment-tab');
         const postponeModal = document.getElementById('postpone-modal');
@@ -5541,6 +5500,25 @@
             showAlert('تم تصدير الرول إلى ملف Word', 'success');
         }
 
+        // ========== دالة موحدة لتوحيد بيانات القضية أيًا كانت مرحلتها (عادية/محجوزة/موقوفة/مشطوبة/حكم/مؤرشفة) ==========
+        // تُستخدم في كل من الطباعة والتصدير إلى Word حتى تظهر نفس البيانات (رقم الدعوي، السنة، رقم المتداول، التاريخ...)
+        // بغض النظر عن المرحلة التي وصلت إليها القضية، وحتى لا تُفقد أي بيانات مسجلة بها.
+        function normalizeCaseRowForDisplay(caseItem) {
+            const number = caseItem.number || caseItem.caseNumber || '';
+            const year = caseItem.year || caseItem.caseYear || '';
+            const subject = caseItem.subject || caseItem.judgmentText || '';
+            const plaintiff = caseItem.plaintiff || '';
+            const defendant = caseItem.defendant || '';
+            const circulation = caseItem.circulationNumber || caseItem.circulation || '';
+            const department = caseItem.department || '';
+            const date = (Array.isArray(caseItem.sessionHistory) && caseItem.sessionHistory.length)
+                ? caseItem.sessionHistory[0].date
+                : (caseItem.sessionDate || caseItem.date || caseItem.reserveDate || caseItem.cancelDate || caseItem.suspendDate || caseItem.archiveDate || caseItem.judgmentDate || '');
+            const notes = caseItem.notes || caseItem.archiveNotes || caseItem.suspendNotes || '';
+
+            return { number, year, subject, plaintiff, defendant, circulation, department, date, notes };
+        }
+
         // ========== دالة لتصدير قائمة القضايا إلى Word ==========
         function exportCasesToWord(showCirculationNumber = true, casesToExport = null, department = '') {
             let casesData = casesToExport || cases;
@@ -5570,31 +5548,26 @@
                 
                 const caseItem = entry.item;
                 exportRowIndex++;
-                
-                // نفس منطق التوحيد المستخدم في الطباعة: التعامل مع قوائم مختلفة الشكل
-                // (قضايا عادية، أحكام، أرشيف) بدون ظهور "undefined" في الحقول الناقصة
-                const number = caseItem.number || (caseItem.caseNumber ? caseItem.caseNumber.split('/')[0] : '') || '';
-                const year = caseItem.year || caseItem.caseYear || (caseItem.caseNumber && caseItem.caseNumber.includes('/') ? caseItem.caseNumber.split('/')[1] : '') || '';
-                const rowSessionDate = caseItem.sessionDate || caseItem.date || caseItem.judgmentDate || caseItem.archiveDate || '';
+                const row = normalizeCaseRowForDisplay(caseItem);
                 
                 tableRows += `
                     <tr>
                         <td>${exportRowIndex}</td>
-                        <td>${number}</td>
-                        <td>${year}</td>
-                        <td>${caseItem.subject || ''}</td>
-                        <td>${caseItem.plaintiff || ''}</td>
-                        <td>${caseItem.defendant || ''}</td>
+                        <td>${row.number}</td>
+                        <td>${row.year}</td>
+                        <td>${row.subject}</td>
+                        <td>${row.plaintiff}</td>
+                        <td>${row.defendant}</td>
                 `;
                 
                 if (showCirculationNumber) {
-                    tableRows += `<td>${caseItem.circulationNumber || ''}</td>`;
+                    tableRows += `<td>${row.circulation}</td>`;
                 }
                 
                 tableRows += `
-                        <td>${formatDate(rowSessionDate)}</td>
-                        <td>${caseItem.department || ''}</td>
-                        <td>${caseItem.notes || ''}</td>
+                        <td>${formatDate(row.date)}</td>
+                        <td>${row.department}</td>
+                        <td>${row.notes}</td>
                     </tr>
                 `;
             });
@@ -6037,6 +6010,7 @@
             populateDepartmentSelectWithAllOption(printCasesDepartmentSelect, printCasesDepartmentSelect ? printCasesDepartmentSelect.value : '');
             populateDepartmentSelectWithAllOption(exportCasesDepartmentSelect, exportCasesDepartmentSelect ? exportCasesDepartmentSelect.value : '');
             populateDepartmentSelectWithAllOption(printDateRangeDepartmentSelect, printDateRangeDepartmentSelect ? printDateRangeDepartmentSelect.value : '');
+            populateDepartmentSelectWithAllOption(prevSessionsPrintDepartmentSelect, prevSessionsPrintDepartmentSelect ? prevSessionsPrintDepartmentSelect.value : '');
             
             const searchDepartmentSelect = document.getElementById('search-department');
             if (searchDepartmentSelect) {
@@ -6318,7 +6292,7 @@
             const legacyNames = cases.map(c => normalizeDeptName(c.department)).filter(d => d !== '');
             const deptNames = [...new Set([...registeredNames, ...legacyNames])].sort((a, b) => a.localeCompare('ar'));
             
-            prevSessionsDepartmentSelect.innerHTML = '<option value="">-- جميع الدوائر --</option>' +
+            prevSessionsDepartmentSelect.innerHTML = '<option value="">-- اختر الدائرة --</option>' +
                 deptNames.map(d => {
                     const dept = getDepartmentByName(d);
                     const label = dept && dept.conveningDay ? `${d} (${dept.conveningDay})` : d;
@@ -6330,99 +6304,7 @@
             }
         }
         
-        // ========== طباعة الجلسات السابقة (حسب الدائرة أو جميع الدوائر) ==========
-        function printPreviousSessions() {
-            const selectedDepartment = prevSessionsDepartmentSelect ? normalizeDeptName(prevSessionsDepartmentSelect.value) : '';
-            const searchTerm = prevSessionsSearchInput ? prevSessionsSearchInput.value.trim().toLowerCase() : '';
-            
-            let filteredCases = selectedDepartment
-                ? cases.filter(c => normalizeDeptName(c.department) === selectedDepartment)
-                : cases;
-            
-            if (searchTerm) {
-                filteredCases = filteredCases.filter(c => {
-                    const haystack = `${c.number || ''}/${c.year || ''} ${c.subject || ''} ${c.plaintiff || ''} ${c.defendant || ''} ${c.circulationNumber || ''}`.toLowerCase();
-                    return haystack.includes(searchTerm);
-                });
-            }
-            
-            if (filteredCases.length === 0) {
-                showAlert('لا توجد قضايا للطباعة', 'warning');
-                return;
-            }
-            
-            let rowsHTML = '';
-            if (selectedDepartment) {
-                rowsHTML = buildPreviousSessionsRowsHTML(filteredCases, false);
-            } else {
-                const grouped = groupByDepartmentForDisplay(filteredCases);
-                grouped.forEach(entry => {
-                    if (entry.isHeader) {
-                        rowsHTML += buildDepartmentHeaderRowHtml(8, entry.department, entry.count);
-                    } else {
-                        rowsHTML += buildPreviousSessionsRowsHTML([entry.item], false);
-                    }
-                });
-            }
-            
-            const departmentText = selectedDepartment ? selectedDepartment : 'جميع الدوائر';
-            const currentDate = formatDate(new Date().toISOString().split('T')[0]);
-            
-            const content = `
-                <!DOCTYPE html>
-                <html lang="ar" dir="rtl">
-                <head>
-                    <meta charset="UTF-8">
-                    <title>الجلسات السابقة للقضايا</title>
-                    <style>
-                        body { font-family: Arial, sans-serif; direction: rtl; padding: 15px; }
-                        h2 { text-align: center; margin-bottom: 5px; }
-                        .print-meta { text-align: center; color: #444; margin-bottom: 15px; font-size: 13px; }
-                        table { border-collapse: collapse; width: 100%; }
-                        th, td { border: 1px solid #000; padding: 6px; text-align: center; font-size: 12px; }
-                        th { background: #f0f0f0; }
-                        td.session-history-notes, td:nth-child(2), td:nth-child(3), td:nth-child(4) { text-align: right; }
-                    </style>
-                </head>
-                <body>
-                    <h2>الجلسات السابقة للقضايا</h2>
-                    <div class="print-meta">
-                        <p>الدائرة: ${departmentText}</p>
-                        <p>عدد القضايا: ${filteredCases.length}</p>
-                        <p>تاريخ الطباعة: ${currentDate}</p>
-                    </div>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>رقم/سنة الدعوي</th>
-                                <th>الموضوع</th>
-                                <th>المدعي</th>
-                                <th>المدعى عليه</th>
-                                <th>رقم المتداول</th>
-                                <th>الجلسة السابقة</th>
-                                <th>الجلسة الأخيرة</th>
-                                <th>سبب الترحيل / القرار في الجلسة السابقة</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${rowsHTML}
-                        </tbody>
-                    </table>
-                    <script>window.onload = function(){ window.print(); };<\/script>
-                </body>
-                </html>
-            `;
-            
-            const printWindow = window.open('', '_blank');
-            printWindow.document.write(content);
-            printWindow.document.close();
-        }
-        
-        const printPrevSessionsBtn = document.getElementById('print-prev-sessions');
-        if (printPrevSessionsBtn) {
-            printPrevSessionsBtn.addEventListener('click', printPreviousSessions);
-        }
-        
+        // تحديد آخر حركة ترحيل/قرار مسجلة لجلسات القضية (الجلسة السابقة، الجلسة الأخيرة، وسبب القرار)
         function getLastSessionMovement(caseItem) {
             const history = caseItem.sessionHistory || [];
             
@@ -6444,8 +6326,41 @@
             };
         }
         
-        // يبني صفوف جدول الجلسات السابقة لقائمة قضايا مُعطاة (يُستخدم في العرض والطباعة معًا)
-        function buildPreviousSessionsRowsHTML(filteredCases, includeActionsColumn) {
+        function renderPreviousSessionsTable() {
+            if (!prevSessionsTableBody) return;
+            
+            const selectedDepartment = prevSessionsDepartmentSelect ? normalizeDeptName(prevSessionsDepartmentSelect.value) : '';
+            const searchTerm = prevSessionsSearchInput ? prevSessionsSearchInput.value.trim().toLowerCase() : '';
+            const summaryEl = document.getElementById('prev-sessions-summary');
+            const countEl = document.getElementById('prev-sessions-count');
+            
+            if (!selectedDepartment) {
+                prevSessionsTableBody.innerHTML = '<tr><td colspan="9" style="text-align:center; padding:20px; color:#999;">يرجى اختيار الدائرة لعرض القضايا</td></tr>';
+                if (summaryEl) summaryEl.style.display = 'none';
+                return;
+            }
+            
+            // مطابقة تلقائية بالاسم (بعد التطبيع) بين الدائرة المختارة وحقل الدائرة في كل قضية،
+            // سواء كانت القضية مرتبطة بدائرة مسجلة حديثًا أو قضية قديمة كُتبت فيها الدائرة يدويًا
+            let filteredCases = cases.filter(c => normalizeDeptName(c.department) === selectedDepartment);
+            
+            if (searchTerm) {
+                filteredCases = filteredCases.filter(c => {
+                    const haystack = `${c.number || ''}/${c.year || ''} ${c.subject || ''} ${c.plaintiff || ''} ${c.defendant || ''} ${c.circulationNumber || ''}`.toLowerCase();
+                    return haystack.includes(searchTerm);
+                });
+            }
+            
+            if (summaryEl && countEl) {
+                summaryEl.style.display = 'block';
+                countEl.textContent = `عدد القضايا في الدائرة: ${filteredCases.length}`;
+            }
+            
+            if (filteredCases.length === 0) {
+                prevSessionsTableBody.innerHTML = '<tr><td colspan="9" style="text-align:center; padding:20px; color:#999;">لا توجد قضايا لهذه الدائرة</td></tr>';
+                return;
+            }
+            
             let rowsHTML = '';
             filteredCases.forEach(caseItem => {
                 const movement = getLastSessionMovement(caseItem);
@@ -6460,69 +6375,14 @@
                         <td style="text-align:center;">${movement.previousDate ? formatDate(movement.previousDate) : '-'}</td>
                         <td style="text-align:center;">${movement.lastDate ? formatDate(movement.lastDate) : '-'}</td>
                         <td class="session-history-notes">${movement.reason}</td>
-                `;
-                if (includeActionsColumn) {
-                    rowsHTML += `
                         <td class="actions no-print" style="text-align:center;">
                             <button class="btn-purple btn-session-history" data-id="${caseItem.id}" style="padding:5px 10px; font-size:12px;">
                                 <i class="fas fa-history"></i> السجل الكامل
                             </button>
                         </td>
-                    `;
-                }
-                rowsHTML += `</tr>`;
+                    </tr>
+                `;
             });
-            return rowsHTML;
-        }
-        
-        function renderPreviousSessionsTable() {
-            if (!prevSessionsTableBody) return;
-            
-            const selectedDepartment = prevSessionsDepartmentSelect ? normalizeDeptName(prevSessionsDepartmentSelect.value) : '';
-            const searchTerm = prevSessionsSearchInput ? prevSessionsSearchInput.value.trim().toLowerCase() : '';
-            const summaryEl = document.getElementById('prev-sessions-summary');
-            const countEl = document.getElementById('prev-sessions-count');
-            
-            // مطابقة تلقائية بالاسم (بعد التطبيع) بين الدائرة المختارة وحقل الدائرة في كل قضية،
-            // سواء كانت القضية مرتبطة بدائرة مسجلة حديثًا أو قضية قديمة كُتبت فيها الدائرة يدويًا.
-            // لو مفيش دائرة مختارة (جميع الدوائر)، نعرض كل القضايا مجمّعة حسب الدائرة.
-            let filteredCases = selectedDepartment
-                ? cases.filter(c => normalizeDeptName(c.department) === selectedDepartment)
-                : cases;
-            
-            if (searchTerm) {
-                filteredCases = filteredCases.filter(c => {
-                    const haystack = `${c.number || ''}/${c.year || ''} ${c.subject || ''} ${c.plaintiff || ''} ${c.defendant || ''} ${c.circulationNumber || ''}`.toLowerCase();
-                    return haystack.includes(searchTerm);
-                });
-            }
-            
-            if (summaryEl && countEl) {
-                summaryEl.style.display = 'block';
-                countEl.textContent = selectedDepartment
-                    ? `عدد القضايا في الدائرة: ${filteredCases.length}`
-                    : `عدد القضايا (جميع الدوائر): ${filteredCases.length}`;
-            }
-            
-            if (filteredCases.length === 0) {
-                prevSessionsTableBody.innerHTML = '<tr><td colspan="9" style="text-align:center; padding:20px; color:#999;">لا توجد قضايا</td></tr>';
-                return;
-            }
-            
-            let rowsHTML = '';
-            if (selectedDepartment) {
-                rowsHTML = buildPreviousSessionsRowsHTML(filteredCases, true);
-            } else {
-                // عرض مجمّع حسب الدائرة لكل القضايا
-                const grouped = groupByDepartmentForDisplay(filteredCases);
-                grouped.forEach(entry => {
-                    if (entry.isHeader) {
-                        rowsHTML += `<tr><td colspan="9" style="background:#0b3d91; color:#fff; font-weight:bold; padding:8px 10px; text-align:right;">الدائرة: ${entry.department} (${entry.count} ${entry.count === 1 ? 'قضية' : 'قضية/قضايا'})</td></tr>`;
-                    } else {
-                        rowsHTML += buildPreviousSessionsRowsHTML([entry.item], true);
-                    }
-                });
-            }
             
             prevSessionsTableBody.innerHTML = rowsHTML;
         }
@@ -6532,6 +6392,239 @@
         }
         if (prevSessionsSearchInput) {
             prevSessionsSearchInput.addEventListener('input', renderPreviousSessionsTable);
+        }
+        
+        // ========== تجميع بيانات الجلسات السابقة (مشتركة بين الطباعة والتصدير) ==========
+        function buildPreviousSessionsReportData() {
+            const selectedDepartment = prevSessionsPrintDepartmentSelect ? normalizeDeptName(prevSessionsPrintDepartmentSelect.value) : '';
+            
+            const casesToPrint = selectedDepartment
+                ? cases.filter(c => normalizeDeptName(c.department) === selectedDepartment)
+                : cases.slice();
+            
+            const departmentText = selectedDepartment ? selectedDepartment : 'جميع الدوائر';
+            const printColspan = 9;
+            const rowEntries = selectedDepartment
+                ? casesToPrint.map(item => ({ isHeader: false, item }))
+                : groupByDepartmentForDisplay(casesToPrint);
+            
+            let rows = '';
+            let rowIndex = 0;
+            rowEntries.forEach(entry => {
+                if (entry.isHeader) {
+                    rows += buildDepartmentHeaderRowHtml(printColspan, entry.department, entry.count);
+                    return;
+                }
+                
+                const caseItem = entry.item;
+                const movement = getLastSessionMovement(caseItem);
+                rowIndex++;
+                
+                rows += `
+                    <tr>
+                        <td>${rowIndex}</td>
+                        <td>${caseItem.number || ''}/${caseItem.year || ''}</td>
+                        <td>${caseItem.subject || '-'}</td>
+                        <td>${caseItem.plaintiff || '-'}</td>
+                        <td>${caseItem.defendant || '-'}</td>
+                        <td>${caseItem.circulationNumber || '-'}</td>
+                        <td>${movement.previousDate ? formatDate(movement.previousDate) : '-'}</td>
+                        <td>${movement.lastDate ? formatDate(movement.lastDate) : '-'}</td>
+                        <td>${movement.reason || '-'}</td>
+                    </tr>
+                `;
+            });
+            
+            return { casesToPrint, departmentText, rows };
+        }
+        
+        // ========== طباعة الجلسات السابقة (دائرة واحدة أو جميع الدوائر) ==========
+        function printPreviousSessions() {
+            const { casesToPrint, departmentText, rows } = buildPreviousSessionsReportData();
+            
+            if (casesToPrint.length === 0) {
+                showAlert('لا توجد قضايا لطباعة الجلسات السابقة', 'warning');
+                return;
+            }
+            
+            const currentDate = formatDate(new Date().toISOString().split('T')[0]);
+            
+            const content = `
+                <!DOCTYPE html>
+                <html lang="ar" dir="rtl">
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <title>طباعة الجلسات السابقة</title>
+                    <style>
+                        @page {
+                            size: A4 landscape;
+                            margin-top: 2cm;
+                            margin-bottom: 3cm;
+                            margin-left: 1.5cm;
+                            margin-right: 1.5cm;
+                            
+                            @bottom-center {
+                                content: "صفحة " counter(page) " من " counter(pages) " | نظام إدارة القضايا - هيئة قضايا الدولة";
+                                font-size: 10px;
+                                color: #666;
+                                direction: rtl;
+                            }
+                        }
+                        
+                        body {
+                            font-family: 'Arial', 'Times New Roman', sans-serif;
+                            margin: 0;
+                            padding: 0;
+                            direction: rtl;
+                            line-height: 1.4;
+                        }
+                        
+                        .prev-sessions-print-header {
+                            text-align: center;
+                            margin-bottom: 20px;
+                            border-bottom: 2px solid #000;
+                            padding-bottom: 15px;
+                        }
+                        
+                        .prev-sessions-print-header h2 {
+                            font-size: 20px;
+                            margin: 5px 0;
+                        }
+                        
+                        .prev-sessions-print-header h3 {
+                            font-size: 16px;
+                            margin: 5px 0;
+                        }
+                        
+                        .prev-sessions-print-header p {
+                            font-size: 12px;
+                            margin: 3px 0;
+                            color: #666;
+                        }
+                        
+                        table {
+                            width: 100%;
+                            border-collapse: collapse;
+                            margin-top: 15px;
+                            font-size: 11px;
+                            direction: rtl;
+                        }
+                        
+                        th, td {
+                            border: 1px solid #000;
+                            padding: 6px;
+                            text-align: center;
+                            vertical-align: middle;
+                        }
+                        
+                        th {
+                            background-color: #f2f2f2;
+                            font-weight: bold;
+                        }
+                        
+                        tbody tr {
+                            page-break-inside: avoid;
+                        }
+                        
+                        thead {
+                            display: table-header-group;
+                        }
+                        
+                        * {
+                            -webkit-print-color-adjust: exact;
+                            color-adjust: exact;
+                            print-color-adjust: exact;
+                        }
+                    </style>
+                </head>
+                <body>
+                    <div class="prev-sessions-print-header">
+                        <h2>هيئة قضايا الدولة</h2>
+                        <h3>الجلسات السابقة للقضايا</h3>
+                        <p>الدائرة: ${departmentText}</p>
+                        <p>تاريخ التقرير: ${currentDate}</p>
+                        <p>عدد القضايا: ${casesToPrint.length}</p>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>م</th>
+                                <th>رقم/سنة الدعوي</th>
+                                <th>الموضوع</th>
+                                <th>المدعي</th>
+                                <th>المدعى عليه</th>
+                                <th>رقم المتداول</th>
+                                <th>الجلسة السابقة</th>
+                                <th>الجلسة الأخيرة</th>
+                                <th>سبب الترحيل / القرار</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${rows}
+                        </tbody>
+                    </table>
+                    <script>
+                        window.onload = function() { window.print(); }
+                    <\/script>
+                </body>
+                </html>
+            `;
+            
+            const printWindow = window.open('', '_blank', 'width=1100,height=800');
+            printWindow.document.write(content);
+            printWindow.document.close();
+        }
+        
+        if (printPreviousSessionsBtn) {
+            printPreviousSessionsBtn.addEventListener('click', printPreviousSessions);
+        }
+        
+        // ========== تصدير الجلسات السابقة إلى Word (دائرة واحدة أو جميع الدوائر) ==========
+        function exportPreviousSessionsToWord() {
+            const { casesToPrint, departmentText, rows } = buildPreviousSessionsReportData();
+            
+            if (casesToPrint.length === 0) {
+                showAlert('لا توجد قضايا لتصدير الجلسات السابقة', 'warning');
+                return;
+            }
+            
+            const content = `
+                <div class="header">
+                    <h1>هيئة قضايا الدولة</h1>
+                    <h2>نظام إدارة القضايا</h2>
+                    <h3>الجلسات السابقة للقضايا</h3>
+                    <p>الدائرة: ${departmentText}</p>
+                    <p>عدد القضايا: ${casesToPrint.length}</p>
+                    <p>تاريخ التصدير: ${formatDate(new Date().toISOString().split('T')[0])}</p>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>م</th>
+                            <th>رقم/سنة الدعوي</th>
+                            <th>الموضوع</th>
+                            <th>المدعي</th>
+                            <th>المدعى عليه</th>
+                            <th>رقم المتداول</th>
+                            <th>الجلسة السابقة</th>
+                            <th>الجلسة الأخيرة</th>
+                            <th>سبب الترحيل / القرار</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${rows}
+                    </tbody>
+                </table>
+            `;
+            
+            const filename = `الجلسات_السابقة_${departmentText === 'جميع الدوائر' ? 'جميع_الدوائر' : departmentText}_${new Date().toISOString().split('T')[0]}`;
+            exportToWord(content, filename);
+            showAlert('تم تصدير الجلسات السابقة إلى ملف Word', 'success');
+        }
+        
+        if (exportPreviousSessionsWordBtn) {
+            exportPreviousSessionsWordBtn.addEventListener('click', exportPreviousSessionsToWord);
         }
         
         function showAlert(message, type) {
@@ -6829,7 +6922,6 @@
                 }
                 
                 archivedCase = {
-                    ...judgment,
                     id: Date.now().toString(),
                     caseId: judgment.caseId,
                     caseNumber: judgment.caseNumber ? judgment.caseNumber.split('/')[0] : ((originalCase && originalCase.number) || ''),
@@ -6845,14 +6937,9 @@
                     archiveDate: new Date().toISOString().split('T')[0],
                     archiveReason: reason,
                     archiveNotes: notes,
-                    sessionHistory: originalCase ? originalCase.sessionHistory || [] : (judgment.sessionHistory || []),
+                    sessionHistory: originalCase ? originalCase.sessionHistory || [] : [],
                     createdAt: new Date().toISOString()
                 };
-                // تنظيف حقول خاصة بشكل "الحكم" لا تنتمي لشكل سجل الأرشيف
-                delete archivedCase.text;
-                delete archivedCase.date;
-                delete archivedCase.type;
-                delete archivedCase.printNotes;
                 
                 archivedCases.push(archivedCase);
                 
@@ -6875,7 +6962,6 @@
                 if (!caseItem) return;
                 
                 archivedCase = {
-                    ...caseItem,
                     id: Date.now().toString(),
                     caseId: caseItem.id,
                     caseNumber: caseItem.number,
@@ -7820,7 +7906,6 @@
             const judgmentSessionDate = caseItem.reserveDate || caseItem.sessionDate;
             
             const judgmentData = {
-                ...caseItem,
                 id: Date.now().toString(),
                 caseId: caseId,
                 caseNumber: `${caseItem.number}/${caseItem.year}`,
@@ -8554,11 +8639,8 @@
                 } else {
                     // إنشاء قضية جديدة من بيانات الحكم إذا لم توجد القضية الأصلية
                     // إنشاء قضية جديدة من بيانات الحكم (آمنة - تتعامل مع قيم ناقصة)
-                    // نبدأ بنسخ كل بيانات الحكم (والتي تحمل بدورها كل بيانات القضية الأصلية
-                    // بما فيها رقم المتداول) حتى لا تُفقد أي بيانات مسجلة سابقًا
                     const parts = (judgment.caseNumber || '').split('/');
                     const newCase = {
-                        ...judgment,
                         id: judgment.caseId || Date.now().toString(),
                         number: parts[0] || '',
                         year: parts[1] || new Date().getFullYear().toString(),
@@ -8567,7 +8649,7 @@
                         subject: judgment.subject || '',
                         department: judgment.department || '',
                         sessionDate: newSessionDate,
-                        circulationNumber: judgment.circulationNumber || '',
+                        circulationNumber: '',
                         notes: `تم استرجاع الدعوى من الحكم ${judgmentType === 'favorable' ? 'الصالح' : 'الالضد'}`,
                         status: 'pending',
                         createdAt: new Date().toISOString(),
@@ -8591,15 +8673,6 @@
                             }
                         ]
                     };
-                    // تنظيف الحقول الخاصة بشكل "الحكم" التي لا تنتمي لشكل "القضية" العادي
-                    delete newCase.caseId;
-                    delete newCase.caseNumber;
-                    delete newCase.text;
-                    delete newCase.date;
-                    delete newCase.appealType;
-                    delete newCase.appeal;
-                    delete newCase.type;
-                    delete newCase.printNotes;
                     cases.push(newCase);
                     localStorage.setItem('cases', JSON.stringify(cases));
                 }
@@ -8813,7 +8886,6 @@
                     const caseItem = archivedCases[caseIndex];
                     
                     const restoredCase = {
-                        ...caseItem,
                         id: caseItem.caseId || Date.now().toString(),
                         number: caseItem.caseNumber || '',
                         year: caseItem.caseYear || '',
@@ -8821,23 +8893,11 @@
                         plaintiff: caseItem.plaintiff || '',
                         defendant: caseItem.defendant || '',
                         department: caseItem.department || '',
-                        circulationNumber: caseItem.circulationNumber || '',
                         sessionDate: newSessionDate,
                         status: 'pending',
                         notes: '',
                         sessionHistory: caseItem.sessionHistory ? [...caseItem.sessionHistory] : []
                     };
-                    // تنظيف حقول خاصة بشكل سجل "الأرشيف" لا تنتمي لشكل "القضية" العادي
-                    delete restoredCase.caseId;
-                    delete restoredCase.caseNumber;
-                    delete restoredCase.caseYear;
-                    delete restoredCase.judgmentType;
-                    delete restoredCase.judgmentText;
-                    delete restoredCase.judgmentDate;
-                    delete restoredCase.archiveDate;
-                    delete restoredCase.archiveReason;
-                    delete restoredCase.archiveNotes;
-                    delete restoredCase.createdAt;
                     
                     restoredCase.sessionHistory.push({
                         date: caseItem.archiveDate,
@@ -11690,37 +11750,28 @@
                 const caseItem = entry.item;
                 printRowIndex++;
 
-                // Normalize common fields across different lists (archived items use caseNumber/caseYear)
-                const number = caseItem.number || caseItem.caseNumber || '';
-                const year = caseItem.year || caseItem.caseYear || '';
-                const subject = caseItem.subject || caseItem.judgmentText || '';
-                const plaintiff = caseItem.plaintiff || '';
-                const defendant = caseItem.defendant || '';
-                const circulation = caseItem.circulationNumber || caseItem.circulation || '';
-                const rowDepartment = caseItem.department || '';
-                const firstSessionDate = (Array.isArray(caseItem.sessionHistory) && caseItem.sessionHistory.length)
-                    ? caseItem.sessionHistory[0].date
-                    : (caseItem.sessionDate || caseItem.reserveDate || caseItem.cancelDate || caseItem.suspendDate || caseItem.archiveDate || '');
+                // توحيد الحقول عبر مختلف القوائم (عادية/محجوزة/موقوفة/مشطوبة/أحكام/مؤرشفة) حتى تحتفظ القضية بكل بياناتها أيًا كانت مرحلتها
+                const row = normalizeCaseRowForDisplay(caseItem);
 
                 content += `
                     <tr>
                         <td>${printRowIndex}</td>
-                        <td>${number}</td>
-                        <td>${year}</td>
-                        <td>${subject}</td>
-                        <td>${plaintiff}</td>
-                        <td>${defendant}</td>
+                        <td>${row.number}</td>
+                        <td>${row.year}</td>
+                        <td>${row.subject}</td>
+                        <td>${row.plaintiff}</td>
+                        <td>${row.defendant}</td>
                 `;
 
                 if (showCirculationNumber) {
-                    content += `<td>${circulation}</td>`;
+                    content += `<td>${row.circulation}</td>`;
                 }
 
                 content += `
-                        <td>${formatDate(firstSessionDate)}</td>
-                        <td>${rowDepartment}</td>
+                        <td>${formatDate(row.date)}</td>
+                        <td>${row.department}</td>
                         <td class="editable-notes-cell">
-                            <textarea class="editable-notes" placeholder="اكتب ملاحظاتك هنا..." data-case-id="${caseItem.id}">${caseItem.notes || ''}</textarea>
+                            <textarea class="editable-notes" placeholder="اكتب ملاحظاتك هنا..." data-case-id="${caseItem.id}">${row.notes}</textarea>
                         </td>
                     </tr>
                 `;
@@ -11818,8 +11869,7 @@
                     return;
                 }
                 
-                // جمع جميع القوائم من جميع الفئات (شامل الأحكام حتى تظهر القضايا التي صدر
-                // فيها حكم ضمن النطاق الزمني برقم متداولها، بنفس منطق الطباعة حسب النطاق الزمني)
+                // جمع جميع القوائم من جميع الفئات (بما فيها الأحكام) حتى تحتفظ القضية بجميع بياناتها في كل مراحلها
                 const allCandidates = []
                     .concat(cases || [])
                     .concat(reservedCases || [])
@@ -11842,7 +11892,7 @@
                         });
                     }
 
-                    // تحقق من الحقول المحتملة للتاريخ (تشمل تاريخ الحكم أيضاً)
+                    // تحقق من الحقول المحتملة للتاريخ (تشمل الأحكام أيضاً)
                     const possibleDates = [c.sessionDate, c.date, c.reserveDate, c.cancelDate, c.suspendDate, c.archiveDate];
                     for (const ds of possibleDates) {
                         if (!ds) continue;
@@ -13089,161 +13139,46 @@
         // كل عدة ثوانٍ، وأيضًا عند رجوع المستخدم لتبويب/تطبيق الموبايل، نعيد تحميل
         // البيانات من نفس السيرفر حتى تظهر أي إضافة تمت من جهاز آخر على نفس الشبكة.
         let __syncInProgress = false;
-        // ========== مقارنة البيانات المحلية بالبيانات الواردة من السيرفر ==========
-        // بيرجع للـ id فرق كل قائمة (إضافة/تعديل/حذف) عشان نعرضها للمستخدم قبل الاستيراد
-        function diffListByObject(localList, remoteList) {
-            const localMap = new Map((localList || []).map(item => [item.id, item]));
-            const remoteMap = new Map((remoteList || []).map(item => [item.id, item]));
-
-            const added = [];
-            const removed = [];
-            const modified = [];
-
-            remoteMap.forEach((item, id) => {
-                if (!localMap.has(id)) {
-                    added.push(item);
-                } else if (JSON.stringify(localMap.get(id)) !== JSON.stringify(item)) {
-                    modified.push(item);
-                }
-            });
-
-            localMap.forEach((item, id) => {
-                if (!remoteMap.has(id)) {
-                    removed.push(item);
-                }
-            });
-
-            return { added, removed, modified };
-        }
-
-        function describeSyncItemLabel(item) {
-            const num = item.number || item.caseNumber || '';
-            const yr = item.year || item.caseYear || '';
-            const subject = item.subject || '';
-            const numberPart = num ? `${num}${yr ? '/' + yr : ''}` : '';
-            if (numberPart && subject) return `${numberPart} - ${subject}`;
-            return numberPart || subject || 'بند بدون رقم دعوى';
-        }
-
-        // يبني ملخص التعديلات بشكل مقروء مقسّم حسب كل قائمة (رول/محجوزة/مشطوبة/موقوفة/أرشيف/أحكام)
-        function computeSyncDiffSummary(remote) {
-            const categories = [
-                { label: 'قضايا الرول', local: cases, remote: remote.cases || [] },
-                { label: 'القضايا المحجوزة للحكم', local: reservedCases, remote: remote.reservedCases || [] },
-                { label: 'القضايا المشطوبة', local: cancelledCases, remote: remote.cancelledCases || [] },
-                { label: 'القضايا الموقوفة', local: suspendedCases, remote: remote.suspendedCases || [] },
-                { label: 'الأرشيف', local: archivedCases, remote: remote.archivedCases || [] },
-                { label: 'أحكام الصالح', local: favorableJudgments, remote: remote.favorableJudgments || [] },
-                { label: 'أحكام الضد', local: againstJudgments, remote: remote.againstJudgments || [] }
-            ];
-
-            const groups = [];
-            let totalChanges = 0;
-
-            categories.forEach(cat => {
-                const { added, removed, modified } = diffListByObject(cat.local, cat.remote);
-                if (added.length || removed.length || modified.length) {
-                    const lines = [];
-                    added.forEach(item => lines.push({ type: 'add', text: `إضافة: ${describeSyncItemLabel(item)}` }));
-                    modified.forEach(item => lines.push({ type: 'mod', text: `تعديل: ${describeSyncItemLabel(item)}` }));
-                    removed.forEach(item => lines.push({ type: 'del', text: `حذف/نقل: ${describeSyncItemLabel(item)}` }));
-                    groups.push({ label: cat.label, lines });
-                    totalChanges += added.length + removed.length + modified.length;
-                }
-            });
-
-            return { groups, totalChanges };
-        }
-
-        // ========== تطبيق البيانات الواردة من السيرفر فعليًا بعد موافقة المستخدم ==========
-        function applyRemoteSyncData(remote, remoteTS) {
-            storeRemoteDataInMemoryAndCache(remote, remoteTS);
-            renderDepartmentsTable();
-            refreshAllDepartmentSelects();
-            refreshAllViews();
-        }
-
-        // ========== عرض نافذة مراجعة التحديثات الواردة والانتظار حتى يقرر المستخدم ==========
-        function showSyncReviewModal(remote, remoteTS) {
-            const modal = document.getElementById('sync-review-modal');
-            const contentEl = document.getElementById('sync-review-content');
-            const acceptBtn = document.getElementById('sync-review-accept');
-            const rejectBtn = document.getElementById('sync-review-reject');
-            if (!modal || !contentEl || !acceptBtn || !rejectBtn) return;
-
-            const { groups, totalChanges } = computeSyncDiffSummary(remote);
-
-            if (totalChanges === 0) {
-                // لا يوجد فرق فعلي في المحتوى (مجرد اختلاف طابع زمني) - نطبّق بهدوء من غير إزعاج المستخدم
-                applyRemoteSyncData(remote, remoteTS);
-                return;
-            }
-
-            contentEl.innerHTML = groups.map(group => `
-                <div style="margin-bottom: 10px;">
-                    <strong style="color: #0b3d91;">${group.label}</strong>
-                    <ul style="margin: 5px 0 0; padding-right: 20px;">
-                        ${group.lines.map(line => {
-                            const color = line.type === 'add' ? '#1a7f37' : line.type === 'del' ? '#cf222e' : '#9a6700';
-                            return `<li style="color:${color}; margin-bottom: 3px;">${line.text}</li>`;
-                        }).join('')}
-                    </ul>
-                </div>
-            `).join('');
-
-            window.__syncReviewOpen = true;
-            modal.style.display = 'flex';
-
-            const cleanup = () => {
-                modal.style.display = 'none';
-                window.__syncReviewOpen = false;
-                acceptBtn.onclick = null;
-                rejectBtn.onclick = null;
-            };
-
-            acceptBtn.onclick = () => {
-                applyRemoteSyncData(remote, remoteTS);
-                localStorage.removeItem('lastRejectedRemoteTS');
-                showAlert('تم استيراد التحديثات بنجاح', 'success');
-                cleanup();
-            };
-
-            rejectBtn.onclick = () => {
-                // نتجاهل هذا الإصدار تحديدًا فقط - البيانات هنا تفضل كما هي، ولن يُعاد
-                // عرض نفس التحديث تاني إلا لو تغيّر على السيرفر مرة أخرى
-                localStorage.setItem('lastRejectedRemoteTS', String(remoteTS));
-                cleanup();
-            };
-        }
-
-        // ========== محاولة رفع أي تعديلات محلية لسه ما وصلتش للسيرفر (كنا أوفلاين وقتها) ==========
-        async function pushPendingChangesIfOnline() {
-            if (!navigator.onLine) return;
-            if (localStorage.getItem('hasPendingSync') !== 'true') return;
-            await saveDataToAPI();
-        }
-
-        window.addEventListener('online', () => {
-            pushPendingChangesIfOnline();
-        });
-
         async function syncFromServer() {
-            if (__syncInProgress || window.__savingToAPI || window.__syncReviewOpen) return;
+            if (__syncInProgress || window.__savingToAPI) return;
             __syncInProgress = true;
             try {
-                // أولاً: لو معانا تعديلات محلية اتحفظت وإحنا أوفلاين، نحاول نرفعها الأول
-                // قبل ما نجيب بيانات السيرفر، عشان تعديلاتنا الحقيقية متتجاهلش
-                await pushPendingChangesIfOnline();
-
                 const remote = await apiRequest('/data');
                 if (remote) {
                     const remoteTS = Number(remote.lastSavedAt || 0);
                     const localTS = Number(localStorage.getItem('lastSavedAt') || '0');
-                    const lastRejectedTS = localStorage.getItem('lastRejectedRemoteTS');
+                    // حدّث الواجهة فقط لو في بيانات أحدث من السيرفر
+                    if (remoteTS && remoteTS > localTS) {
+                        cases = remote.cases || [];
+                        favorableJudgments = remote.favorableJudgments || [];
+                        againstJudgments = remote.againstJudgments || [];
+                        reservedCases = remote.reservedCases || [];
+                        cancelledCases = remote.cancelledCases || [];
+                        suspendedCases = remote.suspendedCases || [];
+                        archivedCases = remote.archivedCases || [];
+                        notifications = remote.notifications || [];
 
-                    // حدّث الواجهة فقط لو في بيانات أحدث من السيرفر لم يسبق للمستخدم رفضها
-                    if (remoteTS && remoteTS > localTS && String(remoteTS) !== lastRejectedTS) {
-                        showSyncReviewModal(remote, remoteTS);
+                        // نمنع أن تُشعل كتابة localStorage هنا حفظًا جديدًا عبر Firebase
+                        // (window.__savingToAPI) لأن هذه البيانات نازلة من السيرفر أصلاً
+                        // وليست تعديلاً جديدًا؛ إعادة رفعها كانت بتختم بطابع زمني جديد
+                        // رغم إنها بيانات قديمة، وده كان يخلي جهاز تاني (اللاب توب) يفتكر
+                        // إنها الأحدث ويستبدل بيها تعديلاته الحقيقية الأحدث.
+                        window.__savingToAPI = true;
+                        try {
+                            localStorage.setItem('cases', JSON.stringify(cases));
+                            localStorage.setItem('favorableJudgments', JSON.stringify(favorableJudgments));
+                            localStorage.setItem('againstJudgments', JSON.stringify(againstJudgments));
+                            localStorage.setItem('reservedCases', JSON.stringify(reservedCases));
+                            localStorage.setItem('cancelledCases', JSON.stringify(cancelledCases));
+                            localStorage.setItem('suspendedCases', JSON.stringify(suspendedCases));
+                            localStorage.setItem('archivedCases', JSON.stringify(archivedCases));
+                            localStorage.setItem('notifications', JSON.stringify(notifications));
+                            localStorage.setItem('lastSavedAt', String(remoteTS));
+                        } finally {
+                            window.__savingToAPI = false;
+                        }
+
+                        refreshAllViews();
                     }
                 }
             } catch (e) {
@@ -13276,17 +13211,6 @@
             updateStats();
             updateDashboard();
             initializeJudgmentsPrintNotes();
-            
-            // لو فيه تحديثات من نسخة أخرى (لاب توب/موبايل) اكتُشفت أثناء التحميل الأولي
-            // (loadDataFromAPI)، نعرضها للمراجعة بعد ما الواجهة خلصت تجهيزها بالكامل، بدل
-            // ما نستبدل بيانات هذا الجهاز تلقائيًا بأي حاجة من غير موافقة صريحة.
-            if (window.__pendingStartupSyncReview) {
-                const pending = window.__pendingStartupSyncReview;
-                window.__pendingStartupSyncReview = null;
-                setTimeout(() => {
-                    showSyncReviewModal(pending.remote, pending.remoteTS);
-                }, 800);
-            }
             
             const today = new Date().toISOString().split('T')[0];
             document.getElementById('session-date').value = today;
