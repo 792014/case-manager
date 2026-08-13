@@ -4091,8 +4091,42 @@
             })();
         }
 
+        // يخزّن بيانات واردة من السيرفر في الذاكرة و localStorage فقط (بدون إعادة رسم الواجهة) -
+        // يُستخدم في التحميل الأول (bootstrap) قبل ما تجهيزات الواجهة تخلص
+        function storeRemoteDataInMemoryAndCache(remote, remoteTS) {
+            cases = remote.cases || [];
+            favorableJudgments = remote.favorableJudgments || [];
+            againstJudgments = remote.againstJudgments || [];
+            reservedCases = remote.reservedCases || [];
+            cancelledCases = remote.cancelledCases || [];
+            suspendedCases = remote.suspendedCases || [];
+            archivedCases = remote.archivedCases || [];
+            notifications = remote.notifications || [];
+            departments = (remote.departments && remote.departments.length) ? remote.departments : (departments || []);
+
+            window.__savingToAPI = true;
+            try {
+                localStorage.setItem('cases', JSON.stringify(cases));
+                localStorage.setItem('favorableJudgments', JSON.stringify(favorableJudgments));
+                localStorage.setItem('againstJudgments', JSON.stringify(againstJudgments));
+                localStorage.setItem('reservedCases', JSON.stringify(reservedCases));
+                localStorage.setItem('cancelledCases', JSON.stringify(cancelledCases));
+                localStorage.setItem('suspendedCases', JSON.stringify(suspendedCases));
+                localStorage.setItem('archivedCases', JSON.stringify(archivedCases));
+                localStorage.setItem('notifications', JSON.stringify(notifications));
+                localStorage.setItem('departments', JSON.stringify(departments));
+                localStorage.setItem('lastSavedAt', String(remoteTS));
+            } finally {
+                window.__savingToAPI = false;
+            }
+        }
+
         async function loadDataFromAPI() {
-            // Attempt to read from Electron persisted file first
+            // ========== الخطوة ١: نجهّز أولاً بيانات هذا الجهاز نفسه (محلية) ========== 
+            // هذه هي البيانات التي ستظل معروضة ومُستخدمة افتراضيًا، ولن تُستبدل ببيانات
+            // نسخة أخرى (لاب توب/موبايل) إلا بعد موافقة صريحة من المستخدم (خطوة ٣).
+            let usedElectronFile = false;
+
             if (window.electronAPI && window.electronAPI.loadData) {
                 try {
                     const data = await window.electronAPI.loadData();
@@ -4120,8 +4154,7 @@
                     );
 
                     if (data && hasElectronData) {
-                        // If both electron file and localStorage exist, prefer the most
-                        // recently-saved source by comparing `lastSavedAt` timestamps.
+                        // بين ملف إلكترون المحلي و localStorage على نفس الجهاز، نفضّل الأحدث زمنيًا (مقارنة محلية بحتة، لا علاقة لها بالمزامنة بين الأجهزة)
                         const electronTS = data && data.lastSavedAt ? Number(data.lastSavedAt) : 0;
                         const localTS = Number(localStorage.getItem('lastSavedAt') || '0');
 
@@ -4135,59 +4168,26 @@
                             archivedCases = JSON.parse(localStorage.getItem('archivedCases')) || [];
                             notifications = JSON.parse(localStorage.getItem('notifications')) || [];
                             departments = JSON.parse(localStorage.getItem('departments')) || [];
-                            return;
+                        } else {
+                            cases = data.cases || [];
+                            favorableJudgments = data.favorableJudgments || [];
+                            againstJudgments = data.againstJudgments || [];
+                            reservedCases = data.reservedCases || [];
+                            cancelledCases = data.cancelledCases || [];
+                            suspendedCases = data.suspendedCases || [];
+                            archivedCases = data.archivedCases || [];
+                            notifications = data.notifications || [];
+                            departments = data.departments || [];
+                            localStorage.setItem('lastSavedAt', String(electronTS || Date.now()));
                         }
-
-                        cases = data.cases || [];
-                        favorableJudgments = data.favorableJudgments || [];
-                        againstJudgments = data.againstJudgments || [];
-                        reservedCases = data.reservedCases || [];
-                        cancelledCases = data.cancelledCases || [];
-                        suspendedCases = data.suspendedCases || [];
-                        archivedCases = data.archivedCases || [];
-                        notifications = data.notifications || [];
-                        departments = data.departments || [];
-                        return;
+                        usedElectronFile = true;
                     }
                 } catch (e) {
                     console.warn('Electron data load failed', e);
                 }
             }
 
-            const data = await apiRequest('/data');
-            if (data) {
-                cases = data.cases || [];
-                favorableJudgments = data.favorableJudgments || [];
-                againstJudgments = data.againstJudgments || [];
-                reservedCases = data.reservedCases || [];
-                cancelledCases = data.cancelledCases || [];
-                suspendedCases = data.suspendedCases || [];
-                archivedCases = data.archivedCases || [];
-                notifications = data.notifications || [];
-                departments = data.departments || JSON.parse(localStorage.getItem('departments') || '[]') || [];
-
-                // نخزن نسخة محلية بنفس الطابع الزمني من أول تحميل حتى تكون مقارنات
-                // المزامنة اللاحقة (syncFromServer) صحيحة من البداية. window.__savingToAPI
-                // بيمنع إن هذه الكتابة تُشعل رفعًا جديدًا للبيانات لـ Firebase (مش تعديل حقيقي).
-                window.__savingToAPI = true;
-                try {
-                    localStorage.setItem('cases', JSON.stringify(cases));
-                    localStorage.setItem('favorableJudgments', JSON.stringify(favorableJudgments));
-                    localStorage.setItem('againstJudgments', JSON.stringify(againstJudgments));
-                    localStorage.setItem('reservedCases', JSON.stringify(reservedCases));
-                    localStorage.setItem('cancelledCases', JSON.stringify(cancelledCases));
-                    localStorage.setItem('suspendedCases', JSON.stringify(suspendedCases));
-                    localStorage.setItem('archivedCases', JSON.stringify(archivedCases));
-                    localStorage.setItem('notifications', JSON.stringify(notifications));
-                    localStorage.setItem('departments', JSON.stringify(departments));
-                    if (data.lastSavedAt) {
-                        localStorage.setItem('lastSavedAt', String(data.lastSavedAt));
-                    }
-                } finally {
-                    window.__savingToAPI = false;
-                }
-            } else {
-                // Fallback to localStorage
+            if (!usedElectronFile) {
                 cases = JSON.parse(localStorage.getItem('cases')) || [];
                 favorableJudgments = JSON.parse(localStorage.getItem('favorableJudgments')) || [];
                 againstJudgments = JSON.parse(localStorage.getItem('againstJudgments')) || [];
@@ -4197,6 +4197,41 @@
                 archivedCases = JSON.parse(localStorage.getItem('archivedCases')) || [];
                 notifications = JSON.parse(localStorage.getItem('notifications')) || [];
                 departments = JSON.parse(localStorage.getItem('departments')) || [];
+            }
+
+            const localTSNow = Number(localStorage.getItem('lastSavedAt') || '0');
+            const hasLocalData = (
+                (cases && cases.length) || (favorableJudgments && favorableJudgments.length) ||
+                (againstJudgments && againstJudgments.length) || (reservedCases && reservedCases.length) ||
+                (cancelledCases && cancelledCases.length) || (suspendedCases && suspendedCases.length) ||
+                (archivedCases && archivedCases.length) || (notifications && notifications.length)
+            );
+
+            // ========== الخطوة ٢: نجيب نسخة السيرفر للمقارنة فقط - لا نستبدل بها البيانات مباشرة ========== 
+            let remote = null;
+            try {
+                remote = await apiRequest('/data');
+            } catch (e) {
+                remote = null;
+            }
+
+            if (remote) {
+                const remoteTS = Number(remote.lastSavedAt || 0);
+
+                if (!hasLocalData) {
+                    // جهاز جديد تمامًا (أو تم مسح بياناته) - لا يوجد شيء نحميه محليًا، فنأخذ نسخة
+                    // السيرفر مباشرة بأمان (مفيش "تعديلات موجودة" هنقارنها أو نطلب موافقة عليها)
+                    storeRemoteDataInMemoryAndCache(remote, remoteTS || Date.now());
+                } else if (remoteTS && remoteTS > localTSNow) {
+                    // فيه بيانات أحدث على السيرفر (من نسخة تانية) تختلف عن اللي موجود هنا فعلاً.
+                    // لا نستبدلها تلقائيًا؛ نُبقي بيانات هذا الجهاز كما هي الآن، ونعرض نافذة
+                    // المراجعة بعد ما تجهيزات الواجهة تخلص (خطوة ٣) ليقرر المستخدم بنفسه.
+                    const lastRejectedTS = localStorage.getItem('lastRejectedRemoteTS');
+                    if (String(remoteTS) !== lastRejectedTS) {
+                        window.__pendingStartupSyncReview = { remote, remoteTS };
+                    }
+                }
+                // لو remoteTS <= localTSNow: بيانات هذا الجهاز مساوية أو أحدث بالفعل، لا حاجة لأي إجراء
             }
 
             // ========== استيراد النسخة الاحتياطية المرفقة (مرة واحدة فقط) ==========
@@ -13122,35 +13157,9 @@
 
         // ========== تطبيق البيانات الواردة من السيرفر فعليًا بعد موافقة المستخدم ==========
         function applyRemoteSyncData(remote, remoteTS) {
-            cases = remote.cases || [];
-            favorableJudgments = remote.favorableJudgments || [];
-            againstJudgments = remote.againstJudgments || [];
-            reservedCases = remote.reservedCases || [];
-            cancelledCases = remote.cancelledCases || [];
-            suspendedCases = remote.suspendedCases || [];
-            archivedCases = remote.archivedCases || [];
-            notifications = remote.notifications || [];
-
-            // نمنع أن تُشعل كتابة localStorage هنا حفظًا جديدًا عبر Firebase
-            // (window.__savingToAPI) لأن هذه البيانات نازلة من السيرفر أصلاً
-            // وليست تعديلاً جديدًا؛ إعادة رفعها كانت بتختم بطابع زمني جديد
-            // رغم إنها بيانات قديمة، وده كان يخلي جهاز تاني (اللاب توب) يفتكر
-            // إنها الأحدث ويستبدل بيها تعديلاته الحقيقية الأحدث.
-            window.__savingToAPI = true;
-            try {
-                localStorage.setItem('cases', JSON.stringify(cases));
-                localStorage.setItem('favorableJudgments', JSON.stringify(favorableJudgments));
-                localStorage.setItem('againstJudgments', JSON.stringify(againstJudgments));
-                localStorage.setItem('reservedCases', JSON.stringify(reservedCases));
-                localStorage.setItem('cancelledCases', JSON.stringify(cancelledCases));
-                localStorage.setItem('suspendedCases', JSON.stringify(suspendedCases));
-                localStorage.setItem('archivedCases', JSON.stringify(archivedCases));
-                localStorage.setItem('notifications', JSON.stringify(notifications));
-                localStorage.setItem('lastSavedAt', String(remoteTS));
-            } finally {
-                window.__savingToAPI = false;
-            }
-
+            storeRemoteDataInMemoryAndCache(remote, remoteTS);
+            renderDepartmentsTable();
+            refreshAllDepartmentSelects();
             refreshAllViews();
         }
 
@@ -13267,6 +13276,17 @@
             updateStats();
             updateDashboard();
             initializeJudgmentsPrintNotes();
+            
+            // لو فيه تحديثات من نسخة أخرى (لاب توب/موبايل) اكتُشفت أثناء التحميل الأولي
+            // (loadDataFromAPI)، نعرضها للمراجعة بعد ما الواجهة خلصت تجهيزها بالكامل، بدل
+            // ما نستبدل بيانات هذا الجهاز تلقائيًا بأي حاجة من غير موافقة صريحة.
+            if (window.__pendingStartupSyncReview) {
+                const pending = window.__pendingStartupSyncReview;
+                window.__pendingStartupSyncReview = null;
+                setTimeout(() => {
+                    showSyncReviewModal(pending.remote, pending.remoteTS);
+                }, 800);
+            }
             
             const today = new Date().toISOString().split('T')[0];
             document.getElementById('session-date').value = today;
