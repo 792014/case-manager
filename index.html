@@ -717,6 +717,15 @@
             background: linear-gradient(to right, #8e44ad, #9b59b6);
         }
         
+        .btn-interim-judgment {
+            background: linear-gradient(to right, #16a085, #1abc9c);
+            color: white;
+        }
+        
+        .btn-interim-judgment:hover {
+            background: linear-gradient(to right, #1abc9c, #16a085);
+        }
+        
         .btn-word {
             background: linear-gradient(to right, var(--word-color), #1e3a5f);
             color: white;
@@ -3742,6 +3751,96 @@
         </div>
     </div>
 
+    <!-- نافذة تسجيل حكم تمهيدي -->
+    <div id="interim-judgment-modal" class="modal">
+        <div class="modal-content" style="max-width: 700px;">
+            <div class="modal-header">
+                <h3 id="interim-judgment-modal-title">تسجيل حكم تمهيدي للقضية المحجوزة</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <form id="interim-judgment-form">
+                <input type="hidden" id="interim-judgment-case-id">
+
+                <!-- عرض بيانات القضية تلقائياً -->
+                <div class="case-details" style="margin-bottom: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px;">
+                    <h4>بيانات القضية</h4>
+                    <div class="case-details-grid">
+                        <div class="case-detail-item">
+                            <label>رقم وسنة الدعوي:</label>
+                            <p id="interim-judgment-case-number-year"></p>
+                        </div>
+                        <div class="case-detail-item">
+                            <label>موضوع الدعوي:</label>
+                            <p id="interim-judgment-subject"></p>
+                        </div>
+                            <div class="case-detail-item">
+                                <label>اسم المدعي:</label>
+                                <p id="interim-judgment-plaintiff"></p>
+                            </div>
+                            <div class="case-detail-item">
+                                <label>اسم المدعي عليه:</label>
+                                <p id="interim-judgment-defendant"></p>
+                            </div>
+                        <div class="case-detail-item">
+                            <label>الدائرة:</label>
+                            <p id="interim-judgment-department"></p>
+                        </div>
+                        <div class="case-detail-item">
+                            <label>تاريخ الجلسة الحالية:</label>
+                            <p id="interim-judgment-session-date"></p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="interim-judgment-type">نوع الحكم التمهيدي *</label>
+                    <select id="interim-judgment-type" required>
+                        <option value="">-- اختر نوع الحكم التمهيدي --</option>
+                        <option value="حكم خبير">حكم خبير</option>
+                        <option value="حكم استجواب">حكم استجواب</option>
+                        <option value="حكم تحقيق">حكم تحقيق</option>
+                        <option value="أخرى">أخرى (اكتب النوع يدويًا)</option>
+                    </select>
+                </div>
+
+                <div class="form-group" id="interim-judgment-custom-type-group" style="display:none;">
+                    <label for="interim-judgment-custom-type">اسم نوع الحكم التمهيدي *</label>
+                    <input type="text" id="interim-judgment-custom-type" placeholder="اكتب نوع الحكم التمهيدي...">
+                </div>
+
+                <div class="form-group">
+                    <label for="interim-judgment-text">منطوق الحكم التمهيدي *</label>
+                    <textarea id="interim-judgment-text" rows="4" required placeholder="اكتب منطوق الحكم التمهيدي هنا..."></textarea>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="interim-judgment-date">تاريخ الحكم التمهيدي *</label>
+                        <input type="date" id="interim-judgment-date" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="interim-judgment-next-session-date">تاريخ الجلسة المحددة (إعادة القضية للمتداولة) *</label>
+                        <input type="date" id="interim-judgment-next-session-date" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="interim-judgment-notes">ملاحظات إضافية</label>
+                    <textarea id="interim-judgment-notes" rows="2" placeholder="ملاحظات إضافية..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="interim-judgment-document">ارفاق مستند الحكم التمهيدي (اختياري)</label>
+                    <input type="file" id="interim-judgment-document" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png">
+                    <small style="color: #666; font-size: 12px;">يمكن رفع ملف PDF أو Word أو صورة</small>
+                </div>
+
+                <button type="submit" class="btn-success" style="width: 100%;"><i class="fas fa-balance-scale"></i> تسجيل الحكم التمهيدي وإعادة القضية للمتداولة</button>
+            </form>
+        </div>
+    </div>
+
     <!-- نافذة وقف حكم -->
     <div id="suspend-judgment-modal" class="modal">
         <div class="modal-content" style="max-width: 700px;">
@@ -4078,6 +4177,12 @@
                         return { success: false, error: 'not-applicable-web' };
                     },
 
+                    // فتح الـ PDF بمتصفح كروم تحديدًا مش متاح من داخل نسخة
+                    // المتصفح/الموبايل أصلاً (البرنامج شغال جوه متصفح بالفعل)
+                    async openPdfInBrowser() {
+                        return { success: false, error: 'not-applicable-web' };
+                    },
+
                     async chooseStorageFolder() {
                         showAlert('على الموبايل/المتصفح، المستندات بتتخزن تلقائيًا في قاعدة البيانات السحابية، مفيش داعي لاختيار مجلد', 'info');
                         return { success: false, error: 'not-applicable-web' };
@@ -4378,6 +4483,7 @@
         const editJudgmentModal = document.getElementById('edit-judgment-modal');
         const sessionHistoryModal = document.getElementById('session-history-modal');
         const judgmentModal = document.getElementById('judgment-modal');
+        const interimJudgmentModal = document.getElementById('interim-judgment-modal');
         const suspendJudgmentModal = document.getElementById('suspend-judgment-modal');
         const archiveModal = document.getElementById('archive-modal');
         const postponeForm = document.getElementById('postpone-form');
@@ -7809,6 +7915,50 @@
             judgmentModal.style.display = 'flex';
         }
 
+        // ========== دالة فتح نافذة تسجيل حكم تمهيدي للقضية المحجوزة ==========
+        function openInterimJudgmentModal(caseId) {
+            const caseItem = reservedCases.find(c => c.id === caseId);
+            if (!caseItem) return;
+
+            document.getElementById('interim-judgment-case-id').value = caseId;
+            document.getElementById('interim-judgment-modal-title').textContent = `تسجيل حكم تمهيدي للقضية: ${caseItem.number}/${caseItem.year}`;
+
+            const currentSessionDate = caseItem.reserveDate || caseItem.sessionDate;
+            document.getElementById('interim-judgment-case-number-year').textContent = `${caseItem.number}/${caseItem.year}`;
+            document.getElementById('interim-judgment-subject').textContent = caseItem.subject;
+            document.getElementById('interim-judgment-department').textContent = caseItem.department;
+            document.getElementById('interim-judgment-plaintiff').textContent = caseItem.plaintiff || '';
+            document.getElementById('interim-judgment-defendant').textContent = caseItem.defendant || '';
+            document.getElementById('interim-judgment-session-date').textContent = formatDate(currentSessionDate);
+
+            document.getElementById('interim-judgment-date').value = getDateKey(currentSessionDate);
+            document.getElementById('interim-judgment-next-session-date').value = '';
+            document.getElementById('interim-judgment-text').value = '';
+            document.getElementById('interim-judgment-notes').value = '';
+            document.getElementById('interim-judgment-type').value = '';
+            document.getElementById('interim-judgment-custom-type').value = '';
+            document.getElementById('interim-judgment-custom-type-group').style.display = 'none';
+            document.getElementById('interim-judgment-document').value = '';
+
+            interimJudgmentModal.style.display = 'flex';
+        }
+
+        const interimJudgmentTypeSelect = document.getElementById('interim-judgment-type');
+        if (interimJudgmentTypeSelect) {
+            interimJudgmentTypeSelect.addEventListener('change', function() {
+                const customGroup = document.getElementById('interim-judgment-custom-type-group');
+                const customInput = document.getElementById('interim-judgment-custom-type');
+                if (this.value === 'أخرى') {
+                    customGroup.style.display = 'block';
+                    customInput.setAttribute('required', 'required');
+                } else {
+                    customGroup.style.display = 'none';
+                    customInput.removeAttribute('required');
+                    customInput.value = '';
+                }
+            });
+        }
+
         // ========== دالة فتح نافذة وقف حكم القضية المحجوزة ==========
         function openSuspendJudgmentModal(caseId) {
             const caseItem = reservedCases.find(c => c.id === caseId);
@@ -8039,6 +8189,136 @@
             updateStats();
         });
 
+        // ========== تسجيل حكم تمهيدي وإعادة القضية للمتداولة على الجلسة المختارة ==========
+        const interimJudgmentForm = document.getElementById('interim-judgment-form');
+        interimJudgmentForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            const caseId = document.getElementById('interim-judgment-case-id').value;
+            const caseIndex = reservedCases.findIndex(c => c.id === caseId);
+            if (caseIndex === -1) return;
+
+            const caseItem = reservedCases[caseIndex];
+
+            const selectedType = document.getElementById('interim-judgment-type').value;
+            const customType = document.getElementById('interim-judgment-custom-type').value.trim();
+            const finalType = selectedType === 'أخرى' ? (customType || 'أخرى') : selectedType;
+
+            if (!finalType) {
+                showAlert('من فضلك حدد نوع الحكم التمهيدي', 'warning');
+                return;
+            }
+
+            const judgmentText = document.getElementById('interim-judgment-text').value;
+            const judgmentDate = document.getElementById('interim-judgment-date').value;
+            const nextSessionDate = document.getElementById('interim-judgment-next-session-date').value;
+            const notes = document.getElementById('interim-judgment-notes').value;
+
+            if (!nextSessionDate) {
+                showAlert('من فضلك حدد تاريخ الجلسة المحددة', 'warning');
+                return;
+            }
+
+            if (!caseItem.sessionHistory) caseItem.sessionHistory = [];
+
+            // تسجيل الحكم التمهيدي في سجل الجلسات
+            caseItem.sessionHistory.push({
+                date: judgmentDate,
+                type: 'interim_judgment',
+                interimJudgmentType: finalType,
+                reason: `حكم تمهيدي: ${finalType}`,
+                judgmentText: judgmentText,
+                notes: notes || '',
+                recordedDate: new Date().toISOString()
+            });
+
+            // تسجيل إعادة القضية للمتداولة على الجلسة المحددة
+            caseItem.sessionHistory.push({
+                date: nextSessionDate,
+                type: 'returned',
+                reason: `إعادة للمتداولة بعد حكم تمهيدي: ${finalType}`,
+                notes: '',
+                recordedDate: new Date().toISOString()
+            });
+
+            // بناء نسخة القضية الراجعة للقضايا المتداولة على الجلسة المختارة
+            const returnedCase = {
+                ...caseItem,
+                sessionDate: nextSessionDate,
+                status: 'pending'
+            };
+            delete returnedCase.reserveDate;
+            delete returnedCase.originalDate;
+            delete returnedCase.reserveReason;
+
+            cases.push(returnedCase);
+            localStorage.setItem('cases', JSON.stringify(cases));
+
+            reservedCases = reservedCases.filter(c => c.id !== caseId);
+            localStorage.setItem('reservedCases', JSON.stringify(reservedCases));
+
+            // رفع مستند الحكم التمهيدي إذا تم اختياره
+            try {
+                const interimFileInput = document.getElementById('interim-judgment-document');
+                if (interimFileInput && interimFileInput.files && interimFileInput.files.length > 0) {
+                    const file = interimFileInput.files[0];
+                    const reader = new FileReader();
+                    reader.onload = async function(ev) {
+                        const arrayBuffer = ev.target.result;
+                        const bytes = new Uint8Array(arrayBuffer);
+                        let binary = '';
+                        const chunkSize = 0x8000;
+                        for (let j = 0; j < bytes.length; j += chunkSize) {
+                            binary += String.fromCharCode.apply(null, bytes.subarray(j, j + chunkSize));
+                        }
+                        const dataBase64 = btoa(binary);
+                        try {
+                            const res = await window.electronAPI.saveFile({
+                                caseId: caseId,
+                                filename: file.name,
+                                dataBase64,
+                                docType: 'حكم تمهيدي',
+                                caseData: {
+                                    number: caseItem.number || caseItem.caseNumber || '',
+                                    year: caseItem.year || caseItem.caseYear || '',
+                                    caseNumber: caseItem.caseNumber || caseItem.number || '',
+                                    caseYear: caseItem.caseYear || caseItem.year || '',
+                                    plaintiff: caseItem.plaintiff || '',
+                                    defendant: caseItem.defendant || ''
+                                }
+                            });
+                            if (res && res.success) {
+                                addNotification(`تم رفع مستند الحكم التمهيدي بنجاح: ${file.name}`, 'success');
+                            } else {
+                                addNotification('فشل في رفع مستند الحكم التمهيدي', 'warning');
+                            }
+                        } catch (err) {
+                            console.error('Upload error:', err);
+                            addNotification('حدث خطأ في رفع مستند الحكم التمهيدي', 'error');
+                        }
+                    };
+                    reader.readAsArrayBuffer(file);
+                }
+            } catch (uploadErr) {
+                console.error('Interim judgment document upload error:', uploadErr);
+                addNotification('حدث خطأ في رفع مستند الحكم التمهيدي', 'warning');
+            }
+
+            addNotification(`تم تسجيل حكم تمهيدي (${finalType}) للقضية: ${caseItem.number}/${caseItem.year} وإعادتها للمتداولة بجلسة ${formatDate(nextSessionDate)}`, 'success');
+            showAlert('تم تسجيل الحكم التمهيدي وإعادة القضية للمتداولة بنجاح ✓', 'success');
+
+            // حفظ البيانات في التخزين الدائم (Electron app-data.json)
+            saveDataToAPI();
+
+            interimJudgmentModal.style.display = 'none';
+            interimJudgmentForm.reset();
+            document.getElementById('interim-judgment-custom-type-group').style.display = 'none';
+            renderReservedAndCancelledCases();
+            renderCasesTable();
+            updateStats();
+            updateDashboard();
+        });
+
         // ========== تسجيل وقف حكم القضية المحجوزة للحكم ==========
         const suspendJudgmentForm = document.getElementById('suspend-judgment-form');
         suspendJudgmentForm.addEventListener('submit', (e) => {
@@ -8141,6 +8421,7 @@
                         <button class="btn-purple btn-session-history" data-id="${caseItem.id}"><i class="fas fa-history"></i> سجل الجلسات</button>
                         <button class="btn-postpone btn-postpone-case" data-id="${caseItem.id}"><i class="fas fa-calendar-plus"></i> مد أجل الحكم</button>
                         <button class="btn-judgment btn-judge-case" data-id="${caseItem.id}"><i class="fas fa-gavel"></i> الحكم</button>
+                        <button class="btn-interim-judgment btn-interim-judgment-case" data-id="${caseItem.id}"><i class="fas fa-balance-scale"></i> أحكام تمهيدية</button>
                         <button class="btn-warning btn-suspend-judgment" data-id="${caseItem.id}"><i class="fas fa-pause-circle"></i> وقف الدعوي</button>
                         <button class="btn-return btn-return-case" data-id="${caseItem.id}" data-type="reserved"><i class="fas fa-redo"></i> إعادة للرول</button>
                     </td>
@@ -9062,6 +9343,10 @@
             } else if (button.classList.contains('btn-judge-case')) {
                 e.preventDefault();
                 openJudgmentModal(dataId);
+                handled = true;
+            } else if (button.classList.contains('btn-interim-judgment-case')) {
+                e.preventDefault();
+                openInterimJudgmentModal(dataId);
                 handled = true;
             } else if (button.classList.contains('btn-suspend-judgment')) {
                 e.preventDefault();
@@ -10039,7 +10324,21 @@
                 if (window.electronAPI && window.electronAPI.getFileUrl) {
                     const urlRes = await window.electronAPI.getFileUrl({ caseId, id });
                     if (urlRes && urlRes.success) {
-                        if (urlRes.mime && (urlRes.mime.startsWith('image/') || urlRes.mime === 'application/pdf')) {
+                        // ملفات الـ PDF: تفتح بمتصفح كروم المثبت على الجهاز، أو
+                        // بالمتصفح الافتراضي للجهاز لو كروم مش متثبت (مش جوه
+                        // نافذة البرنامج نفسه)
+                        if (urlRes.mime === 'application/pdf') {
+                            const op = await window.electronAPI.openPdfInBrowser({ caseId, id });
+                            if (op && op.success) {
+                                try { w.close(); } catch (e) {}
+                                return;
+                            }
+                            // فشل فتح المتصفح لأي سبب: اعرض الملف جوه نافذة
+                            // البرنامج نفسه كحل احتياطي بدل ما يفضل فاضي
+                            w.location.href = urlRes.url;
+                            return;
+                        }
+                        if (urlRes.mime && urlRes.mime.startsWith('image/')) {
                             w.location.href = urlRes.url;
                             return;
                         }
