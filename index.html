@@ -4741,6 +4741,19 @@
         }, 100);
         
         // ========== دالة البحث العام في القضايا ==========
+        function getGeneralSearchFilteredCases(searchTerm) {
+            const term = (searchTerm || '').toLowerCase();
+            return cases.filter(c => 
+                String(c.number || '').toLowerCase().includes(term) ||
+                String(c.year || '').toLowerCase().includes(term) ||
+                String(c.subject || '').toLowerCase().includes(term) ||
+                String(c.sessionDate || '').includes(term) ||
+                (c.department && c.department.toLowerCase().includes(term)) ||
+                (c.notes && c.notes.toLowerCase().includes(term)) ||
+                formatDate(c.sessionDate).includes(term)
+            );
+        }
+
         function generalSearchCases() {
             const searchTerm = generalSearchInput.value.toLowerCase();
             
@@ -4749,15 +4762,7 @@
                 return;
             }
             
-            const filteredCases = cases.filter(c => 
-                c.number.toLowerCase().includes(searchTerm) ||
-                c.year.toString().includes(searchTerm) ||
-                c.subject.toLowerCase().includes(searchTerm) ||
-                c.sessionDate.includes(searchTerm) ||
-                (c.department && c.department.toLowerCase().includes(searchTerm)) ||
-                (c.notes && c.notes.toLowerCase().includes(searchTerm)) ||
-                formatDate(c.sessionDate).includes(searchTerm)
-            );
+            const filteredCases = getGeneralSearchFilteredCases(searchTerm);
             
             renderCasesTable(filteredCases);
             
@@ -4769,7 +4774,19 @@
         }
         
         // ========== دالة البحث المتقدم في القضايا (تم تعديلها) ==========
-        function advancedSearchCases() {
+        function isAdvancedCasesSearchActive() {
+            return !!(
+                (searchCaseNumber && searchCaseNumber.value) ||
+                (searchCaseYear && searchCaseYear.value) ||
+                (searchCaseSubject && searchCaseSubject.value) ||
+                (searchPlaintiff && searchPlaintiff.value) ||
+                (searchDefendant && searchDefendant.value) ||
+                (searchSessionDate && searchSessionDate.value) ||
+                (searchDepartment && searchDepartment.value)
+            );
+        }
+
+        function getAdvancedSearchFilteredCases() {
             const caseNumber = searchCaseNumber.value.toLowerCase();
             const caseYear = searchCaseYear.value.toLowerCase();
             const caseSubject = searchCaseSubject.value.toLowerCase();
@@ -4778,7 +4795,7 @@
             const sessionDate = searchSessionDate.value;
             const department = normalizeDeptName(searchDepartment.value);
             
-            const filteredCases = cases.filter(c => 
+            return cases.filter(c => 
                 (!caseNumber || String(c.number || '').toLowerCase().includes(caseNumber)) &&
                 (!caseYear || String(c.year || '').toLowerCase().includes(caseYear)) &&
                 (!caseSubject || String(c.subject || '').toLowerCase().includes(caseSubject)) &&
@@ -4787,9 +4804,27 @@
                 (!sessionDate || c.sessionDate === sessionDate) &&
                 (!department || normalizeDeptName(c.department) === department)
             );
+        }
+
+        function advancedSearchCases() {
+            const filteredCases = getAdvancedSearchFilteredCases();
             
             renderCasesTable(filteredCases);
             showAlert(`تم العثور على ${filteredCases.length} قضية`, 'success');
+        }
+
+        // بتعيد تطبيق فلتر البحث الحالي (لو موجود) على قائمة القضايا، من غير
+        // ما تعرض أي رسالة تنبيه. بتُستدعى بعد أي تحديث تلقائي للبيانات في
+        // الخلفية (المزامنة كل 8 ثوانٍ) حتى لا تُفقد نتيجة البحث التي يراها
+        // المستخدم فجأة وترجع القائمة لعرض كل القضايا من كل الدوائر.
+        function reapplyActiveCasesFilterSilently() {
+            if (isAdvancedCasesSearchActive()) {
+                renderCasesTable(getAdvancedSearchFilteredCases());
+            } else if (generalSearchInput && generalSearchInput.value.trim()) {
+                renderCasesTable(getGeneralSearchFilteredCases(generalSearchInput.value));
+            } else {
+                renderCasesTable();
+            }
         }
         
         function getDateKey(dateString) {
@@ -13408,7 +13443,7 @@
         // ========== إعادة رسم كل الشاشات بعد أي تحديث للبيانات ==========
         function refreshAllViews() {
             try {
-                renderCasesTable();
+                reapplyActiveCasesFilterSilently();
                 renderJudgmentsTables();
                 renderReservedAndCancelledCases();
                 renderArchivedCasesTable();
