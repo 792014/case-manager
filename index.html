@@ -2649,7 +2649,6 @@
                                 <option value="postpone">ترحيل الجلسة</option>
                                 <option value="reserve">حجز الدعوي للحكم</option>
                                 <option value="cancel">شطب الدعوي</option>
-                                <option value="suspend">وقف الدعوي</option>
                             </select>
                         </div>
                         <div class="form-group" id="bulk-main-suspend-reason-container" style="display:none;">
@@ -3267,7 +3266,6 @@
                         <option value="postpone">ترحيل الجلسة</option>
                         <option value="reserve">حجز الدعوي للحكم</option>
                         <option value="cancel">شطب الدعوي</option>
-                        <option value="suspend">وقف الدعوي</option>
                     </select>
                 </div>
                 <div id="suspend-reason-container" class="form-group" style="display: none;">
@@ -3525,23 +3523,55 @@
 
     <!-- نافذة إعادة القضية للرول -->
     <div id="return-to-roll-modal" class="modal">
-        <div class="modal-content">
+        <div class="modal-content" style="max-width: 700px;">
             <div class="modal-header">
-                <h3>إعادة القضية للرول</h3>
+                <h3 id="return-to-roll-modal-title">إعادة القضية للرول</h3>
                 <button class="close-modal">&times;</button>
             </div>
             <form id="return-to-roll-form">
                 <input type="hidden" id="return-judgment-id">
                 <input type="hidden" id="return-judgment-type">
+
+                <!-- عرض بيانات القضية تلقائياً -->
+                <div class="case-details" style="margin-bottom: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px;">
+                    <h4>بيانات القضية</h4>
+                    <div class="case-details-grid">
+                        <div class="case-detail-item">
+                            <label>رقم وسنة الدعوي:</label>
+                            <p id="return-modal-case-number-year"></p>
+                        </div>
+                        <div class="case-detail-item">
+                            <label>موضوع الدعوي:</label>
+                            <p id="return-modal-subject"></p>
+                        </div>
+                        <div class="case-detail-item">
+                            <label>اسم المدعي:</label>
+                            <p id="return-modal-plaintiff"></p>
+                        </div>
+                        <div class="case-detail-item">
+                            <label>اسم المدعي عليه:</label>
+                            <p id="return-modal-defendant"></p>
+                        </div>
+                        <div class="case-detail-item">
+                            <label>الدائرة:</label>
+                            <p id="return-modal-department"></p>
+                        </div>
+                        <div class="case-detail-item">
+                            <label id="return-modal-status-date-label">التاريخ:</label>
+                            <p id="return-modal-status-date"></p>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="form-group">
-                    <label for="return-session-date">تاريخ جلسة الإعادة</label>
+                    <label for="return-session-date" id="return-session-date-label">تاريخ جلسة الإعادة</label>
                     <input type="date" id="return-session-date" required>
                 </div>
-                <div class="form-group">
+                <div class="form-group" id="return-reason-group">
                     <label for="return-reason">سبب إعادة الدعوي للرول</label>
                     <textarea id="return-reason" rows="3" placeholder="اكتب سبب الإعادة (مثلاً: طلب إعادة نظر، طعن جديد، غياب طرف)..."></textarea>
                 </div>
-                <button type="submit" class="btn-success" style="width: 100%;"><i class="fas fa-redo"></i> إعادة للرول</button>
+                <button type="submit" class="btn-success" style="width: 100%;" id="return-to-roll-submit-btn"><i class="fas fa-redo"></i> إعادة للرول</button>
             </form>
         </div>
     </div>
@@ -3837,6 +3867,80 @@
                 </div>
 
                 <button type="submit" class="btn-success" style="width: 100%;"><i class="fas fa-balance-scale"></i> تسجيل الحكم التمهيدي وإعادة القضية للمتداولة</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- نافذة حكم إعادة الدعوى للمرافعة -->
+    <div id="return-to-pleading-modal" class="modal">
+        <div class="modal-content" style="max-width: 700px;">
+            <div class="modal-header">
+                <h3 id="return-to-pleading-modal-title">تسجيل حكم بإعادة الدعوى للمرافعة</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <form id="return-to-pleading-form">
+                <input type="hidden" id="return-to-pleading-case-id">
+
+                <!-- عرض بيانات القضية تلقائياً -->
+                <div class="case-details" style="margin-bottom: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px;">
+                    <h4>بيانات القضية</h4>
+                    <div class="case-details-grid">
+                        <div class="case-detail-item">
+                            <label>رقم وسنة الدعوي:</label>
+                            <p id="return-to-pleading-case-number-year"></p>
+                        </div>
+                        <div class="case-detail-item">
+                            <label>موضوع الدعوي:</label>
+                            <p id="return-to-pleading-subject"></p>
+                        </div>
+                        <div class="case-detail-item">
+                            <label>اسم المدعي:</label>
+                            <p id="return-to-pleading-plaintiff"></p>
+                        </div>
+                        <div class="case-detail-item">
+                            <label>اسم المدعي عليه:</label>
+                            <p id="return-to-pleading-defendant"></p>
+                        </div>
+                        <div class="case-detail-item">
+                            <label>الدائرة:</label>
+                            <p id="return-to-pleading-department"></p>
+                        </div>
+                        <div class="case-detail-item">
+                            <label>تاريخ الحجز للحكم:</label>
+                            <p id="return-to-pleading-reserve-date"></p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="return-to-pleading-text">منطوق الحكم بإعادة الدعوى للمرافعة *</label>
+                    <textarea id="return-to-pleading-text" rows="4" required placeholder="اكتب منطوق الحكم بإعادة الدعوى للمرافعة هنا..."></textarea>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="return-to-pleading-judgment-date">تاريخ صدور الحكم *</label>
+                        <input type="date" id="return-to-pleading-judgment-date" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="return-to-pleading-session-date">الجلسة التي تعاد القضية إليها *</label>
+                        <input type="date" id="return-to-pleading-session-date" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="return-to-pleading-notes">ملاحظات إضافية</label>
+                    <textarea id="return-to-pleading-notes" rows="2" placeholder="ملاحظات إضافية..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="return-to-pleading-document">ارفاق مستند الحكم (اختياري)</label>
+                    <input type="file" id="return-to-pleading-document" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png">
+                    <small style="color: #666; font-size: 12px;">يمكن رفع ملف PDF أو Word أو صورة</small>
+                </div>
+
+                <button type="submit" class="btn-success" style="width: 100%;"><i class="fas fa-gavel"></i> تسجيل الحكم وإعادة القضية للمرافعة</button>
             </form>
         </div>
     </div>
@@ -4484,6 +4588,7 @@
         const sessionHistoryModal = document.getElementById('session-history-modal');
         const judgmentModal = document.getElementById('judgment-modal');
         const interimJudgmentModal = document.getElementById('interim-judgment-modal');
+        const returnToPleadingModal = document.getElementById('return-to-pleading-modal');
         const suspendJudgmentModal = document.getElementById('suspend-judgment-modal');
         const archiveModal = document.getElementById('archive-modal');
         const postponeForm = document.getElementById('postpone-form');
@@ -7869,7 +7974,6 @@
                     <td class="actions">
                         <button class="btn-info btn-view-judgment" data-id="${judgment.id}" data-type="favorable"><i class="fas fa-eye"></i> عرض</button>
                         <button class="btn-warning btn-edit-judgment" data-id="${judgment.id}" data-type="favorable"><i class="fas fa-edit"></i> تعديل</button>
-                        <button class="btn-warning btn-return-to-roll" data-id="${judgment.id}" data-type="favorable"><i class="fas fa-undo"></i> إعادة للرول</button>
                         <button class="btn-purple btn-session-history" data-id="${judgment.caseId}"><i class="fas fa-history"></i> سجل الجلسات</button>
                         <button class="btn-archive btn-archive-judgment" data-id="${judgment.id}" data-type="favorable"><i class="fas fa-archive"></i> أرشفة</button>
                         <button class="btn-word btn-export-judgment" data-id="${judgment.id}" data-type="favorable"><i class="fas fa-file-word"></i> Word</button>
@@ -7907,7 +8011,6 @@
                     <td class="actions">
                         <button class="btn-info btn-view-judgment" data-id="${judgment.id}" data-type="against"><i class="fas fa-eye"></i> عرض</button>
                         <button class="btn-warning btn-edit-judgment" data-id="${judgment.id}" data-type="against"><i class="fas fa-edit"></i> تعديل</button>
-                        <button class="btn-warning btn-return-to-roll" data-id="${judgment.id}" data-type="against"><i class="fas fa-undo"></i> إعادة للرول</button>
                         <button class="btn-purple btn-session-history" data-id="${judgment.caseId}"><i class="fas fa-history"></i> سجل الجلسات</button>
                         <button class="btn-archive btn-archive-judgment" data-id="${judgment.id}" data-type="against"><i class="fas fa-archive"></i> أرشفة</button>
                         <button class="btn-word btn-export-judgment" data-id="${judgment.id}" data-type="against"><i class="fas fa-file-word"></i> Word</button>
@@ -8348,6 +8451,150 @@
             interimJudgmentModal.style.display = 'none';
             interimJudgmentForm.reset();
             document.getElementById('interim-judgment-custom-type-group').style.display = 'none';
+            renderReservedAndCancelledCases();
+            renderCasesTable();
+            updateStats();
+            updateDashboard();
+        });
+
+        // ========== دالة فتح نافذة حكم إعادة الدعوى للمرافعة ==========
+        function openReturnToPleadingModal(caseId) {
+            const caseItem = reservedCases.find(c => c.id === caseId);
+            if (!caseItem) return;
+
+            document.getElementById('return-to-pleading-case-id').value = caseId;
+            document.getElementById('return-to-pleading-modal-title').textContent = `تسجيل حكم بإعادة الدعوى للمرافعة: ${caseItem.number}/${caseItem.year}`;
+
+            const currentSessionDate = caseItem.reserveDate || caseItem.sessionDate;
+            document.getElementById('return-to-pleading-case-number-year').textContent = `${caseItem.number}/${caseItem.year}`;
+            document.getElementById('return-to-pleading-subject').textContent = caseItem.subject;
+            document.getElementById('return-to-pleading-department').textContent = caseItem.department;
+            document.getElementById('return-to-pleading-plaintiff').textContent = caseItem.plaintiff || '';
+            document.getElementById('return-to-pleading-defendant').textContent = caseItem.defendant || '';
+            document.getElementById('return-to-pleading-reserve-date').textContent = formatDate(currentSessionDate);
+
+            document.getElementById('return-to-pleading-judgment-date').value = getDateKey(currentSessionDate);
+            document.getElementById('return-to-pleading-session-date').value = '';
+            document.getElementById('return-to-pleading-text').value = '';
+            document.getElementById('return-to-pleading-notes').value = '';
+            document.getElementById('return-to-pleading-document').value = '';
+
+            returnToPleadingModal.style.display = 'flex';
+        }
+
+        // ========== تسجيل حكم إعادة الدعوى للمرافعة وإعادتها للقضايا المتداولة ==========
+        const returnToPleadingForm = document.getElementById('return-to-pleading-form');
+        returnToPleadingForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            const caseId = document.getElementById('return-to-pleading-case-id').value;
+            const caseIndex = reservedCases.findIndex(c => c.id === caseId);
+            if (caseIndex === -1) return;
+
+            const caseItem = reservedCases[caseIndex];
+
+            const judgmentText = document.getElementById('return-to-pleading-text').value;
+            const judgmentDate = document.getElementById('return-to-pleading-judgment-date').value;
+            const nextSessionDate = document.getElementById('return-to-pleading-session-date').value;
+            const notes = document.getElementById('return-to-pleading-notes').value;
+
+            if (!nextSessionDate) {
+                showAlert('من فضلك حدد الجلسة التي تعاد القضية إليها', 'warning');
+                return;
+            }
+
+            if (!caseItem.sessionHistory) caseItem.sessionHistory = [];
+
+            // تسجيل الحكم بإعادة الدعوى للمرافعة في سجل الجلسات
+            caseItem.sessionHistory.push({
+                date: judgmentDate,
+                type: 'return_to_pleading_judgment',
+                reason: 'حكم بإعادة الدعوى للمرافعة',
+                judgmentText: judgmentText,
+                notes: notes || '',
+                recordedDate: new Date().toISOString()
+            });
+
+            // تسجيل إعادة القضية للمرافعة على الجلسة المحددة
+            caseItem.sessionHistory.push({
+                date: nextSessionDate,
+                type: 'returned',
+                reason: 'إعادة للمرافعة بموجب حكم',
+                notes: '',
+                recordedDate: new Date().toISOString()
+            });
+
+            // بناء نسخة القضية الراجعة للقضايا المتداولة على الجلسة المختارة
+            const returnedCase = {
+                ...caseItem,
+                sessionDate: nextSessionDate,
+                status: 'pending'
+            };
+            delete returnedCase.reserveDate;
+            delete returnedCase.originalDate;
+            delete returnedCase.reserveReason;
+
+            cases.push(returnedCase);
+            localStorage.setItem('cases', JSON.stringify(cases));
+
+            reservedCases = reservedCases.filter(c => c.id !== caseId);
+            localStorage.setItem('reservedCases', JSON.stringify(reservedCases));
+
+            // رفع مستند الحكم إذا تم اختياره
+            try {
+                const pleadingFileInput = document.getElementById('return-to-pleading-document');
+                if (pleadingFileInput && pleadingFileInput.files && pleadingFileInput.files.length > 0) {
+                    const file = pleadingFileInput.files[0];
+                    const reader = new FileReader();
+                    reader.onload = async function(ev) {
+                        const arrayBuffer = ev.target.result;
+                        const bytes = new Uint8Array(arrayBuffer);
+                        let binary = '';
+                        const chunkSize = 0x8000;
+                        for (let j = 0; j < bytes.length; j += chunkSize) {
+                            binary += String.fromCharCode.apply(null, bytes.subarray(j, j + chunkSize));
+                        }
+                        const dataBase64 = btoa(binary);
+                        try {
+                            const res = await window.electronAPI.saveFile({
+                                caseId: caseId,
+                                filename: file.name,
+                                dataBase64,
+                                docType: 'حكم إعادة للمرافعة',
+                                caseData: {
+                                    number: caseItem.number || caseItem.caseNumber || '',
+                                    year: caseItem.year || caseItem.caseYear || '',
+                                    caseNumber: caseItem.caseNumber || caseItem.number || '',
+                                    caseYear: caseItem.caseYear || caseItem.year || '',
+                                    plaintiff: caseItem.plaintiff || '',
+                                    defendant: caseItem.defendant || ''
+                                }
+                            });
+                            if (res && res.success) {
+                                addNotification(`تم رفع مستند الحكم بنجاح: ${file.name}`, 'success');
+                            } else {
+                                addNotification('فشل في رفع مستند الحكم', 'warning');
+                            }
+                        } catch (err) {
+                            console.error('Upload error:', err);
+                            addNotification('حدث خطأ في رفع مستند الحكم', 'error');
+                        }
+                    };
+                    reader.readAsArrayBuffer(file);
+                }
+            } catch (uploadErr) {
+                console.error('Return to pleading document upload error:', uploadErr);
+                addNotification('حدث خطأ في رفع مستند الحكم', 'warning');
+            }
+
+            addNotification(`تم تسجيل حكم بإعادة الدعوى للمرافعة للقضية: ${caseItem.number}/${caseItem.year} وإعادتها بجلسة ${formatDate(nextSessionDate)}`, 'success');
+            showAlert('تم تسجيل الحكم وإعادة القضية للمرافعة بنجاح ✓', 'success');
+
+            // حفظ البيانات في التخزين الدائم (Electron app-data.json)
+            saveDataToAPI();
+
+            returnToPleadingModal.style.display = 'none';
+            returnToPleadingForm.reset();
             renderReservedAndCancelledCases();
             renderCasesTable();
             updateStats();
@@ -9029,10 +9276,77 @@
             document.getElementById('return-judgment-id').value = caseId;
             document.getElementById('return-judgment-type').value = type;
             document.getElementById('return-session-date').value = '';
-            // Clear reason field when opening
+
+            const titleEl = document.getElementById('return-to-roll-modal-title');
             const reasonEl = document.getElementById('return-reason');
-            if (reasonEl) reasonEl.value = '';
-            document.getElementById('return-to-roll-modal').style.display = 'block';
+            const reasonGroup = document.getElementById('return-reason-group');
+            const submitBtn = document.getElementById('return-to-roll-submit-btn');
+            const dateLabel = document.getElementById('return-session-date-label');
+            const statusDateLabel = document.getElementById('return-modal-status-date-label');
+
+            // إيجاد بيانات القضية وتحديد نوع الإجراء ونص السبب التلقائي حسب مصدرها
+            let caseItem = null;
+            let statusDateValue = '';
+
+            if (type === 'reserved') {
+                caseItem = reservedCases.find(c => c.id === caseId);
+                statusDateValue = caseItem ? (caseItem.reserveDate || caseItem.sessionDate) : '';
+                titleEl.textContent = 'إعادة القضية للمرافعة';
+                statusDateLabel.textContent = 'تاريخ الحجز للحكم:';
+                dateLabel.textContent = 'الجلسة التي تعاد القضية إليها';
+                reasonGroup.style.display = 'none';
+                reasonEl.removeAttribute('readonly');
+                reasonEl.value = 'إعادة للمرافعة';
+                submitBtn.innerHTML = '<i class="fas fa-redo"></i> تأكيد الإعادة للمرافعة';
+            } else if (type === 'cancelled') {
+                caseItem = cancelledCases.find(c => c.id === caseId);
+                statusDateValue = caseItem ? (caseItem.cancelDate || caseItem.originalDate) : '';
+                titleEl.textContent = 'تجديد الدعوى من الشطب';
+                statusDateLabel.textContent = 'تاريخ الشطب:';
+                dateLabel.textContent = 'الجلسة التي يتم تجديد الدعوى إليها';
+                reasonGroup.style.display = 'block';
+                reasonEl.value = 'تجديد من الشطب';
+                reasonEl.setAttribute('readonly', 'readonly');
+                submitBtn.innerHTML = '<i class="fas fa-redo"></i> تأكيد التجديد من الشطب';
+            } else if (type === 'suspended') {
+                caseItem = suspendedCases.find(c => c.id === caseId);
+                statusDateValue = caseItem ? (caseItem.suspendDate || caseItem.originalDate) : '';
+                titleEl.textContent = 'تعجيل الدعوى من الوقف';
+                statusDateLabel.textContent = 'تاريخ الوقف:';
+                dateLabel.textContent = 'الجلسة التي يتم تعجيل الدعوى إليها';
+                reasonGroup.style.display = 'block';
+                reasonEl.value = 'تعجيل الدعوى من الوقف';
+                reasonEl.setAttribute('readonly', 'readonly');
+                submitBtn.innerHTML = '<i class="fas fa-redo"></i> تأكيد التعجيل من الوقف';
+            } else if (type === 'archived') {
+                caseItem = archivedCases.find(c => c.id === caseId);
+                statusDateValue = caseItem ? (caseItem.archiveDate || caseItem.originalDate) : '';
+                titleEl.textContent = 'إعادة القضية للتداول';
+                statusDateLabel.textContent = 'تاريخ الأرشفة:';
+                dateLabel.textContent = 'تاريخ جلسة الإعادة';
+                reasonGroup.style.display = 'block';
+                reasonEl.removeAttribute('readonly');
+                reasonEl.value = '';
+                submitBtn.innerHTML = '<i class="fas fa-redo"></i> إعادة للتداول';
+            } else {
+                // احتياطي لأي نوع آخر (احتفاظ بالسلوك القديم)
+                titleEl.textContent = 'إعادة القضية للرول';
+                statusDateLabel.textContent = 'التاريخ:';
+                dateLabel.textContent = 'تاريخ جلسة الإعادة';
+                reasonGroup.style.display = 'block';
+                reasonEl.removeAttribute('readonly');
+                reasonEl.value = '';
+                submitBtn.innerHTML = '<i class="fas fa-redo"></i> إعادة للرول';
+            }
+
+            document.getElementById('return-modal-case-number-year').textContent = caseItem ? `${caseItem.number}/${caseItem.year}` : '';
+            document.getElementById('return-modal-subject').textContent = caseItem ? (caseItem.subject || '') : '';
+            document.getElementById('return-modal-plaintiff').textContent = caseItem ? (caseItem.plaintiff || '') : '';
+            document.getElementById('return-modal-defendant').textContent = caseItem ? (caseItem.defendant || '') : '';
+            document.getElementById('return-modal-department').textContent = caseItem ? (caseItem.department || '') : '';
+            document.getElementById('return-modal-status-date').textContent = statusDateValue ? formatDate(statusDateValue) : '-';
+
+            document.getElementById('return-to-roll-modal').style.display = 'flex';
         }
         
         // ========== معالج نموذج إعادة الدعوى إلى الرول ==========
@@ -9389,7 +9703,11 @@
                 handled = true;
             } else if (button.classList.contains('btn-return-case')) {
                 e.preventDefault();
-                openReturnToRollModal(dataId, dataType);
+                if (dataType === 'reserved') {
+                    openReturnToPleadingModal(dataId);
+                } else {
+                    openReturnToRollModal(dataId, dataType);
+                }
                 handled = true;
             } else if (button.classList.contains('btn-return-suspended-case')) {
                 e.preventDefault();
