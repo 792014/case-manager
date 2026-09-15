@@ -16,6 +16,7 @@ const { app, BrowserWindow, ipcMain, dialog, shell, clipboard, Menu } = require(
 const { pathToFileURL } = require('url');
 const path = require('path');
 const fs = require('fs');
+const { exec, execFile, execSync } = require('child_process');
 
 const DEFAULT_STORAGE_DIRNAME = 'مستندات نظام إدارة القضايا';
 const CONFIG_FILE = path.join(app.getPath('userData'), 'config.json');
@@ -332,6 +333,126 @@ function guessMimeType(filename) {
 }
 
 // ---------------------------------------------------------------
+// فتح ملفات الـ PDF في متصفح كروم تحديدًا (أو المتصفح الافتراضي
+// للجهاز لو كروم مش متثبت)، بدل ما تتفتح جوه نافذة البرنامج نفسه.
+// ---------------------------------------------------------------
+
+// بيدور على مسار برنامج كروم المثبت على الجهاز (لو موجود)
+function findChromeExecutablePath() {
+    try {
+        if (process.platform === 'win32') {
+            const candidates = [
+                path.join(process.env['PROGRAMFILES'] || 'C:\\Program Files', 'Google\\Chrome\\Application\\chrome.exe'),
+                path.join(process.env['PROGRAMFILES(X86)'] || 'C:\\Program Files (x86)', 'Google\\Chrome\\Application\\chrome.exe'),
+                path.join(process.env['LOCALAPPDATA'] || '', 'Google\\Chrome\\Application\\chrome.exe')
+            ];
+            for (const c of candidates) {
+                if (c && fs.existsSync(c)) return c;
+            }
+
+            // احتياطي: نقرأ مسار البرنامج المسجل في الـ Registry (App Paths)
+            const regKeys = [
+                'HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\App Paths\\chrome.exe',
+                'HKLM\\SOFTWARE\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\App Paths\\chrome.exe',
+                'HKCU\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\App Paths\\chrome.exe'
+            ];
+            for (const key of regKeys) {
+                try {
+                    const out = execSync(`reg query "${key}" /ve`, { windowsHide: true }).toString();
+                    const m = out.match(/REG_SZ\s+(.+)/);
+                    if (m) {
+                        const p = m[1].trim().replace(/^"|"$/g, '');
+                        if (p && fs.existsSync(p)) return p;
+                    }
+                } catch (e) { /* المفتاح ده مش موجود، جرّب اللي بعده */ }
+            }
+            return null;
+        }
+
+        if (process.platform === 'darwin') {
+            const candidates = [
+                '/Applications/Google Chrome.app',
+                path.join(require('os').homedir(), 'Applications/Google Chrome.app')
+            ];
+            for (const c of candidates) {
+                if (fs.existsSync(c)) return c;
+            }
+            return null;
+        }
+
+        // لينكس
+        for (const name of ['google-chrome', 'google-chrome-stable', 'chromium-browser', 'chromium']) {
+            try {
+                const out = execSync(`command -v ${name}`, { shell: '/bin/bash' }).toString().trim();
+                if (out) return out;
+            } catch (e) { /* مش موجود، جرّب اللي بعده */ }
+        }
+        return null;
+    } catch (e) {
+        console.warn('تعذر البحث عن مسار كروم:', e.message);
+        return null;
+    }
+}
+
+// بيدور على أمر تشغيل المتصفح الافتراضي المسجل على ويندوز (لو كروم مش موجود)
+function getWindowsDefaultBrowserCommand() {
+    if (process.platform !== 'win32') return null;
+    try {
+        const out = execSync(
+            'reg query "HKCU\\Software\\Microsoft\\Windows\\Shell\\Associations\\UrlAssociations\\http\\UserChoice" /v ProgId',
+            { windowsHide: true }
+        ).toString();
+        const m = out.match(/ProgId\s+REG_SZ\s+(\S+)/);
+        if (!m) return null;
+        const progId = m[1];
+
+        const cmdOut = execSync(`reg query "HKCR\\${progId}\\shell\\open\\command" /ve`, { windowsHide: true }).toString();
+        const cmdMatch = cmdOut.match(/REG_SZ\s+(.+)/);
+        if (!cmdMatch) return null;
+        return cmdMatch[1].trim(); // شكله عادة: "C:\...\browser.exe" -- "%1"
+    } catch (e) {
+        return null;
+    }
+}
+
+// بيفتح ملف بمتصفح كروم لو موجود، ولو مش موجود بيجرب المتصفح الافتراضي
+// المسجل على الجهاز، وآخر حل احتياطي: البرنامج الافتراضي المرتبط بامتداد الملف
+function openFileInBrowser(fullPath) {
+    return new Promise((resolve) => {
+        const chromePath = findChromeExecutablePath();
+
+        if (chromePath) {
+            if (process.platform === 'darwin') {
+                execFile('open', ['-a', chromePath, fullPath], (err) => resolve(!err));
+            } else {
+                execFile(chromePath, [fullPath], (err) => resolve(!err));
+            }
+            return;
+        }
+
+        // مفيش كروم متثبت على الجهاز... جرّب المتصفح الافتراضي المسجل عليه
+        if (process.platform === 'win32') {
+            const cmdTemplate = getWindowsDefaultBrowserCommand();
+            if (cmdTemplate) {
+                const finalCmd = cmdTemplate.includes('%1')
+                    ? cmdTemplate.replace(/%1/g, `"${fullPath}"`)
+                    : `${cmdTemplate} "${fullPath}"`;
+                exec(finalCmd, (err) => {
+                    if (!err) { resolve(true); return; }
+                    // فشل تشغيل المتصفح الافتراضي، اعرض الملف بالبرنامج
+                    // الافتراضي المرتبط بامتداده كآخر حل احتياطي
+                    shell.openPath(fullPath).then(result => resolve(!result));
+                });
+                return;
+            }
+        }
+
+        // آخر حل احتياطي: افتح بالبرنامج الافتراضي المرتبط بامتداد الملف
+        shell.openPath(fullPath).then(result => resolve(!result));
+    });
+}
+
+// ---------------------------------------------------------------
 // إنشاء نافذة التطبيق
 // ---------------------------------------------------------------
 function createWindow() {
@@ -611,6 +732,23 @@ ipcMain.handle('openFileNative', async (event, { caseId, id }) => {
         return { success: true };
     } catch (e) {
         console.error('openFileNative error:', e);
+        return { success: false, error: e.message };
+    }
+});
+
+// بيفتح ملف PDF تحديدًا بمتصفح كروم (أو المتصفح الافتراضي للجهاز لو
+// كروم مش متثبت)، بدل ما يتفتح جوه نافذة البرنامج نفسه.
+ipcMain.handle('openPdfInBrowser', async (event, { caseId, id }) => {
+    try {
+        const { entry } = findEntry(caseId, id);
+        if (!entry) return { success: false, error: 'الملف غير موجود' };
+        const fullPath = path.join(getCaseFolderPath(caseId), entry.storedFileName);
+        if (!fs.existsSync(fullPath)) return { success: false, error: 'الملف غير موجود على القرص' };
+        const ok = await openFileInBrowser(fullPath);
+        if (!ok) return { success: false, error: 'تعذر فتح المتصفح' };
+        return { success: true };
+    } catch (e) {
+        console.error('openPdfInBrowser error:', e);
         return { success: false, error: e.message };
     }
 });

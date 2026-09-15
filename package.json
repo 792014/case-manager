@@ -1,12 +1,51 @@
 {
-  "name": "case-manager-server",
+  "name": "case-manager-desktop",
+  "productName": "نظام إدارة القضايا",
   "version": "1.0.0",
-  "description": "سيرفر محلي لمزامنة نظام إدارة القضايا بين اللاب توب والموبايل عبر الواي فاي",
-  "main": "server.js",
+  "description": "نظام إدارة القضايا - المستشار محمود العوابدي",
+  "main": "main.js",
+  "author": "المستشار محمود العوابدي",
+  "private": true,
   "scripts": {
-    "start": "node server.js"
+    "start": "electron .",
+    "dist": "electron-builder --win",
+    "dist:dir": "electron-builder --win --dir"
   },
-  "dependencies": {
-    "express": "^4.19.2"
+  "devDependencies": {
+    "electron": "^31.3.0",
+    "electron-builder": "^24.13.3"
+  },
+  "build": {
+    "appId": "eg.stateslawsuits.casemanager",
+    "productName": "نظام إدارة القضايا",
+    "files": [
+      "main.js",
+      "preload.js",
+      "app/**/*",
+      "build/icon.png",
+      "package.json"
+    ],
+    "directories": {
+      "output": "release"
+    },
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": ["x64"]
+        }
+      ],
+      "icon": "build/icon.png"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "نظام إدارة القضايا",
+      "uninstallDisplayName": "نظام إدارة القضايا - المستشار محمود العوابدي",
+      "artifactName": "تثبيت-نظام-إدارة-القضايا-المستشار-محمود-العوابدي-${version}.${ext}"
+    }
   }
 }

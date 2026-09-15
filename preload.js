@@ -14,6 +14,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
     deleteFile: (args) => ipcRenderer.invoke('deleteFile', args),
     downloadFile: (args) => ipcRenderer.invoke('downloadFile', args),
     openFileNative: (args) => ipcRenderer.invoke('openFileNative', args),
+    openPdfInBrowser: (args) => ipcRenderer.invoke('openPdfInBrowser', args),
     chooseStorageFolder: () => ipcRenderer.invoke('chooseStorageFolder'),
     getStoragePath: () => ipcRenderer.invoke('getStoragePath'),
     readClipboard: () => ipcRenderer.invoke('readClipboard'),
