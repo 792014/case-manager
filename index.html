@@ -4515,26 +4515,14 @@
             }
         }
 
-        // Override localStorage.setItem to auto-persist key changes to the Electron storage
-        (function() {
-            try {
-                const originalSetItem = localStorage.setItem.bind(localStorage);
-                const keysToAutoPersist = new Set(['cases','favorableJudgments','againstJudgments','reservedCases','cancelledCases','suspendedCases','archivedCases','notifications','departments','programmerName','lastBackup']);
-                localStorage.setItem = function(key, value) {
-                    // always perform the original setItem
-                    originalSetItem(key, value);
-                    try {
-                        // avoid recursive persistence when saveDataToAPI is already running
-                        if (!window.__savingToAPI && keysToAutoPersist.has(String(key))) {
-                            if (typeof saveDataToAPI === 'function') {
-                                // fire-and-forget; any errors logged inside saveDataToAPI
-                                saveDataToAPI().catch(err => console.warn('saveDataToAPI error from setItem override', err));
-                            }
-                        }
-                    } catch (e) { /* ignore */ }
-                };
-            } catch (e) { /* ignore */ }
-        })();
+        // ملحوظة هامة: كان هنا كود بيعمل "استماع" لأي localStorage.setItem ويشعل
+        // saveDataToAPI() تلقائيًا لأي مفتاح من مفاتيح بيانات القضايا. اتشال لأنه
+        // كان السبب في مشكلة فقدان البيانات: لو حصل استدعاء لـ localStorage.setItem
+        // لمفتاح واحد بس في لحظة كانت فيها مصفوفة تانية (زي suspendedCases) لسه
+        // فاضية أو مش محمّلة كاملة في الذاكرة، كان بيتم رفع نسخة ناقصة من كل
+        // البيانات إلى Firebase على طول وبتستبدل البيانات الحقيقية فيه. دلوقتي
+        // saveDataToAPI() بتتنادى بشكل صريح وواضح في كل نقطة تعديل فعلية فقط
+        // (بعد ما تكون كل المصفوفات محدّثة بشكل صحيح)، وده أأمن بكتير.
 
         // بيانات التطبيق
         let cases = [];
@@ -6912,6 +6900,7 @@
                         againstJudgments = data.againstJudgments || [];
                         reservedCases = data.reservedCases || [];
                         cancelledCases = data.cancelledCases || [];
+                        suspendedCases = data.suspendedCases || [];
                         archivedCases = data.archivedCases || [];
                         notifications = data.notifications || [];
                         departments = data.departments || [];
@@ -13512,6 +13501,7 @@
                 againstJudgments: againstJudgments,
                 reservedCases: reservedCases,
                 cancelledCases: cancelledCases,
+                suspendedCases: suspendedCases,
                 archivedCases: archivedCases,
                 notifications: notifications,
                 departments: departments,

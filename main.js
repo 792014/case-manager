@@ -12,7 +12,7 @@
 //   بدل تخزينها كـ Base64 داخل قاعدة البيانات، عشان الأداء والسعة.
 // ============================================================
 
-const { app, BrowserWindow, ipcMain, dialog, shell, clipboard, Menu } = require('electron');
+const { app, BrowserWindow, ipcMain, dialog, shell, clipboard, Menu, MenuItem } = require('electron');
 const { pathToFileURL } = require('url');
 const path = require('path');
 const fs = require('fs');
@@ -563,6 +563,48 @@ function createWindow() {
         mainWindow = null;
     });
 }
+
+// ---------------------------------------------------------------
+// قائمة نسخ/لصق تظهر بالزر الأيمن للماوس (Copy/Paste عن طريق الماوس)
+// ---------------------------------------------------------------
+// بتتفعّل على أي نافذة في البرنامج (النافذة الرئيسية وأي نافذة فرعية زي
+// معاينة المستندات)، وبتعرض بس الخيارات المناسبة حسب مكان الضغطة: لو حقل
+// إدخال قابل للتحرير بتظهر (تراجع/إعادة/قص/نسخ/لصق/تحديد الكل)، ولو نص عادي
+// متحدد بتظهر (نسخ/تحديد الكل)، ولو مفيش تحديد بتظهر (تحديد الكل ولصق لو
+// فيه حاجة في الحافظة).
+function setupCopyPasteContextMenu(webContents) {
+    webContents.on('context-menu', (event, params) => {
+        const menu = new Menu();
+
+        if (params.isEditable) {
+            menu.append(new MenuItem({ label: 'تراجع', role: 'undo', enabled: params.editFlags.canUndo }));
+            menu.append(new MenuItem({ label: 'إعادة', role: 'redo', enabled: params.editFlags.canRedo }));
+            menu.append(new MenuItem({ type: 'separator' }));
+            menu.append(new MenuItem({ label: 'قص', role: 'cut', enabled: params.editFlags.canCut }));
+            menu.append(new MenuItem({ label: 'نسخ', role: 'copy', enabled: params.editFlags.canCopy }));
+            menu.append(new MenuItem({ label: 'لصق', role: 'paste', enabled: params.editFlags.canPaste }));
+            menu.append(new MenuItem({ type: 'separator' }));
+            menu.append(new MenuItem({ label: 'تحديد الكل', role: 'selectAll' }));
+        } else if (params.selectionText && params.selectionText.trim().length > 0) {
+            menu.append(new MenuItem({ label: 'نسخ', role: 'copy' }));
+            menu.append(new MenuItem({ type: 'separator' }));
+            menu.append(new MenuItem({ label: 'تحديد الكل', role: 'selectAll' }));
+        } else {
+            menu.append(new MenuItem({ label: 'تحديد الكل', role: 'selectAll' }));
+            if (params.editFlags && params.editFlags.canPaste) {
+                menu.append(new MenuItem({ label: 'لصق', role: 'paste' }));
+            }
+        }
+
+        menu.popup({ window: BrowserWindow.fromWebContents(webContents) });
+    });
+}
+
+// نطبّق القائمة دي على أي نافذة (webContents) تتفتح في البرنامج كله، مش بس
+// النافذة الرئيسية، عشان تشتغل برضه في نوافذ معاينة المستندات وغيرها.
+app.on('web-contents-created', (event, contents) => {
+    setupCopyPasteContextMenu(contents);
+});
 
 // نسخة واحدة فقط من التطبيق تعمل في نفس الوقت
 const gotLock = app.requestSingleInstanceLock();
