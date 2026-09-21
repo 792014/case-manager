@@ -4202,9 +4202,34 @@
                             const mime = guessMimeType(filename);
                             const fileId = `${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
 
+                            // اسم العرض: لو المستخدم اختار نوع المستند وقت الرفع (زي
+                            // "صحيفة دعوى"، "مذكرة دفاع"، "حكم"...) يبقى ده اسمه بدل
+                            // اسم الملف الأصلي، مع الحفاظ على امتداد الملف الأصلي
+                            const extMatch = String(filename || '').match(/\.[^.\\/]+$/);
+                            const originalExt = extMatch ? extMatch[0] : '';
+                            const rawDocType = (docType || '').trim();
+                            const cleanDocType = rawDocType && rawDocType.toLowerCase() !== originalExt.toLowerCase()
+                                ? rawDocType.replace(/[\\/:*?"<>|]/g, '_')
+                                : '';
+                            const baseName = cleanDocType || String(filename || 'مستند').replace(originalExt, '') || 'مستند';
+
+                            // نتأكد إن الاسم مش متكرر لنفس القضية (زي اتنين "مذكرة دفاع")
+                            let displayName = `${baseName}${originalExt}`;
+                            try {
+                                const existingMeta = await docListMeta(caseId);
+                                const existingNames = new Set(
+                                    Object.values(existingMeta || {}).map(f => String(f.originalName || '').toLowerCase())
+                                );
+                                let counter = 2;
+                                while (existingNames.has(displayName.toLowerCase())) {
+                                    displayName = `${baseName} (${counter})${originalExt}`;
+                                    counter++;
+                                }
+                            } catch (e) { /* لو فشل التحقق، نكمل بالاسم الأساسي */ }
+
                             await docSet(caseId, fileId, {
                                 id: fileId,
-                                originalName: filename,
+                                originalName: displayName,
                                 type: docType || '',
                                 uploadedAt: Date.now(),
                                 mime,
@@ -11108,9 +11133,13 @@
 
                     // بيدور على القضية المطابقة لاسم مجلد معين. المرحلة 1:
                     // مطابقة بادئة اسم المدعي + المدعي عليه (الأسلوب الثابت
-                    // اللي بتتسمى بيه كل المجلدات يدويًا). المرحلة 2 (لو
-                    // مالقيناش): مطابقة مرنة برقم وسنة الدعوى في أي مكان
-                    // داخل اسم المجلد، سواء قبل بعض أو بعد بعض.
+                    // اللي بتتسمى بيه كل المجلدات). المرحلة 2 (لو مالقيناش):
+                    // مطابقة رقم وسنة الدعوى + وجود اسم أحد الطرفين (المدعي
+                    // أو المدعي عليه) في اسم المجلد كمان. لازم الشرطين مع
+                    // بعض دايمًا — الاعتماد على رقم وسنة الدعوى وحدهم مش آمن
+                    // لأن قضيتين مختلفتين تمامًا ممكن يتصادف تطابق رقمهم
+                    // وسنتهم، وده كان بيسبب مطابقة ونقل مستندات قضية لمجلد
+                    // قضية تانية غلط.
                     function findCaseForFolder(folderName) {
                         for (const c of allCases) {
                             const plaintiff = normalizeForMatch(c.plaintiff);
@@ -11129,10 +11158,21 @@
                             const numberCandidate = (before && /^\d+$/.test(before)) ? before
                                 : ((after && /^\d+$/.test(after)) ? after : null);
                             if (!numberCandidate) continue;
-                            const match = allCases.find(c =>
-                                numbersMatch(c.number || c.caseNumber, numberCandidate) &&
-                                numbersMatch(c.year || c.caseYear, yearCandidate)
-                            );
+
+                            const match = allCases.find(c => {
+                                const numberYearOk =
+                                    numbersMatch(c.number || c.caseNumber, numberCandidate) &&
+                                    numbersMatch(c.year || c.caseYear, yearCandidate);
+                                if (!numberYearOk) return false;
+
+                                const plaintiff = normalizeForMatch(c.plaintiff);
+                                const defendant = normalizeForMatch(c.defendant);
+                                const hasPartyName =
+                                    (plaintiff && folderName.indexOf(plaintiff) !== -1) ||
+                                    (defendant && folderName.indexOf(defendant) !== -1);
+
+                                return hasPartyName;
+                            });
                             if (match) return match;
                         }
                         return null;

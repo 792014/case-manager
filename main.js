@@ -182,20 +182,35 @@ function findExistingFolderForCase(storageFolder, caseData, excludeFolderName) {
         }
     }
 
-    // المرحلة 2: مطابقة مرنة برقم وسنة الدعوى في أي مكان بالاسم
-    if (number && year) {
+    // المرحلة 2: مطابقة برقم وسنة الدعوى + وجود اسم أحد الطرفين (المدعي أو
+    // المدعي عليه) في اسم المجلد كمان. لازم الشرطين مع بعض، لأن الاعتماد على
+    // رقم وسنة الدعوى وحدهم مش آمن: قضيتين مختلفتين تمامًا (بدائرتين مختلفتين
+    // مثلاً) ممكن جدًا يكون ليهم نفس الرقم ونفس السنة بالصدفة، وده كان بيسبب
+    // مشكلة خطيرة: مستندات قضية جديدة كانت بتتحط في مجلد قضية تانية قديمة
+    // بس لمجرد تطابق الرقم والسنة، من غير أي تحقق من هوية الأطراف.
+    if (number && year && (plaintiff || defendant)) {
         for (const e of entries) {
             if (excludeFolderName && e.name === excludeFolderName) continue;
+
             const tokens = e.name.split(/[_\-\s]+/);
+            let numberYearMatches = false;
             for (let i = 0; i < tokens.length; i++) {
                 if (!/^\d{4}$/.test(tokens[i]) || !numbersMatch(tokens[i], year)) continue;
                 const before = tokens[i - 1];
                 const after = tokens[i + 1];
                 if ((before && /^\d+$/.test(before) && numbersMatch(before, number)) ||
                     (after && /^\d+$/.test(after) && numbersMatch(after, number))) {
-                    return e.name;
+                    numberYearMatches = true;
+                    break;
                 }
             }
+            if (!numberYearMatches) continue;
+
+            // لازم كمان اسم أحد الطرفين يكون موجود فعلاً جوه اسم المجلد،
+            // كتأكيد إضافي إن ده نفس القضية بالظبط مش بس نفس الرقم بالصدفة
+            const nameHasParty = (plaintiff && e.name.indexOf(plaintiff) !== -1) ||
+                                  (defendant && e.name.indexOf(defendant) !== -1);
+            if (nameHasParty) return e.name;
         }
     }
 
@@ -285,22 +300,41 @@ function getCaseFolderPath(caseId, caseData) {
             mapping[caseId] = folderName;
             writeCaseFoldersIndex(mapping);
         } else {
-            // معندناش مجلد حقيقي تاني، بس ممكن بيانات القضية اتغيرت (رقمها
-            // أو اسم الأطراف)، فنعيد تسمية المجلد الحالي ليطابق التغيير
-            const desiredName = buildCaseFolderName(caseData, caseId);
-            if (desiredName && desiredName !== folderName) {
-                const oldPath = path.join(storageFolder, folderName);
-                const newPath = path.join(storageFolder, desiredName);
-                try {
-                    if (fs.existsSync(oldPath) && !fs.existsSync(newPath)) {
-                        fs.renameSync(oldPath, newPath);
-                    }
-                } catch (e) {
-                    console.warn('تعذر إعادة تسمية مجلد القضية:', e.message);
-                }
-                folderName = desiredName;
+            // معندناش مجلد حقيقي تاني بنفس بيانات القضية، بس قبل ما نثق في
+            // المجلد المربوط حاليًا، لازم نتأكد الأول إنه فعلاً مخصص للقضية
+            // دي وحدها، مش مجلد بيشاركه معاها caseId تاني (وده بالظبط السيناريو
+            // اللي كان بيحصل فيه الخطأ قبل كده: قضيتين مختلفتين اتسجلوا على
+            // نفس المجلد بالغلط بسبب تطابق الرقم والسنة بالصدفة).
+            const otherCaseIdsSharingFolder = Object.keys(mapping).filter(
+                id => id !== caseId && mapping[id] === folderName
+            );
+
+            if (otherCaseIdsSharingFolder.length > 0) {
+                // المجلد ده مستخدم فعليًا من قضية تانية غيرنا؛ منلمسوش خالص
+                // (عشان محفضاش ملفاتها)، وبننشئ مجلد جديد صحيح مخصص للقضية
+                // الحالية بس، ونحدّث الربط بتاعها هي بس
+                folderName = buildCaseFolderName(caseData, caseId);
                 mapping[caseId] = folderName;
                 writeCaseFoldersIndex(mapping);
+            } else {
+                // المجلد ده فعلاً بتاع القضية دي وحدها؛ ممكن بس بيانات القضية
+                // اتغيرت (رقمها أو اسم الأطراف)، فنعيد تسمية المجلد الحالي
+                // ليطابق التغيير مع الحفاظ على كل الملفات جواه
+                const desiredName = buildCaseFolderName(caseData, caseId);
+                if (desiredName && desiredName !== folderName) {
+                    const oldPath = path.join(storageFolder, folderName);
+                    const newPath = path.join(storageFolder, desiredName);
+                    try {
+                        if (fs.existsSync(oldPath) && !fs.existsSync(newPath)) {
+                            fs.renameSync(oldPath, newPath);
+                        }
+                    } catch (e) {
+                        console.warn('تعذر إعادة تسمية مجلد القضية:', e.message);
+                    }
+                    folderName = desiredName;
+                    mapping[caseId] = folderName;
+                    writeCaseFoldersIndex(mapping);
+                }
             }
         }
     } else if (!folderName) {
@@ -641,17 +675,40 @@ ipcMain.handle('saveFile', async (event, { caseId, filename, dataBase64, docType
         const caseFolder = getCaseFolderPath(caseId, caseData);
 
         const id = `${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
-        const cleanName = sanitizeName(filename);
-        const storedFileName = `${id}__${cleanName}`;
+
+        // امتداد الملف الأصلي (زي .pdf أو .docx) لازم يفضل زي ما هو دايمًا
+        const originalExt = path.extname(filename) || '';
+
+        // اسم المستند اللي هيظهر للمستخدم ويتسمى بيه الملف فعليًا على القرص:
+        // لو المستخدم اختار نوع المستند وقت الرفع (زي "صحيفة دعوى"، "مذكرة
+        // دفاع"، "حكم"...) يبقى ده اسمه بدل اسم الملف الأصلي (زي scan001.pdf)
+        const cleanDocType = docType ? sanitizeName(docType.replace(new RegExp(originalExt.replace('.', '\\.') + '$', 'i'), '')) : '';
+        const baseName = cleanDocType || sanitizeName(path.basename(filename, originalExt)) || 'مستند';
+
+        // لو في مستند بنفس الاسم ده مسجل قبل كده لنفس القضية (مثلاً اتنين
+        // "مذكرة دفاع")، أو حتى لو في ملف بنفس الاسم فعليًا على القرص، نضيف
+        // رقم تسلسلي عشان الاسم يفضل مميز ومايحصلش تعارض أو استبدال لملف قديم
+        const index = readIndex();
+        if (!index[caseId]) index[caseId] = [];
+
+        let displayName = `${baseName}${originalExt}`;
+        let counter = 2;
+        while (
+            index[caseId].some(f => (f.originalName || '').toLowerCase() === displayName.toLowerCase()) ||
+            fs.existsSync(path.join(caseFolder, displayName))
+        ) {
+            displayName = `${baseName} (${counter})${originalExt}`;
+            counter++;
+        }
+
+        const storedFileName = displayName;
         const fullPath = path.join(caseFolder, storedFileName);
 
         fs.writeFileSync(fullPath, Buffer.from(dataBase64, 'base64'));
 
-        const index = readIndex();
-        if (!index[caseId]) index[caseId] = [];
         index[caseId].push({
             id,
-            originalName: filename,
+            originalName: displayName,
             storedFileName,
             type: docType || '',
             uploadedAt: Date.now(),
@@ -919,13 +976,27 @@ ipcMain.handle('importCaseFolder', async (event, { caseId, folderName }) => {
             return { success: false, error: 'المجلد غير موجود على القرص' };
         }
 
-        // اربط المجلد ده بالقضية دي بشكل دائم، عشان أي مستند جديد يتضاف
-        // لنفس القضية بعد كده يروح لنفس المجلد ده بالظبط
         const mapping = readCaseFoldersIndex();
-        mapping[caseId] = folderName;
-        writeCaseFoldersIndex(mapping);
+        const existingFolderName = mapping[caseId];
 
-        const files = fs.readdirSync(folderPath, { withFileTypes: true })
+        // لو القضية دي أصلاً ليها مجلد مخصص ومختلف عن المجلد اللي بنستورده،
+        // منستبدلوش خالص (وإلا هنفقد إمكانية الوصول للمستندات القديمة اللي
+        // فهرسها لسه بيشاور على المجلد القديم). بدل كده بننقل كل ملفات
+        // المجلد الجديد لجوه المجلد الأصلي بتاع القضية، عشان يفضل مجلد
+        // واحد بس لكل قضية طول عمرها، فيه كل مستنداتها من غير تكرار.
+        let effectiveFolderName = folderName;
+        if (existingFolderName && existingFolderName !== folderName) {
+            mergeFolderInto(storageFolder, folderName, existingFolderName, caseId);
+            effectiveFolderName = existingFolderName;
+        } else if (!existingFolderName) {
+            // القضية معهاش مجلد متسجل قبل كده؛ اربطها بالمجلد ده بشكل دائم
+            // عشان أي مستند جديد يتضاف بعد كده يروح لنفس المجلد ده بالظبط
+            mapping[caseId] = folderName;
+            writeCaseFoldersIndex(mapping);
+        }
+
+        const effectiveFolderPath = path.join(storageFolder, effectiveFolderName);
+        const files = fs.readdirSync(effectiveFolderPath, { withFileTypes: true })
             .filter(f => f.isFile() && isImportableDocument(f.name));
         const index = readIndex();
         if (!index[caseId]) index[caseId] = [];
@@ -937,7 +1008,7 @@ ipcMain.handle('importCaseFolder', async (event, { caseId, folderName }) => {
             if (existingStoredNames.has(f.name)) continue; // متسجل بالفعل، تجاهله عشان ميتكررش
             let mtime = Date.now();
             try {
-                mtime = fs.statSync(path.join(folderPath, f.name)).mtimeMs;
+                mtime = fs.statSync(path.join(effectiveFolderPath, f.name)).mtimeMs;
             } catch (e) { /* تجاهل */ }
 
             index[caseId].push({
