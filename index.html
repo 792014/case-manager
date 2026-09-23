@@ -4495,6 +4495,20 @@
                     lastSavedAt: Date.now()
                 };
 
+                // شبكة أمان: لو كل الفئات فاضية تمامًا في نفس اللحظة، ده غالبًا
+                // مؤشر على فشل تحميل مؤقت (مش مسح متعمد فعلي من المستخدم)،
+                // فمنسمحش برفع البيانات دي لـ Firebase عشان ميتمسحش أي بيانات
+                // حقيقية موجودة هناك فعلاً لباقي الأجهزة (الموبايل مثلاً).
+                const isCompletelyEmpty = [
+                    cases, favorableJudgments, againstJudgments, reservedCases,
+                    cancelledCases, suspendedCases, archivedCases, notifications, departments
+                ].every(arr => !Array.isArray(arr) || arr.length === 0);
+
+                if (isCompletelyEmpty) {
+                    console.warn('تم تجاهل محاولة حفظ بيانات فاضية بالكامل لـ Firebase (حماية من فقدان البيانات)');
+                    return;
+                }
+
                 let stored = false;
                 if (window.electronAPI && window.electronAPI.saveData) {
                     try {
@@ -6551,7 +6565,7 @@
             const legacyNames = cases.map(c => normalizeDeptName(c.department)).filter(d => d !== '');
             const deptNames = [...new Set([...registeredNames, ...legacyNames])].sort((a, b) => a.localeCompare('ar'));
             
-            prevSessionsDepartmentSelect.innerHTML = '<option value="">-- اختر الدائرة --</option>' +
+            prevSessionsDepartmentSelect.innerHTML = '<option value="">جميع الدوائر</option>' +
                 deptNames.map(d => {
                     const dept = getDepartmentByName(d);
                     const label = dept && dept.conveningDay ? `${d} (${dept.conveningDay})` : d;
@@ -6593,15 +6607,12 @@
             const summaryEl = document.getElementById('prev-sessions-summary');
             const countEl = document.getElementById('prev-sessions-count');
             
-            if (!selectedDepartment) {
-                prevSessionsTableBody.innerHTML = '<tr><td colspan="9" style="text-align:center; padding:20px; color:#999;">يرجى اختيار الدائرة لعرض القضايا</td></tr>';
-                if (summaryEl) summaryEl.style.display = 'none';
-                return;
-            }
-            
             // مطابقة تلقائية بالاسم (بعد التطبيع) بين الدائرة المختارة وحقل الدائرة في كل قضية،
-            // سواء كانت القضية مرتبطة بدائرة مسجلة حديثًا أو قضية قديمة كُتبت فيها الدائرة يدويًا
-            let filteredCases = cases.filter(c => normalizeDeptName(c.department) === selectedDepartment);
+            // سواء كانت القضية مرتبطة بدائرة مسجلة حديثًا أو قضية قديمة كُتبت فيها الدائرة يدويًا.
+            // لو "جميع الدوائر" هي المختارة (قيمة فاضية)، نعرض كل القضايا مجمّعة حسب كل دائرة.
+            let filteredCases = selectedDepartment
+                ? cases.filter(c => normalizeDeptName(c.department) === selectedDepartment)
+                : cases.slice();
             
             if (searchTerm) {
                 filteredCases = filteredCases.filter(c => {
@@ -6612,7 +6623,9 @@
             
             if (summaryEl && countEl) {
                 summaryEl.style.display = 'block';
-                countEl.textContent = `عدد القضايا في الدائرة: ${filteredCases.length}`;
+                countEl.textContent = selectedDepartment
+                    ? `عدد القضايا في الدائرة: ${filteredCases.length}`
+                    : `عدد القضايا في جميع الدوائر: ${filteredCases.length}`;
             }
             
             if (filteredCases.length === 0) {
@@ -6620,8 +6633,18 @@
                 return;
             }
             
+            const rowEntries = selectedDepartment
+                ? filteredCases.map(item => ({ isHeader: false, item }))
+                : groupByDepartmentForDisplay(filteredCases);
+            
             let rowsHTML = '';
-            filteredCases.forEach(caseItem => {
+            rowEntries.forEach(entry => {
+                if (entry.isHeader) {
+                    rowsHTML += buildDepartmentHeaderRowHtml(9, entry.department, entry.count);
+                    return;
+                }
+                
+                const caseItem = entry.item;
                 const movement = getLastSessionMovement(caseItem);
                 
                 rowsHTML += `
@@ -13644,7 +13667,8 @@
                             cancelledCases: [],
                             suspendedCases: [],
                             archivedCases: [],
-                            notifications: []
+                            notifications: [],
+                            forceEmpty: true
                         });
                     } catch (e) {
                         console.warn('Failed to save empty data via Electron API', e);

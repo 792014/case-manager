@@ -60,6 +60,105 @@ function getIndexFilePath() {
     return path.join(getStorageFolder(), 'documents-index.json');
 }
 
+// ---------------------------------------------------------------
+// نسخة احتياطية محلية دائمة لبيانات القضايا (cases, judgments...) على
+// قرص الجهاز، جنب مجلد المستندات نفسه. دي كانت مفقودة فعليًا من قبل رغم
+// إن كود الواجهة (index.html) مكتوب بيتوقعها وبينادي عليها - وهو بالظبط
+// السبب اللي كان بيخلي التطبيق يعتمد بشكل كامل على وصول Firebase وقت فتح
+// البرنامج؛ لو حصل أي انقطاع مؤقت في الشبكة وقت البدء، كان بيظهر للمستخدم
+// إن كل البيانات اختفت رغم إنها لسه موجودة فعليًا على Firebase.
+function getAppDataFilePath() {
+    return path.join(getStorageFolder(), 'app-data.json');
+}
+
+function getAppDataBackupFilePath() {
+    return path.join(getStorageFolder(), 'app-data.backup.json');
+}
+
+const TRACKED_DATA_KEYS = [
+    'cases', 'favorableJudgments', 'againstJudgments', 'reservedCases',
+    'cancelledCases', 'suspendedCases', 'archivedCases', 'notifications', 'departments'
+];
+
+function isCompletelyEmptyData(data) {
+    if (!data || typeof data !== 'object') return true;
+    return TRACKED_DATA_KEYS.every(key => !Array.isArray(data[key]) || data[key].length === 0);
+}
+
+ipcMain.handle('loadData', async () => {
+    try {
+        const p = getAppDataFilePath();
+        if (fs.existsSync(p)) {
+            const raw = fs.readFileSync(p, 'utf-8');
+            return JSON.parse(raw);
+        }
+        return null;
+    } catch (e) {
+        console.warn('تعذرت قراءة ملف النسخة المحلية للبيانات، سيتم تجربة النسخة الاحتياطية:', e.message);
+        // الملف الأساسي اتعطب (مثلاً بسبب انقطاع كهرباء أثناء الكتابة)؛
+        // نحاول نرجع للنسخة الاحتياطية بدل ما نرجع فاضي
+        try {
+            const backupPath = getAppDataBackupFilePath();
+            if (fs.existsSync(backupPath)) {
+                return JSON.parse(fs.readFileSync(backupPath, 'utf-8'));
+            }
+        } catch (e2) {
+            console.warn('تعذرت قراءة النسخة الاحتياطية أيضًا:', e2.message);
+        }
+        return null;
+    }
+});
+
+ipcMain.handle('saveData', async (event, data) => {
+    try {
+        if (!data || typeof data !== 'object') {
+            return { success: false, error: 'بيانات غير صالحة' };
+        }
+
+        const p = getAppDataFilePath();
+        const forceEmpty = data.forceEmpty === true;
+        // الحقل ده مجرد إشارة داخلية للسماح بحفظ بيانات فاضية عمدًا (زر "مسح
+        // جميع البيانات" مثلاً)؛ مش جزء من شكل البيانات المحفوظ فعليًا
+        if ('forceEmpty' in data) delete data.forceEmpty;
+
+        // شبكة أمان: لو الملف الموجود فيه بيانات حقيقية، ومطلوب نحفظ محله
+        // بيانات فاضية تمامًا من كل الفئات، ده مؤشر قوي على خطأ (فشل تحميل
+        // مؤقت مثلاً) مش رغبة حقيقية في مسح كل حاجة. في الحالة دي منكتبش
+        // فوق الملف، ونرجع فشل بدل ما نفقد البيانات المحفوظة فعليًا. الاستثناء
+        // الوحيد: لو الطلب مُعلّم صراحةً كمسح متعمد (forceEmpty).
+        if (!forceEmpty && isCompletelyEmptyData(data) && fs.existsSync(p)) {
+            try {
+                const existing = JSON.parse(fs.readFileSync(p, 'utf-8'));
+                if (!isCompletelyEmptyData(existing)) {
+                    console.warn('تم تجاهل محاولة حفظ بيانات فاضية فوق نسخة محلية فيها بيانات حقيقية');
+                    return { success: false, error: 'رفض الحفظ: البيانات الجديدة فاضية بالكامل بينما الملف المحفوظ فيه بيانات' };
+                }
+            } catch (e) { /* الملف الحالي معطوب أصلاً، كمّل عادي */ }
+        }
+
+        // قبل الاستبدال، نحتفظ بنسخة من آخر حفظة صحيحة كنسخة احتياطية دوّارة
+        try {
+            if (fs.existsSync(p)) {
+                fs.copyFileSync(p, getAppDataBackupFilePath());
+            }
+        } catch (e) {
+            console.warn('تعذر أخذ نسخة احتياطية قبل الحفظ:', e.message);
+        }
+
+        // كتابة ذرية: نكتب في ملف مؤقت الأول ثم نستبدل الملف الأصلي دفعة
+        // واحدة، عشان لو حصل انقطاع كهرباء أو انهيار مفاجئ أثناء الكتابة
+        // نفسها، الملف الأصلي يفضل سليم زي ما كان
+        const tmpPath = `${p}.tmp`;
+        fs.writeFileSync(tmpPath, JSON.stringify(data, null, 2), 'utf-8');
+        fs.renameSync(tmpPath, p);
+
+        return { success: true };
+    } catch (e) {
+        console.error('saveData error:', e);
+        return { success: false, error: e.message };
+    }
+});
+
 function readIndex() {
     try {
         const p = getIndexFilePath();
@@ -576,21 +675,34 @@ function createWindow() {
     // بدون هذا الإعداد، Electron بيمنع أي نافذة جديدة تتفتح بـ window.open()
     // بشكل افتراضي، وده اللي كان بيسبب ظهور نافذة بيضاء فاضية عند محاولة
     // عرض مستند (اللي بيستخدم window.open داخليًا). هنا بنسمح بفتحها صراحة.
-    mainWindow.webContents.setWindowOpenHandler(() => {
-        return {
-            action: 'allow',
-            overrideBrowserWindowOptions: {
-                autoHideMenuBar: true,
-                webPreferences: {
-                    contextIsolation: true,
-                    nodeIntegration: false,
-                    sandbox: false,
-                    // لازم نفعّل ده صراحة، وإلا وسم <embed type="application/pdf">
-                    // هيفضل شاشة بيضاء فاضية من غير ما يعرض محتوى ملف الـ PDF
-                    plugins: true
+    mainWindow.webContents.setWindowOpenHandler(({ url }) => {
+        // نوافذ العرض/الطباعة الداخلية في البرنامج (زي معاينة المستندات
+        // وتقارير الطباعة) بتتفتح بـ window.open('', '_blank') من غير رابط
+        // حقيقي (about:blank)، فديه لازم تفضل تتفتح جوه نافذة تابعة للبرنامج
+        if (!url || url === 'about:blank') {
+            return {
+                action: 'allow',
+                overrideBrowserWindowOptions: {
+                    autoHideMenuBar: true,
+                    webPreferences: {
+                        contextIsolation: true,
+                        nodeIntegration: false,
+                        sandbox: false,
+                        // لازم نفعّل ده صراحة، وإلا وسم <embed type="application/pdf">
+                        // هيفضل شاشة بيضاء فاضية من غير ما يعرض محتوى ملف الـ PDF
+                        plugins: true
+                    }
                 }
-            }
-        };
+            };
+        }
+
+        // أي رابط خارجي حقيقي (زي روابط مشاركة واتساب wa.me) لازم يتفتح
+        // بتطبيق واتساب نفسه أو المتصفح الافتراضي المسجل دخوله بحساب
+        // المستخدم على الجهاز، مش جوه نافذة جديدة فاضية تابعة للبرنامج —
+        // النافذة الجديدة دي معندهاش أي جلسة واتساب مسجلة، فكانت المشاركة
+        // بتفشل أو تفضل عالقة على صفحة تسجيل دخول واتساب ويب فاضية.
+        shell.openExternal(url).catch(err => console.warn('تعذر فتح الرابط الخارجي:', err.message));
+        return { action: 'deny' };
     });
 
     mainWindow.on('closed', () => {
