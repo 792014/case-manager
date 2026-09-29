@@ -77,7 +77,8 @@ function getAppDataBackupFilePath() {
 
 const TRACKED_DATA_KEYS = [
     'cases', 'favorableJudgments', 'againstJudgments', 'reservedCases',
-    'cancelledCases', 'suspendedCases', 'archivedCases', 'notifications', 'departments'
+    'cancelledCases', 'suspendedCases', 'archivedCases', 'notifications', 'departments',
+    'underFilingCases', 'underFilingAppeals'
 ];
 
 function isCompletelyEmptyData(data) {
@@ -375,28 +376,78 @@ function mergeFolderInto(storageFolder, sourceFolderName, targetFolderName, case
 // لو اتبعتت caseData (بيانات المدعي/المدعي عليه/الرقم/السنة)، وكان اسم
 // المجلد القديم مختلف عن الاسم المفروض حاليًا (يعني بيانات القضية اتغيرت)،
 // بيتم إعادة تسمية المجلد تلقائيًا مع الحفاظ على كل الملفات جواه.
+// المجلد الأساسي لكل مستندات قسم "تحت الرفع" (قضايا واستئنافات)، جوه نفس
+// مجلد التخزين الرئيسي اللي بيه كل مستندات القضايا في البرنامج
+function getUnderFilingBaseFolder() {
+    const base = path.join(getStorageFolder(), 'تحت الرفع');
+    if (!fs.existsSync(base)) {
+        fs.mkdirSync(base, { recursive: true });
+    }
+    return base;
+}
+
+// اسم مجلد سجل "تحت الرفع" (قضية أو استئناف): برقم الاستئناف/القيد + أسماء
+// الخصوم، ولو معندوش رقم لسه، بأسماء الخصوم بس
+function buildUnderFilingFolderName(caseData, caseId) {
+    const plaintiff = String((caseData && caseData.plaintiff) || '').trim();
+    const defendant = String((caseData && caseData.defendant) || '').trim();
+    const number = String((caseData && caseData.number) || '').trim();
+
+    const parts = [];
+    if (number) parts.push(number);
+    if (plaintiff) parts.push(plaintiff);
+    if (defendant) parts.push(defendant);
+
+    let name = parts.length ? parts.join('_') : `سجل_تحت_الرفع_${caseId}`;
+
+    name = sanitizeName(name);
+    const MAX_LEN = 120;
+    if (name.length > MAX_LEN) {
+        name = name.slice(0, MAX_LEN).trim();
+    }
+    return name;
+}
+
+const UNDER_FILING_PREFIX = 'تحت الرفع' + path.sep;
+
 function getCaseFolderPath(caseId, caseData) {
-    const storageFolder = getStorageFolder();
+    const root = getStorageFolder();
     const mapping = readCaseFoldersIndex();
-    let folderName = mapping[caseId];
+    const storedRelPath = mapping[caseId];
+
+    // تحديد هل السجل ده تابع لقسم "تحت الرفع" ولا لا: من العلم underFiling
+    // في البيانات الجديدة (أول مرة أو لما البيانات تتغير)، أو من شكل المسار
+    // المحفوظ مسبقًا في الفهرس (في المرات اللي مفيش فيها caseData، زي الحذف
+    // أو الفتح أو القراءة)
+    const isUnderFiling = caseData
+        ? !!caseData.underFiling
+        : !!(storedRelPath && storedRelPath.indexOf(UNDER_FILING_PREFIX) === 0);
+
+    const baseDir = isUnderFiling ? getUnderFilingBaseFolder() : root;
+    const nameBuilder = isUnderFiling ? buildUnderFilingFolderName : buildCaseFolderName;
+
+    // اسم المجلد الفعلي جوه baseDir (من غير بادئة "تحت الرفع/" لو موجودة)
+    let folderName = storedRelPath && storedRelPath.indexOf(UNDER_FILING_PREFIX) === 0
+        ? storedRelPath.slice(UNDER_FILING_PREFIX.length)
+        : storedRelPath;
 
     if (caseData) {
         // ندور دايمًا (مش أول مرة بس) على مجلد حقيقي موجود بالفعل على القرص
         // خاص بنفس القضية دي، غير المجلد المربوط حاليًا. لو لقينا واحد، ده
         // معناه إن الربط الحالي (لو موجود) كان غلط من محاولة قديمة، فبننقل
         // أي ملفات كانت اتحفظت فيه للمجلد الصحيح، ونصحح الربط.
-        const realFolder = findExistingFolderForCase(storageFolder, caseData, folderName);
+        const realFolder = findExistingFolderForCase(baseDir, caseData, folderName);
 
         if (realFolder && realFolder !== folderName) {
             if (folderName) {
-                mergeFolderInto(storageFolder, folderName, realFolder, caseId);
+                mergeFolderInto(baseDir, folderName, realFolder, caseId);
             }
             folderName = realFolder;
-            mapping[caseId] = folderName;
+            mapping[caseId] = isUnderFiling ? path.join('تحت الرفع', folderName) : folderName;
             writeCaseFoldersIndex(mapping);
         } else if (!folderName) {
-            folderName = buildCaseFolderName(caseData, caseId);
-            mapping[caseId] = folderName;
+            folderName = nameBuilder(caseData, caseId);
+            mapping[caseId] = isUnderFiling ? path.join('تحت الرفع', folderName) : folderName;
             writeCaseFoldersIndex(mapping);
         } else {
             // معندناش مجلد حقيقي تاني بنفس بيانات القضية، بس قبل ما نثق في
@@ -405,24 +456,24 @@ function getCaseFolderPath(caseId, caseData) {
             // اللي كان بيحصل فيه الخطأ قبل كده: قضيتين مختلفتين اتسجلوا على
             // نفس المجلد بالغلط بسبب تطابق الرقم والسنة بالصدفة).
             const otherCaseIdsSharingFolder = Object.keys(mapping).filter(
-                id => id !== caseId && mapping[id] === folderName
+                id => id !== caseId && mapping[id] === (isUnderFiling ? path.join('تحت الرفع', folderName) : folderName)
             );
 
             if (otherCaseIdsSharingFolder.length > 0) {
                 // المجلد ده مستخدم فعليًا من قضية تانية غيرنا؛ منلمسوش خالص
                 // (عشان محفضاش ملفاتها)، وبننشئ مجلد جديد صحيح مخصص للقضية
                 // الحالية بس، ونحدّث الربط بتاعها هي بس
-                folderName = buildCaseFolderName(caseData, caseId);
-                mapping[caseId] = folderName;
+                folderName = nameBuilder(caseData, caseId);
+                mapping[caseId] = isUnderFiling ? path.join('تحت الرفع', folderName) : folderName;
                 writeCaseFoldersIndex(mapping);
             } else {
                 // المجلد ده فعلاً بتاع القضية دي وحدها؛ ممكن بس بيانات القضية
                 // اتغيرت (رقمها أو اسم الأطراف)، فنعيد تسمية المجلد الحالي
                 // ليطابق التغيير مع الحفاظ على كل الملفات جواه
-                const desiredName = buildCaseFolderName(caseData, caseId);
+                const desiredName = nameBuilder(caseData, caseId);
                 if (desiredName && desiredName !== folderName) {
-                    const oldPath = path.join(storageFolder, folderName);
-                    const newPath = path.join(storageFolder, desiredName);
+                    const oldPath = path.join(baseDir, folderName);
+                    const newPath = path.join(baseDir, desiredName);
                     try {
                         if (fs.existsSync(oldPath) && !fs.existsSync(newPath)) {
                             fs.renameSync(oldPath, newPath);
@@ -431,18 +482,18 @@ function getCaseFolderPath(caseId, caseData) {
                         console.warn('تعذر إعادة تسمية مجلد القضية:', e.message);
                     }
                     folderName = desiredName;
-                    mapping[caseId] = folderName;
+                    mapping[caseId] = isUnderFiling ? path.join('تحت الرفع', folderName) : folderName;
                     writeCaseFoldersIndex(mapping);
                 }
             }
         }
     } else if (!folderName) {
         folderName = sanitizeName(String(caseId));
-        mapping[caseId] = folderName;
+        mapping[caseId] = isUnderFiling ? path.join('تحت الرفع', folderName) : folderName;
         writeCaseFoldersIndex(mapping);
     }
 
-    const fullPath = path.join(storageFolder, folderName);
+    const fullPath = path.join(baseDir, folderName);
     fs.mkdirSync(fullPath, { recursive: true });
     return fullPath;
 }

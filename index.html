@@ -122,7 +122,8 @@
             });
         })();
     </script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="vendor/chart.umd.min.js"></script>
+    <script>window.Chart || document.write('<script src="https://cdn.jsdelivr.net/npm/chart.js"><\/script>');</script>
     <!-- Mammoth removed: offline behavior uses system apps to open files natively -->
     
     <style>
@@ -697,6 +698,14 @@
         
         .btn-purple:hover {
             background: linear-gradient(to right, #8e44ad, var(--purple-color));
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(to right, #95a5a6, #7f8c8d);
+        }
+        
+        .btn-secondary:hover {
+            background: linear-gradient(to right, #7f8c8d, #95a5a6);
         }
         
         .btn-gold {
@@ -2052,6 +2061,69 @@
                 font-size: 30px !important;
             }
         }
+    
+        /* ================= لوحة التحكم الاحترافية (pd-) ================= */
+        #dashboard { background: linear-gradient(180deg, #f4f7fc 0%, #ffffff 260px); }
+        .pd-head { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:14px; margin-bottom:14px; padding-bottom:14px; border-bottom:1px solid #e3e9f4; }
+        .pd-title { display:flex; align-items:center; gap:12px; }
+        .pd-title h2 { margin:0; color:var(--primary-color); font-size:22px; line-height:1.2; }
+        .pd-title p { margin:2px 0 0; color:#6b7a90; font-size:13px; }
+        .pd-updated { display:inline-block; margin-inline-start:6px; padding:1px 8px; border-radius:20px; background:#e8f1fd; color:#1565c0; font-size:11px; }
+        .pd-controls { display:flex; flex-wrap:wrap; align-items:center; gap:8px; }
+        .pd-filter { display:flex; align-items:center; gap:6px; background:#fff; border:1px solid #d5deed; border-radius:8px; padding:0 10px; height:38px; color:#6b7a90; }
+        .pd-filter select { border:0; outline:0; background:transparent; font-size:13px; color:#22324a; min-width:110px; max-width:190px; cursor:pointer; }
+        .pd-btn { height:38px; padding:0 14px; border-radius:8px; border:1px solid transparent; cursor:pointer; font-size:13px; display:inline-flex; align-items:center; gap:7px; transition:all .2s; }
+        .pd-btn-ghost { background:#fff; border-color:#d5deed; color:#41546f; padding:0 12px; }
+        .pd-btn-ghost:hover { background:#eef3fb; }
+        .pd-btn-main { background:linear-gradient(135deg, var(--primary-color), var(--secondary-color)); color:#fff; box-shadow:0 3px 10px rgba(11,61,145,.25); }
+        .pd-btn-main:hover { transform:translateY(-1px); box-shadow:0 5px 14px rgba(11,61,145,.32); }
+        .pd-filter-note { margin-bottom:12px; padding:8px 12px; border-radius:8px; background:#fff8e6; border:1px solid #f5d98b; color:#8a6100; font-size:13px; }
+
+        .pd-kpis { display:grid; grid-template-columns:repeat(6, minmax(0,1fr)); gap:12px; margin-bottom:16px; }
+        .pd-kpi { --c:#1976d2; position:relative; display:flex; align-items:center; gap:10px; padding:12px; background:#fff; border:1px solid #e6ecf5; border-radius:12px; cursor:pointer; overflow:hidden; transition:transform .2s, box-shadow .2s; }
+        .pd-kpi::before { content:""; position:absolute; inset-block:0; inset-inline-start:0; width:4px; background:var(--c); }
+        .pd-kpi:hover { transform:translateY(-3px); box-shadow:0 8px 22px rgba(20,40,80,.12); }
+        .pd-kpi-ic { flex:0 0 42px; height:42px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:18px; color:var(--c); background:color-mix(in srgb, var(--c) 12%, white); }
+        .pd-kpi-b h3 { margin:0; font-size:24px; line-height:1.1; color:#1b2a41; font-weight:700; }
+        .pd-kpi-b p { margin:2px 0 0; font-size:12.5px; color:#41546f; font-weight:600; }
+        .pd-kpi-b small { display:block; margin-top:1px; font-size:10.5px; color:#8592a6; min-height:14px; line-height:1.3; }
+
+        .pd-grid { display:grid; grid-template-columns:repeat(12, minmax(0,1fr)); gap:16px; margin-bottom:18px; }
+        .pd-c4 { grid-column:span 4; } .pd-c6 { grid-column:span 6; } .pd-c8 { grid-column:span 8; } .pd-c12 { grid-column:span 12; }
+        .pd-card { background:#fff; border:1px solid #e6ecf5; border-radius:14px; padding:16px; box-shadow:0 2px 10px rgba(20,40,80,.05); min-width:0; }
+        .pd-card-h { display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:10px; padding-bottom:10px; border-bottom:1px solid #eef2f8; }
+        .pd-card-h h3 { margin:0; padding:0; border:0; font-size:15px; color:var(--primary-color); display:flex; align-items:center; flex-wrap:wrap; gap:6px; }
+        .pd-hint { font-size:11px; font-weight:400; color:#94a0b3; }
+        .pd-mini { flex:0 0 auto; width:30px; height:30px; border-radius:8px; border:1px solid #dbe3f0; background:#fff; color:#5b6b83; cursor:pointer; }
+        .pd-mini:hover { background:var(--primary-color); color:#fff; border-color:var(--primary-color); }
+        .pd-chart { position:relative; height:260px; }
+        .pd-chart-tall { height:320px; }
+        .pd-empty { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; background:rgba(255,255,255,.92); color:#94a0b3; font-size:14px; border-radius:8px; }
+        .pd-empty[hidden] { display:none; }
+        .pd-muted { color:#8592a6; font-size:13px; line-height:1.8; }
+        .pd-scroll { max-height:300px; overflow-y:auto; }
+        .pd-day { max-height:280px; overflow-y:auto; }
+        .pd-day-item { padding:9px 10px; margin-bottom:8px; border:1px solid #e6ecf5; border-inline-start:3px solid #1976d2; border-radius:8px; background:#fafcff; font-size:13px; }
+        .pd-day-item strong { color:#0b3d91; }
+        .pd-day-item span { display:block; color:#6b7a90; font-size:12px; margin-top:2px; }
+        .pd-day-title { margin-bottom:10px; font-weight:700; color:#22324a; font-size:14px; }
+
+        .pd-table-wrap { overflow-x:auto; }
+        .pd-table { width:100%; border-collapse:collapse; font-size:13px; }
+        .pd-table th { background:#eef3fb; color:#22324a; padding:9px 8px; text-align:center; white-space:nowrap; border-bottom:2px solid #d5deed; }
+        .pd-table td { padding:8px; text-align:center; border-bottom:1px solid #edf1f7; }
+        .pd-table td:first-child { text-align:right; font-weight:600; color:#0b3d91; }
+        .pd-table tbody tr { cursor:pointer; transition:background .15s; }
+        .pd-table tbody tr:hover { background:#f3f7fd; }
+        .pd-table tbody tr.pd-sel { background:#e3eefc; }
+        .pd-table tfoot td { background:#f7f9fc; font-weight:700; border-top:2px solid #d5deed; cursor:default; }
+        .pd-quick { margin:0; }
+        .pd-quick .quick-action-btn { min-width:130px; }
+
+        @media (max-width: 1100px) { .pd-c4 { grid-column:span 6; } .pd-c8 { grid-column:span 12; } .pd-kpis { grid-template-columns:repeat(4, minmax(0,1fr)); } }
+        @media (max-width: 800px) { .pd-kpis { grid-template-columns:repeat(3, minmax(0,1fr)); } }
+        @media (max-width: 700px) { .pd-c4, .pd-c6, .pd-c8 { grid-column:span 12; } .pd-controls { width:100%; } .pd-filter { flex:1 1 140px; } .pd-filter select { max-width:none; width:100%; } .pd-kpis { grid-template-columns:repeat(2, minmax(0,1fr)); } .pd-kpi { padding:11px; gap:9px; } .pd-kpi-ic { flex-basis:38px; height:38px; font-size:17px; } .pd-kpi-b h3 { font-size:22px; } }
+        @media print { #dashboard .pd-controls, #dashboard .pd-mini, #dashboard .pd-quick { display:none !important; } }
     </style>
 </head>
 <body>
@@ -2151,78 +2223,121 @@
                 <li><a href="#" class="nav-link" data-section="archived-cases-page"><i class="fas fa-archive icon-large icon-teal"></i> الأرشيف</a></li>
                 <li><a href="#" class="nav-link" data-section="session-roll"><i class="fas fa-file-alt icon-large icon-purple"></i> رول الجلسة</a></li>
                 <li><a href="#" class="nav-link" data-section="previous-sessions"><i class="fas fa-history icon-large icon-teal"></i> الجلسات السابقة</a></li>
+                <li><a href="#" class="nav-link" data-section="under-filing"><i class="fas fa-cloud-upload-alt icon-large icon-navy"></i> تحت الرفع</a></li>
                 <li><a href="#" class="nav-link" data-section="data-management"><i class="fas fa-database icon-large icon-silver"></i> إدارة البيانات</a></li>
             </ul>
         </nav>
         
         <!-- قسم لوحة التحكم -->
         <section id="dashboard" class="section active">
-            <h2><span class="dashboard-badge"><i class="fas fa-scale-balanced"></i></span> لوحة التحكم</h2>
-            
-            <div class="stats-cards">
-                <div class="stat-card">
-                    <h3 id="total-cases-dash">0</h3>
-                    <p>إجمالي القضايا</p>
+            <div class="pd-head">
+                <div class="pd-title">
+                    <span class="dashboard-badge"><i class="fas fa-scale-balanced"></i></span>
+                    <div>
+                        <h2>لوحة التحكم</h2>
+                        <p>نظرة شاملة على جميع أقسام النظام — تتحدث تلقائيًا مع بياناتك <span class="pd-updated" id="pd-updated"></span></p>
+                    </div>
                 </div>
-                <div class="stat-card">
-                    <h3 id="upcoming-cases-dash">0</h3>
-                    <p>قضايا قادمة</p>
-                </div>
-                <div class="stat-card">
-                    <h3 id="expired-cases-dash">0</h3>
-                    <p>جلسات منقضية</p>
-                </div>
-                <div class="stat-card">
-                    <h3 id="favorable-judgments-dash">0</h3>
-                    <p>أحكام صالح</p>
-                </div>
-                <div class="stat-card">
-                    <h3 id="against-judgments-dash">0</h3>
-                    <p>أحكام ضد</p>
-                </div>
-                <div class="stat-card">
-                    <h3 id="reserved-cases-dash">0</h3>
-                    <p>قضايا محجوزة</p>
-                </div>
-                <div class="stat-card">
-                    <h3 id="suspended-cases-dash">0</h3>
-                    <p>قضايا موقوفة</p>
-                </div>
-                <div class="stat-card">
-                    <h3 id="cancelled-cases-dash">0</h3>
-                    <p>قضايا مشطوبة</p>
-                </div>
-                <div class="stat-card">
-                    <h3 id="archived-cases-dash">0</h3>
-                    <p>قضايا مؤرشفة</p>
+                <div class="pd-controls">
+                    <label class="pd-filter"><i class="fas fa-calendar"></i>
+                        <select id="pd-year" title="تصفية حسب سنة الدعوى"><option value="all">كل السنوات</option></select>
+                    </label>
+                    <label class="pd-filter"><i class="fas fa-building"></i>
+                        <select id="pd-dept" title="تصفية حسب الدائرة"><option value="all">كل الدوائر</option></select>
+                    </label>
+                    <button type="button" class="pd-btn pd-btn-ghost" id="pd-reset-filters" title="إلغاء التصفية"><i class="fas fa-filter-circle-xmark"></i></button>
+                    <button type="button" class="pd-btn pd-btn-ghost" id="pd-refresh" title="تحديث"><i class="fas fa-rotate"></i></button>
+                    <button type="button" class="pd-btn pd-btn-main" id="pd-print-all"><i class="fas fa-print"></i> طباعة الإحصائيات</button>
                 </div>
             </div>
-            
-            <div class="dashboard-grid">
-                <div class="dashboard-card">
-                    <h3><i class="fas fa-exclamation-triangle icon-orange"></i> القضايا العاجلة</h3>
-                    <div id="urgent-cases-list">
+            <div class="pd-filter-note" id="pd-filter-note" hidden></div>
+
+            <div class="pd-kpis">
+                <div class="pd-kpi" data-go="cases-list" style="--c:#1976d2"><div class="pd-kpi-ic"><i class="fas fa-folder-open"></i></div><div class="pd-kpi-b"><h3 id="total-cases-dash">0</h3><p>إجمالي القضايا</p><small id="pd-sub-total"></small></div></div>
+                <div class="pd-kpi" data-go="cases-list" style="--c:#0d9488"><div class="pd-kpi-ic"><i class="fas fa-calendar-check"></i></div><div class="pd-kpi-b"><h3 id="upcoming-cases-dash">0</h3><p>قضايا قادمة</p><small id="pd-sub-upcoming"></small></div></div>
+                <div class="pd-kpi" data-go="bulk-sessions" style="--c:#e67e22"><div class="pd-kpi-ic"><i class="fas fa-hourglass-end"></i></div><div class="pd-kpi-b"><h3 id="expired-cases-dash">0</h3><p>جلسات منقضية</p><small>تحتاج إلى ترحيل</small></div></div>
+                <div class="pd-kpi" data-go="judgments" style="--c:#27ae60"><div class="pd-kpi-ic"><i class="fas fa-thumbs-up"></i></div><div class="pd-kpi-b"><h3 id="favorable-judgments-dash">0</h3><p>أحكام صالح</p><small id="pd-sub-fav"></small></div></div>
+                <div class="pd-kpi" data-go="judgments" style="--c:#c0392b"><div class="pd-kpi-ic"><i class="fas fa-thumbs-down"></i></div><div class="pd-kpi-b"><h3 id="against-judgments-dash">0</h3><p>أحكام ضد</p><small id="pd-sub-against"></small></div></div>
+                <div class="pd-kpi" data-go="judgments" style="--c:#8e44ad"><div class="pd-kpi-ic"><i class="fas fa-gavel"></i></div><div class="pd-kpi-b"><h3 id="reserved-cases-dash">0</h3><p>قضايا محجوزة</p><small>للحكم</small></div></div>
+                <div class="pd-kpi" data-go="suspended-cases-page" style="--c:#f39c12"><div class="pd-kpi-ic"><i class="fas fa-pause"></i></div><div class="pd-kpi-b"><h3 id="suspended-cases-dash">0</h3><p>قضايا موقوفة</p><small></small></div></div>
+                <div class="pd-kpi" data-go="cancelled-cases-page" style="--c:#e74c3c"><div class="pd-kpi-ic"><i class="fas fa-ban"></i></div><div class="pd-kpi-b"><h3 id="cancelled-cases-dash">0</h3><p>قضايا مشطوبة</p><small></small></div></div>
+                <div class="pd-kpi" data-go="archived-cases-page" style="--c:#7f8c8d"><div class="pd-kpi-ic"><i class="fas fa-box-archive"></i></div><div class="pd-kpi-b"><h3 id="archived-cases-dash">0</h3><p>قضايا مؤرشفة</p><small></small></div></div>
+                <div class="pd-kpi" data-go="under-filing" style="--c:#34495e"><div class="pd-kpi-ic"><i class="fas fa-cloud-upload-alt"></i></div><div class="pd-kpi-b"><h3 id="pd-kpi-uf">0</h3><p>تحت الرفع</p><small id="pd-sub-uf"></small></div></div>
+                <div class="pd-kpi" data-go="judgments" style="--c:#16a085"><div class="pd-kpi-ic"><i class="fas fa-percent"></i></div><div class="pd-kpi-b"><h3 id="pd-kpi-win">0%</h3><p>نسبة الأحكام لصالح</p><small>من إجمالي الأحكام</small></div></div>
+                <div class="pd-kpi" data-go="session-roll" style="--c:#2980b9"><div class="pd-kpi-ic"><i class="fas fa-calendar-week"></i></div><div class="pd-kpi-b"><h3 id="pd-kpi-week">0</h3><p>جلسات خلال 7 أيام</p><small id="pd-sub-week"></small></div></div>
+            </div>
+
+            <div class="pd-grid">
+                <div class="pd-card pd-c4">
+                    <div class="pd-card-h"><h3><i class="fas fa-chart-pie"></i> توزيع القضايا حسب الحالة</h3><button type="button" class="pd-mini" data-print-chart="pd-chart-status" data-title="توزيع القضايا حسب الحالة" title="طباعة"><i class="fas fa-print"></i></button></div>
+                    <div class="pd-chart"><canvas id="pd-chart-status"></canvas><div class="pd-empty" hidden>لا توجد بيانات</div></div>
+                </div>
+                <div class="pd-card pd-c4">
+                    <div class="pd-card-h"><h3><i class="fas fa-scale-balanced"></i> نتائج الأحكام</h3><button type="button" class="pd-mini" data-print-chart="pd-chart-judg" data-title="نتائج الأحكام" title="طباعة"><i class="fas fa-print"></i></button></div>
+                    <div class="pd-chart"><canvas id="pd-chart-judg"></canvas><div class="pd-empty" hidden>لا توجد أحكام مسجلة</div></div>
+                </div>
+                <div class="pd-card pd-c4">
+                    <div class="pd-card-h"><h3><i class="fas fa-chart-bar"></i> إحصائيات القضايا</h3><button type="button" class="pd-mini" data-print-chart="cases-chart" data-title="إحصائيات القضايا" title="طباعة"><i class="fas fa-print"></i></button></div>
+                    <div class="pd-chart"><canvas id="cases-chart"></canvas></div>
+                </div>
+
+                <div class="pd-card pd-c8">
+                    <div class="pd-card-h"><h3><i class="fas fa-calendar-days"></i> الجلسات القادمة — 14 يومًا <span class="pd-hint">(اضغط على عمود لعرض قضايا اليوم)</span></h3><button type="button" class="pd-mini" data-print-chart="pd-chart-upcoming" data-title="الجلسات القادمة خلال 14 يومًا" title="طباعة"><i class="fas fa-print"></i></button></div>
+                    <div class="pd-chart"><canvas id="pd-chart-upcoming"></canvas><div class="pd-empty" hidden>لا توجد جلسات قادمة</div></div>
+                </div>
+                <div class="pd-card pd-c4">
+                    <div class="pd-card-h"><h3><i class="fas fa-list-check"></i> قضايا اليوم المحدد</h3></div>
+                    <div class="pd-day" id="pd-day-detail"><p class="pd-muted">اضغط على أي عمود في مخطط الجلسات لعرض القضايا المنظورة في ذلك اليوم.</p></div>
+                </div>
+
+                <div class="pd-card pd-c8">
+                    <div class="pd-card-h"><h3><i class="fas fa-building"></i> القضايا حسب الدائرة</h3><button type="button" class="pd-mini" data-print-chart="pd-chart-dept" data-title="القضايا حسب الدائرة" title="طباعة"><i class="fas fa-print"></i></button></div>
+                    <div class="pd-chart pd-chart-tall"><canvas id="pd-chart-dept"></canvas><div class="pd-empty" hidden>لا توجد بيانات</div></div>
+                </div>
+                <div class="pd-card pd-c4">
+                    <div class="pd-card-h"><h3><i class="fas fa-calendar-week"></i> الجلسات القادمة حسب اليوم</h3><button type="button" class="pd-mini" data-print-chart="pd-chart-weekday" data-title="الجلسات القادمة حسب أيام الأسبوع" title="طباعة"><i class="fas fa-print"></i></button></div>
+                    <div class="pd-chart pd-chart-tall"><canvas id="pd-chart-weekday"></canvas><div class="pd-empty" hidden>لا توجد جلسات قادمة</div></div>
+                </div>
+
+                <div class="pd-card pd-c8">
+                    <div class="pd-card-h"><h3><i class="fas fa-chart-line"></i> الأحكام خلال آخر 12 شهرًا</h3><button type="button" class="pd-mini" data-print-chart="pd-chart-monthly" data-title="الأحكام خلال آخر 12 شهرًا" title="طباعة"><i class="fas fa-print"></i></button></div>
+                    <div class="pd-chart"><canvas id="pd-chart-monthly"></canvas><div class="pd-empty" hidden>لا توجد أحكام خلال الفترة</div></div>
+                </div>
+                <div class="pd-card pd-c4">
+                    <div class="pd-card-h"><h3><i class="fas fa-calendar"></i> القضايا حسب سنة الدعوى <span class="pd-hint">(لا تتأثر بتصفية السنة)</span></h3><button type="button" class="pd-mini" data-print-chart="pd-chart-year" data-title="القضايا حسب سنة الدعوى" title="طباعة"><i class="fas fa-print"></i></button></div>
+                    <div class="pd-chart"><canvas id="pd-chart-year"></canvas><div class="pd-empty" hidden>لا توجد بيانات</div></div>
+                </div>
+
+                <div class="pd-card pd-c12">
+                    <div class="pd-card-h"><h3><i class="fas fa-table"></i> ملخص الدوائر <span class="pd-hint">(اضغط على صف لتصفية اللوحة بالدائرة)</span></h3></div>
+                    <div class="pd-table-wrap">
+                        <table class="pd-table" id="pd-dept-table">
+                            <thead><tr><th>الدائرة</th><th>متداولة</th><th>محجوزة</th><th>موقوفة</th><th>مشطوبة</th><th>مؤرشفة</th><th>أحكام صالح</th><th>أحكام ضد</th><th>الإجمالي</th></tr></thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="pd-card pd-c4">
+                    <div class="pd-card-h"><h3><i class="fas fa-cloud-upload-alt"></i> قسم «تحت الرفع» <span class="pd-hint">(غير خاضع للتصفية)</span></h3><button type="button" class="pd-mini" data-print-chart="pd-chart-uf" data-title="القضايا والاستئنافات تحت الرفع" title="طباعة"><i class="fas fa-print"></i></button></div>
+                    <div class="pd-chart"><canvas id="pd-chart-uf"></canvas><div class="pd-empty" hidden>لا توجد بيانات</div></div>
+                </div>
+                <div class="pd-card pd-c4">
+                    <div class="pd-card-h"><h3><i class="fas fa-exclamation-triangle icon-orange"></i> القضايا العاجلة <span class="pd-hint">(اليوم وغدًا)</span></h3></div>
+                    <div id="urgent-cases-list" class="pd-scroll">
                         <!-- سيتم ملؤها بالبيانات -->
                     </div>
                 </div>
-                
-                <div class="dashboard-card">
-                    <h3><i class="fas fa-bell icon-blue"></i> الإشعارات</h3>
-                    <div class="notification-list" id="notifications-list">
+                <div class="pd-card pd-c4">
+                    <div class="pd-card-h"><h3><i class="fas fa-bell icon-blue"></i> الإشعارات</h3></div>
+                    <div class="notification-list pd-scroll" id="notifications-list">
                         <!-- سيتم ملؤها بالبيانات -->
                     </div>
                 </div>
-                
-                <div class="dashboard-card">
-                    <h3><i class="fas fa-chart-bar icon-primary"></i> إحصائيات القضايا</h3>
-                    <div class="chart-container">
-                        <canvas id="cases-chart"></canvas>
-                    </div>
-                </div>
-                
-                <div class="dashboard-card">
-                    <h3><i class="fas fa-bolt icon-green"></i> الإجراءات السريعة</h3>
-                    <div class="quick-actions">
+
+                <div class="pd-card pd-c12">
+                    <div class="pd-card-h"><h3><i class="fas fa-bolt icon-green"></i> الإجراءات السريعة</h3></div>
+                    <div class="quick-actions pd-quick">
                         <div class="quick-action-btn" data-section="add-case">
                             <i class="fas fa-plus-circle"></i>
                             <p>إضافة قضية</p>
@@ -2242,7 +2357,7 @@
                     </div>
                 </div>
             </div>
-            
+
             <!-- فوتر المطور في لوحة التحكم -->
             <div class="developer-footer">
                 <div class="developer-info">
@@ -2257,7 +2372,8 @@
             </div>
         </section>
         
-        <!-- قسم تسجيل الدوائر -->
+        
+<!-- قسم تسجيل الدوائر -->
         <section id="departments-management" class="section">
             <h2><i class="fas fa-building icon-navy"></i> تسجيل الدوائر</h2>
             
@@ -3210,6 +3326,124 @@
             </div>
         </section>
         
+        <!-- قسم تحت الرفع -->
+        <section id="under-filing" class="section">
+            <h2><i class="fas fa-cloud-upload-alt icon-navy"></i> تحت الرفع</h2>
+
+            <div style="display:flex; gap:10px; margin-bottom:20px; flex-wrap:wrap;">
+                <button type="button" id="uf-tab-cases-btn" class="btn-primary uf-tab-btn"><i class="fas fa-gavel"></i> قضية تحت الرفع</button>
+                <button type="button" id="uf-tab-appeals-btn" class="btn-secondary uf-tab-btn"><i class="fas fa-balance-scale"></i> استئناف تحت الرفع</button>
+            </div>
+
+            <!-- ===== عرض: قضايا تحت الرفع ===== -->
+            <div id="uf-cases-view">
+                <div class="advanced-search">
+                    <div class="search-filters" style="display:flex; gap:10px; align-items:flex-end; flex-wrap:wrap;">
+                        <div class="form-group" style="flex:2; min-width:220px;">
+                            <label for="uf-case-search">بحث (رقم المتداول / المدعي / المدعى عليه / الموضوع)</label>
+                            <input type="text" id="uf-case-search" placeholder="بحث...">
+                        </div>
+                        <div class="form-group" style="min-width:180px;">
+                            <label for="uf-case-status-filter">الحالة</label>
+                            <select id="uf-case-status-filter">
+                                <option value="">الكل</option>
+                                <option value="pending">تحت الرفع</option>
+                                <option value="filed">تم رفعها</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <button type="button" id="uf-add-case-btn" class="btn-success"><i class="fas fa-plus-circle"></i> إضافة قضية تحت الرفع</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="share-buttons" style="margin:15px 0;">
+                    <button type="button" id="uf-print-cases-btn" class="btn-print"><i class="fas fa-print"></i> طباعة</button>
+                    <button type="button" id="uf-export-cases-word-btn" class="btn-word"><i class="fas fa-file-word"></i> تصدير إلى Word</button>
+                </div>
+
+                <div id="uf-cases-summary" style="margin-bottom:10px; display:none;">
+                    <span class="badge-count" id="uf-cases-count"></span>
+                </div>
+
+                <div style="overflow-x:auto;">
+                    <table class="print-table" style="width:100%;">
+                        <thead>
+                            <tr>
+                                <th>رقم المتداول</th>
+                                <th>المدعي</th>
+                                <th>المدعى عليه</th>
+                                <th>الموضوع</th>
+                                <th>الحالة</th>
+                                <th>رقم القيد</th>
+                                <th>تاريخ الجلسة</th>
+                                <th>ملاحظات</th>
+                                <th class="no-print">الإجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody id="uf-cases-table-body">
+                            <tr><td colspan="9" style="text-align:center; padding:20px; color:#999;">لا توجد قضايا تحت الرفع</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ===== عرض: استئنافات تحت الرفع ===== -->
+            <div id="uf-appeals-view" style="display:none;">
+                <div class="advanced-search">
+                    <div class="search-filters" style="display:flex; gap:10px; align-items:flex-end; flex-wrap:wrap;">
+                        <div class="form-group" style="flex:2; min-width:220px;">
+                            <label for="uf-appeal-search">بحث (رقم المتداول / المستأنف / المستأنف ضده)</label>
+                            <input type="text" id="uf-appeal-search" placeholder="بحث...">
+                        </div>
+                        <div class="form-group" style="min-width:180px;">
+                            <label for="uf-appeal-status-filter">الحالة</label>
+                            <select id="uf-appeal-status-filter">
+                                <option value="">الكل</option>
+                                <option value="pending">تحت الرفع</option>
+                                <option value="filed">تم رفعه</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <button type="button" id="uf-add-appeal-btn" class="btn-success"><i class="fas fa-plus-circle"></i> إضافة استئناف تحت الرفع</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="share-buttons" style="margin:15px 0;">
+                    <button type="button" id="uf-print-appeals-btn" class="btn-print"><i class="fas fa-print"></i> طباعة</button>
+                    <button type="button" id="uf-export-appeals-word-btn" class="btn-word"><i class="fas fa-file-word"></i> تصدير إلى Word</button>
+                </div>
+
+                <div id="uf-appeals-summary" style="margin-bottom:10px; display:none;">
+                    <span class="badge-count" id="uf-appeals-count"></span>
+                </div>
+
+                <div style="overflow-x:auto;">
+                    <table class="print-table" style="width:100%;">
+                        <thead>
+                            <tr>
+                                <th>رقم المتداول</th>
+                                <th>رقم الحكم</th>
+                                <th>سنة الحكم</th>
+                                <th>المستأنف</th>
+                                <th>المستأنف ضده</th>
+                                <th>الحالة</th>
+                                <th>رقم الاستئناف</th>
+                                <th>سنة الاستئناف</th>
+                                <th>تاريخ الجلسة</th>
+                                <th>ملاحظات</th>
+                                <th class="no-print">الإجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody id="uf-appeals-table-body">
+                            <tr><td colspan="11" style="text-align:center; padding:20px; color:#999;">لا توجد استئنافات تحت الرفع</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+        
         <!-- قسم إدارة البيانات -->
         <section id="data-management" class="section">
             <h2><i class="fas fa-database icon-silver"></i> إدارة البيانات</h2>
@@ -3945,6 +4179,206 @@
         </div>
     </div>
 
+    <!-- ========== نوافذ قسم "تحت الرفع" ========== -->
+
+    <!-- نافذة إضافة/تعديل قضية تحت الرفع -->
+    <div id="uf-case-modal" class="modal">
+        <div class="modal-content" style="max-width: 650px;">
+            <div class="modal-header">
+                <h3 id="uf-case-modal-title">إضافة قضية تحت الرفع</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <form id="uf-case-form">
+                <input type="hidden" id="uf-case-id">
+                <div class="form-group">
+                    <label for="uf-case-circulation">رقم المتداول *</label>
+                    <input type="text" id="uf-case-circulation" required>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="uf-case-plaintiff">اسم المدعي *</label>
+                        <input type="text" id="uf-case-plaintiff" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="uf-case-defendant">اسم المدعى عليه *</label>
+                        <input type="text" id="uf-case-defendant" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="uf-case-subject">موضوع الدعوى *</label>
+                    <textarea id="uf-case-subject" rows="3" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="uf-case-notes">ملاحظات</label>
+                    <textarea id="uf-case-notes" rows="2"></textarea>
+                </div>
+                <button type="submit" class="btn-success" style="width: 100%;"><i class="fas fa-save"></i> حفظ القضية</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- نافذة إضافة/تعديل استئناف تحت الرفع -->
+    <div id="uf-appeal-modal" class="modal">
+        <div class="modal-content" style="max-width: 650px;">
+            <div class="modal-header">
+                <h3 id="uf-appeal-modal-title">إضافة استئناف تحت الرفع</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <form id="uf-appeal-form">
+                <input type="hidden" id="uf-appeal-id">
+                <div class="form-group">
+                    <label for="uf-appeal-circulation">رقم المتداول *</label>
+                    <input type="text" id="uf-appeal-circulation" required>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="uf-appeal-judgment-number">رقم الحكم *</label>
+                        <input type="text" id="uf-appeal-judgment-number" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="uf-appeal-judgment-year">سنة الحكم *</label>
+                        <input type="text" id="uf-appeal-judgment-year" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="uf-appeal-appellant">اسم المستأنف *</label>
+                        <input type="text" id="uf-appeal-appellant" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="uf-appeal-appellee">اسم المستأنف ضده *</label>
+                        <input type="text" id="uf-appeal-appellee" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="uf-appeal-notes">ملاحظات</label>
+                    <textarea id="uf-appeal-notes" rows="2"></textarea>
+                </div>
+                <button type="submit" class="btn-success" style="width: 100%;"><i class="fas fa-save"></i> حفظ الاستئناف</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- نافذة إجراءات القضية/الاستئناف تحت الرفع (مشتركة بين النوعين) -->
+    <div id="uf-actions-modal" class="modal">
+        <div class="modal-content" style="max-width: 700px;">
+            <div class="modal-header">
+                <h3 id="uf-actions-modal-title">إجراءات السجل</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <input type="hidden" id="uf-actions-kind">
+            <input type="hidden" id="uf-actions-record-id">
+
+            <form id="uf-action-form" style="margin-bottom:15px; padding:15px; background:#f8f9fa; border-radius:8px;">
+                <input type="hidden" id="uf-action-edit-id">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="uf-action-date">تاريخ الإجراء *</label>
+                        <input type="date" id="uf-action-date" required>
+                    </div>
+                    <div class="form-group" style="flex:2;">
+                        <label for="uf-action-details">تفاصيل الإجراء *</label>
+                        <input type="text" id="uf-action-details" required placeholder="مثال: تجهيز صحيفة الدعوى...">
+                    </div>
+                </div>
+                <button type="submit" class="btn-success" id="uf-action-submit-btn" style="width:100%;"><i class="fas fa-plus-circle"></i> إضافة الإجراء</button>
+            </form>
+
+            <div id="uf-actions-list"></div>
+        </div>
+    </div>
+
+    <!-- نافذة تسجيل رفع القضية -->
+    <div id="uf-file-case-modal" class="modal">
+        <div class="modal-content" style="max-width: 550px;">
+            <div class="modal-header">
+                <h3 id="uf-file-case-modal-title">تسجيل رفع القضية</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <form id="uf-file-case-form">
+                <input type="hidden" id="uf-file-case-id">
+                <div class="form-group">
+                    <label for="uf-file-case-registration-number">الرقم الذي قُيدت به القضية *</label>
+                    <input type="text" id="uf-file-case-registration-number" required>
+                </div>
+                <div class="form-group">
+                    <label for="uf-file-case-session-date">تاريخ الجلسة *</label>
+                    <input type="date" id="uf-file-case-session-date" required>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="uf-file-case-department">الدائرة (اختياري)</label>
+                        <input type="text" id="uf-file-case-department">
+                    </div>
+                    <div class="form-group">
+                        <label for="uf-file-case-court">المحكمة (اختياري)</label>
+                        <input type="text" id="uf-file-case-court">
+                    </div>
+                </div>
+                <button type="submit" class="btn-success" id="uf-file-case-submit-btn" style="width: 100%;"><i class="fas fa-check-circle"></i> تأكيد رفع القضية</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- نافذة تسجيل رفع الاستئناف -->
+    <div id="uf-file-appeal-modal" class="modal">
+        <div class="modal-content" style="max-width: 550px;">
+            <div class="modal-header">
+                <h3 id="uf-file-appeal-modal-title">تسجيل رفع الاستئناف</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <form id="uf-file-appeal-form">
+                <input type="hidden" id="uf-file-appeal-id">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="uf-file-appeal-number">رقم الاستئناف *</label>
+                        <input type="text" id="uf-file-appeal-number" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="uf-file-appeal-year">سنة الاستئناف *</label>
+                        <input type="text" id="uf-file-appeal-year" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="uf-file-appeal-session-date">تاريخ الجلسة *</label>
+                    <input type="date" id="uf-file-appeal-session-date" required>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="uf-file-appeal-department">الدائرة (اختياري)</label>
+                        <input type="text" id="uf-file-appeal-department">
+                    </div>
+                    <div class="form-group">
+                        <label for="uf-file-appeal-court">المحكمة (اختياري)</label>
+                        <input type="text" id="uf-file-appeal-court">
+                    </div>
+                </div>
+                <button type="submit" class="btn-success" id="uf-file-appeal-submit-btn" style="width: 100%;"><i class="fas fa-check-circle"></i> تأكيد رفع الاستئناف</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- نافذة مستندات القضية/الاستئناف تحت الرفع (مشتركة بين النوعين) -->
+    <div id="uf-documents-modal" class="modal">
+        <div class="modal-content" style="max-width: 650px;">
+            <div class="modal-header">
+                <h3 id="uf-documents-modal-title">مستندات السجل</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <input type="hidden" id="uf-documents-record-id">
+            <div class="form-group">
+                <label for="uf-document-type">نوع المستند (اختياري)</label>
+                <input type="text" id="uf-document-type" placeholder="مثال: صحيفة دعوى، توكيل، مستند مؤيد...">
+            </div>
+            <div class="form-group">
+                <label for="uf-document-file">اختر الملف</label>
+                <input type="file" id="uf-document-file" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.xlsx,.xls">
+            </div>
+            <button type="button" id="uf-document-upload-btn" class="btn-success" style="width:100%; margin-bottom:15px;"><i class="fas fa-upload"></i> رفع المستند</button>
+            <div id="uf-documents-list"><i>لا يوجد مستندات</i></div>
+        </div>
+    </div>
+
     <!-- نافذة وقف حكم -->
     <div id="suspend-judgment-modal" class="modal">
         <div class="modal-content" style="max-width: 700px;">
@@ -4338,7 +4772,9 @@
                         (Array.isArray(data.suspendedCases) && data.suspendedCases.length > 0) ||
                         (Array.isArray(data.archivedCases) && data.archivedCases.length > 0) ||
                         (Array.isArray(data.notifications) && data.notifications.length > 0) ||
-                        (Array.isArray(data.departments) && data.departments.length > 0)
+                        (Array.isArray(data.departments) && data.departments.length > 0) ||
+                        (Array.isArray(data.underFilingCases) && data.underFilingCases.length > 0) ||
+                        (Array.isArray(data.underFilingAppeals) && data.underFilingAppeals.length > 0)
                     );
                     const localStorageDataExists = (
                         (JSON.parse(localStorage.getItem('cases') || '[]') || []).length > 0 ||
@@ -4349,7 +4785,9 @@
                         (JSON.parse(localStorage.getItem('suspendedCases') || '[]') || []).length > 0 ||
                         (JSON.parse(localStorage.getItem('archivedCases') || '[]') || []).length > 0 ||
                         (JSON.parse(localStorage.getItem('notifications') || '[]') || []).length > 0 ||
-                        (JSON.parse(localStorage.getItem('departments') || '[]') || []).length > 0
+                        (JSON.parse(localStorage.getItem('departments') || '[]') || []).length > 0 ||
+                        (JSON.parse(localStorage.getItem('underFilingCases') || '[]') || []).length > 0 ||
+                        (JSON.parse(localStorage.getItem('underFilingAppeals') || '[]') || []).length > 0
                     );
 
                     if (data && hasElectronData) {
@@ -4368,6 +4806,8 @@
                             archivedCases = JSON.parse(localStorage.getItem('archivedCases')) || [];
                             notifications = JSON.parse(localStorage.getItem('notifications')) || [];
                             departments = JSON.parse(localStorage.getItem('departments')) || [];
+                            underFilingCases = JSON.parse(localStorage.getItem('underFilingCases')) || [];
+                            underFilingAppeals = JSON.parse(localStorage.getItem('underFilingAppeals')) || [];
                             return;
                         }
 
@@ -4380,6 +4820,8 @@
                         archivedCases = data.archivedCases || [];
                         notifications = data.notifications || [];
                         departments = data.departments || [];
+                        underFilingCases = data.underFilingCases || [];
+                        underFilingAppeals = data.underFilingAppeals || [];
                         return;
                     }
                 } catch (e) {
@@ -4398,6 +4840,8 @@
                 archivedCases = data.archivedCases || [];
                 notifications = data.notifications || [];
                 departments = data.departments || JSON.parse(localStorage.getItem('departments') || '[]') || [];
+                underFilingCases = data.underFilingCases || [];
+                underFilingAppeals = data.underFilingAppeals || [];
 
                 // نخزن نسخة محلية بنفس الطابع الزمني من أول تحميل حتى تكون مقارنات
                 // المزامنة اللاحقة (syncFromServer) صحيحة من البداية. window.__savingToAPI
@@ -4413,6 +4857,8 @@
                     localStorage.setItem('archivedCases', JSON.stringify(archivedCases));
                     localStorage.setItem('notifications', JSON.stringify(notifications));
                     localStorage.setItem('departments', JSON.stringify(departments));
+                    localStorage.setItem('underFilingCases', JSON.stringify(underFilingCases));
+                    localStorage.setItem('underFilingAppeals', JSON.stringify(underFilingAppeals));
                     if (data.lastSavedAt) {
                         localStorage.setItem('lastSavedAt', String(data.lastSavedAt));
                     }
@@ -4430,6 +4876,8 @@
                 archivedCases = JSON.parse(localStorage.getItem('archivedCases')) || [];
                 notifications = JSON.parse(localStorage.getItem('notifications')) || [];
                 departments = JSON.parse(localStorage.getItem('departments')) || [];
+                underFilingCases = JSON.parse(localStorage.getItem('underFilingCases')) || [];
+                underFilingAppeals = JSON.parse(localStorage.getItem('underFilingAppeals')) || [];
             }
 
             // ========== استيراد النسخة الاحتياطية المرفقة (مرة واحدة فقط) ==========
@@ -4457,6 +4905,8 @@
                         archivedCases = seed.archivedCases || [];
                         notifications = seed.notifications || [];
                         departments = seed.departments || [];
+                        underFilingCases = seed.underFilingCases || [];
+                        underFilingAppeals = seed.underFilingAppeals || [];
 
                         localStorage.setItem('cases', JSON.stringify(cases));
                         localStorage.setItem('favorableJudgments', JSON.stringify(favorableJudgments));
@@ -4467,6 +4917,8 @@
                         localStorage.setItem('archivedCases', JSON.stringify(archivedCases));
                         localStorage.setItem('notifications', JSON.stringify(notifications));
                         localStorage.setItem('departments', JSON.stringify(departments));
+                        localStorage.setItem('underFilingCases', JSON.stringify(underFilingCases));
+                        localStorage.setItem('underFilingAppeals', JSON.stringify(underFilingAppeals));
                         console.log('تم استيراد بيانات النسخة الاحتياطية المرفقة بنجاح');
                     }
                 } catch (e) {
@@ -4491,6 +4943,8 @@
                     archivedCases,
                     notifications,
                     departments,
+                    underFilingCases,
+                    underFilingAppeals,
                     // Timestamp to help choose the most recent source on load
                     lastSavedAt: Date.now()
                 };
@@ -4501,7 +4955,8 @@
                 // حقيقية موجودة هناك فعلاً لباقي الأجهزة (الموبايل مثلاً).
                 const isCompletelyEmpty = [
                     cases, favorableJudgments, againstJudgments, reservedCases,
-                    cancelledCases, suspendedCases, archivedCases, notifications, departments
+                    cancelledCases, suspendedCases, archivedCases, notifications, departments,
+                    underFilingCases, underFilingAppeals
                 ].every(arr => !Array.isArray(arr) || arr.length === 0);
 
                 if (isCompletelyEmpty) {
@@ -4572,6 +5027,9 @@
         let cancelledCases = [];
         let suspendedCases = [];
         let archivedCases = [];
+        // بيانات قسم "تحت الرفع" (مستقل تمامًا عن قوائم القضايا المتداولة)
+        let underFilingCases = [];
+        let underFilingAppeals = [];
         let programmerName = 'المستشار محمود العوابدي - هيئة قضايا الدولة - أحد رواد العدالة الرقمية - جميع الحقوق محفوظة للمطور 2025';
         let notifications = [];
         
@@ -5973,7 +6431,500 @@
             
             archivedCasesCountElement.textContent = archivedCases.length;
             archivedCasesDashElement.textContent = archivedCases.length;
+
+            // تحديث لوحة التحكم الاحترافية (آمن: لا يؤثر على باقي الوظائف عند أي خطأ)
+            try {
+                if (typeof pdSchedule === 'function') {
+                    if (PD.filters.year !== 'all' || PD.filters.dept !== 'all') pdRender(); else pdSchedule();
+                }
+            } catch (e) { /* لوحة التحكم لم تُهيّأ بعد */ }
         }
+
+        // ==================================================================
+        // لوحة التحكم الاحترافية: إحصائيات ورسوم بيانية تفاعلية + طباعة
+        // (قراءة فقط من بيانات البرنامج — لا تعدّل أي بيانات أو وظائف)
+        // ==================================================================
+        const PD = {
+            charts: {},
+            filters: { year: 'all', dept: 'all' },
+            timer: null,
+            ovTries: 0,
+            lastCounts: {},
+            upcomingKeys: [],
+            colors: {
+                current: '#1976d2', reserved: '#8e44ad', suspended: '#f39c12', cancelled: '#e74c3c', archived: '#7f8c8d',
+                fav: '#27ae60', against: '#c0392b', pending: '#f39c12', filed: '#16a085', uf: '#34495e'
+            },
+            months: ['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'],
+            days: ['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت']
+        };
+
+        function pdEsc(v) {
+            return String(v == null ? '' : v).replace(/[&<>"']/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
+        }
+        function pdArr(a) { return Array.isArray(a) ? a : []; }
+        function pdNum(n) { return Number(n || 0).toLocaleString('en-US'); }
+        function pdISO(d) {
+            const m = String(d.getMonth() + 1).padStart(2, '0'), day = String(d.getDate()).padStart(2, '0');
+            return d.getFullYear() + '-' + m + '-' + day;
+        }
+        function pdDateFromISO(s) { return new Date(String(s).slice(0, 10) + 'T00:00:00'); }
+        function pdYearOf(r) {
+            let y = r.year || r.caseYear;
+            if (!y && r.caseNumber && String(r.caseNumber).indexOf('/') > -1) y = String(r.caseNumber).split('/')[1];
+            return y ? String(y).trim() : '';
+        }
+        function pdDeptOf(r) { return String(r.department || '').trim(); }
+        function pdMatch(r, ignoreYear) {
+            if (!r) return false;
+            if (!ignoreYear && PD.filters.year !== 'all' && pdYearOf(r) !== PD.filters.year) return false;
+            if (PD.filters.dept !== 'all' && pdDeptOf(r) !== PD.filters.dept) return false;
+            return true;
+        }
+        function pdCollect(ignoreYear) {
+            const f = arr => pdArr(arr).filter(r => pdMatch(r, ignoreYear));
+            return {
+                cases: f(cases), reserved: f(reservedCases), suspended: f(suspendedCases), cancelled: f(cancelledCases),
+                archived: f(archivedCases), fav: f(favorableJudgments), against: f(againstJudgments)
+            };
+        }
+
+        // ---- بناء قوائم التصفية من البيانات الفعلية ----
+        function pdFillFilters() {
+            const yearSel = document.getElementById('pd-year'), deptSel = document.getElementById('pd-dept');
+            if (!yearSel || !deptSel) return;
+            const all = [].concat(pdArr(cases), pdArr(reservedCases), pdArr(suspendedCases), pdArr(cancelledCases), pdArr(archivedCases), pdArr(favorableJudgments), pdArr(againstJudgments));
+            const years = Array.from(new Set(all.map(pdYearOf).filter(Boolean))).sort((a, b) => b.localeCompare(a));
+            const depts = Array.from(new Set(pdArr(departments).map(d => String((d && d.name) || '').trim()).concat(all.map(pdDeptOf)).filter(Boolean))).sort((a, b) => a.localeCompare(b, 'ar'));
+            if (PD.filters.year !== 'all' && years.indexOf(PD.filters.year) === -1) PD.filters.year = 'all';
+            if (PD.filters.dept !== 'all' && depts.indexOf(PD.filters.dept) === -1) PD.filters.dept = 'all';
+            const sig = years.join('|') + '#' + depts.join('|');
+            if (PD.filterSig !== sig) {
+                PD.filterSig = sig;
+                yearSel.innerHTML = '<option value="all">كل السنوات</option>' + years.map(y => '<option value="' + pdEsc(y) + '">' + pdEsc(y) + '</option>').join('');
+                deptSel.innerHTML = '<option value="all">كل الدوائر</option>' + depts.map(d => '<option value="' + pdEsc(d) + '">' + pdEsc(d) + '</option>').join('');
+            }
+            yearSel.value = PD.filters.year;
+            deptSel.value = PD.filters.dept;
+            const note = document.getElementById('pd-filter-note');
+            if (note) {
+                const parts = [];
+                if (PD.filters.year !== 'all') parts.push('سنة الدعوى: ' + PD.filters.year);
+                if (PD.filters.dept !== 'all') parts.push('الدائرة: ' + PD.filters.dept);
+                note.hidden = parts.length === 0;
+                note.innerHTML = parts.length ? '<i class="fas fa-filter"></i> الإحصائيات معروضة بعد التصفية — ' + pdEsc(parts.join(' | ')) : '';
+            }
+        }
+
+        // ---- عدّاد متحرك للأرقام ----
+        function pdSetNum(id, value, suffix) {
+            const el = document.getElementById(id);
+            if (!el) return;
+            const from = Number(PD.lastCounts[id] || 0), to = Number(value || 0);
+            PD.lastCounts[id] = to;
+            suffix = suffix || '';
+            if (from === to || !window.requestAnimationFrame) { el.textContent = pdNum(to) + suffix; return; }
+            const t0 = performance.now(), dur = 450;
+            (function step(t) {
+                const p = Math.min(1, (t - t0) / dur), e = 1 - Math.pow(1 - p, 3);
+                el.textContent = pdNum(Math.round(from + (to - from) * e)) + suffix;
+                if (p < 1) requestAnimationFrame(step);
+            })(t0);
+        }
+        function pdSetText(id, text) { const el = document.getElementById(id); if (el) el.textContent = text; }
+
+        // ---- مساعد إنشاء/تحديث الرسوم ----
+        const pdCenterPlugin = {
+            id: 'pdCenter',
+            afterDraw(chart) {
+                const o = chart.options && chart.options.pdCenter;
+                if (!o) return;
+                const a = chart.chartArea; if (!a) return;
+                const x = (a.left + a.right) / 2, y = (a.top + a.bottom) / 2, c = chart.ctx;
+                c.save(); c.textAlign = 'center'; c.textBaseline = 'middle';
+                c.fillStyle = '#1b2a41'; c.font = 'bold 26px Segoe UI, Tahoma, sans-serif'; c.fillText(o.value, x, y - 8);
+                c.fillStyle = '#8592a6'; c.font = '12px Segoe UI, Tahoma, sans-serif'; c.fillText(o.label, x, y + 15);
+                c.restore();
+            }
+        };
+        function pdBase(extra) {
+            const rtl = { rtl: true, textDirection: 'rtl' };
+            return Object.assign({
+                responsive: true, maintainAspectRatio: false,
+                animation: { duration: 500 },
+                plugins: {
+                    legend: { position: 'bottom', rtl: true, textDirection: 'rtl', labels: { usePointStyle: true, boxWidth: 8, font: { size: 12 } } },
+                    tooltip: Object.assign({ padding: 10, bodyFont: { size: 13 }, titleFont: { size: 13 } }, rtl)
+                }
+            }, extra || {});
+        }
+        function pdDraw(id, config, isEmpty) {
+            const el = document.getElementById(id);
+            if (!el || typeof Chart === 'undefined') return null;
+            const wrap = el.parentNode;
+            const empty = wrap && wrap.querySelector('.pd-empty');
+            if (empty) empty.hidden = !isEmpty;
+            let ch = PD.charts[id];
+            if (ch) {
+                ch.data.labels = config.data.labels;
+                ch.data.datasets = config.data.datasets;
+                ch.options = config.options;
+                ch.update();
+            } else {
+                PD.charts[id] = ch = new Chart(el, config);
+            }
+            return ch;
+        }
+
+        function pdCalc(d) {
+            const today = pdISO(new Date());
+            const cur = d.cases;
+            const upcoming = cur.filter(c => c.sessionDate >= today && c.status !== 'completed');
+            const expired = cur.filter(c => c.sessionDate < today && c.status !== 'completed');
+            const in7 = new Date(); in7.setDate(in7.getDate() + 6);
+            const end7 = pdISO(in7);
+            const week = upcoming.filter(c => c.sessionDate <= end7);
+            const judgTotal = d.fav.length + d.against.length;
+            return { today, upcoming, expired, week, judgTotal, win: judgTotal ? Math.round(d.fav.length * 100 / judgTotal) : 0 };
+        }
+
+        function pdRender() {
+            try {
+                if (typeof cases === 'undefined' || !document.getElementById('pd-year')) return;
+                pdFillFilters();
+                const d = pdCollect(false);
+                const k = pdCalc(d);
+                const ufC = pdArr(underFilingCases), ufA = pdArr(underFilingAppeals);
+                const totalNoArchive = d.cases.length + d.reserved.length + d.suspended.length + d.cancelled.length;
+
+                // بطاقات المؤشرات
+                pdSetNum('total-cases-dash', totalNoArchive);
+                pdSetNum('upcoming-cases-dash', k.upcoming.length);
+                pdSetNum('expired-cases-dash', k.expired.length);
+                pdSetNum('favorable-judgments-dash', d.fav.length);
+                pdSetNum('against-judgments-dash', d.against.length);
+                pdSetNum('reserved-cases-dash', d.reserved.length);
+                pdSetNum('suspended-cases-dash', d.suspended.length);
+                pdSetNum('cancelled-cases-dash', d.cancelled.length);
+                pdSetNum('archived-cases-dash', d.archived.length);
+                pdSetNum('pd-kpi-uf', ufC.length + ufA.length);
+                pdSetNum('pd-kpi-win', k.win, '%');
+                pdSetNum('pd-kpi-week', k.week.length);
+                pdSetText('pd-sub-total', 'متداولة ' + pdNum(d.cases.length) + ' (بدون المؤرشفة)');
+                pdSetText('pd-sub-upcoming', 'خلال 7 أيام: ' + pdNum(k.week.length));
+                pdSetText('pd-sub-fav', k.judgTotal ? 'بنسبة ' + k.win + '% من الأحكام' : '');
+                pdSetText('pd-sub-against', k.judgTotal ? 'بنسبة ' + (100 - k.win) + '% من الأحكام' : '');
+                pdSetText('pd-sub-uf', 'قضايا ' + pdNum(ufC.length) + ' | استئنافات ' + pdNum(ufA.length));
+                pdSetText('pd-sub-week', k.week.length ? 'أقرب جلسة: ' + k.week.slice().sort((a, b) => a.sessionDate.localeCompare(b.sessionDate))[0].sessionDate.split('-').reverse().join('/') : 'لا توجد جلسات');
+                pdSetText('pd-updated', 'آخر تحديث ' + new Date().toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' }));
+
+                if (typeof Chart === 'undefined') return;
+                Chart.defaults.font.family = "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif";
+                const C = PD.colors;
+
+                // 1) توزيع القضايا حسب الحالة
+                const stLabels = ['متداولة', 'محجوزة للحكم', 'موقوفة', 'مشطوبة', 'مؤرشفة'];
+                const stData = [d.cases.length, d.reserved.length, d.suspended.length, d.cancelled.length, d.archived.length];
+                const stTotal = stData.reduce((a, b) => a + b, 0);
+                pdDraw('pd-chart-status', {
+                    type: 'doughnut',
+                    data: { labels: stLabels, datasets: [{ data: stData, backgroundColor: [C.current, C.reserved, C.suspended, C.cancelled, C.archived], borderColor: '#fff', borderWidth: 2, hoverOffset: 8 }] },
+                    options: pdBase({ cutout: '62%', pdCenter: { value: pdNum(stTotal), label: 'إجمالي القضايا' }, plugins: Object.assign(pdBase().plugins, { tooltip: Object.assign({ rtl: true, textDirection: 'rtl', padding: 10, callbacks: { label: c => ' ' + c.label + ': ' + pdNum(c.parsed) + ' (' + (stTotal ? Math.round(c.parsed * 100 / stTotal) : 0) + '%)' } }) }) }),
+                    plugins: [pdCenterPlugin]
+                }, stTotal === 0);
+
+                // 2) نتائج الأحكام
+                pdDraw('pd-chart-judg', {
+                    type: 'doughnut',
+                    data: { labels: ['أحكام لصالح', 'أحكام ضد'], datasets: [{ data: [d.fav.length, d.against.length], backgroundColor: [C.fav, C.against], borderColor: '#fff', borderWidth: 2, hoverOffset: 8 }] },
+                    options: pdBase({ cutout: '62%', pdCenter: { value: k.win + '%', label: 'نسبة الكسب' }, plugins: Object.assign(pdBase().plugins, { tooltip: Object.assign({ rtl: true, textDirection: 'rtl', padding: 10, callbacks: { label: c => ' ' + c.label + ': ' + pdNum(c.parsed) + ' (' + (k.judgTotal ? Math.round(c.parsed * 100 / k.judgTotal) : 0) + '%)' } }) }) }),
+                    plugins: [pdCenterPlugin]
+                }, k.judgTotal === 0);
+
+                // 3) الرسم الأصلي «إحصائيات القضايا» — يُحدَّث ببيانات حقيقية
+                const ov = Chart.getChart ? Chart.getChart('cases-chart') : null;
+                if (ov) {
+                    ov.data.labels = ['متداولة', 'محجوزة', 'موقوفة', 'مشطوبة', 'مؤرشفة', 'أحكام صالح', 'أحكام ضد', 'تحت الرفع'];
+                    const ds = ov.data.datasets[0];
+                    ds.label = 'العدد';
+                    ds.data = [d.cases.length, d.reserved.length, d.suspended.length, d.cancelled.length, d.archived.length, d.fav.length, d.against.length, ufC.length + ufA.length];
+                    ds.backgroundColor = [C.current, C.reserved, C.suspended, C.cancelled, C.archived, C.fav, C.against, C.uf];
+                    ds.borderWidth = 0; ds.borderRadius = 6;
+                    ov.options.maintainAspectRatio = false;
+                    ov.options.plugins.tooltip = Object.assign({ rtl: true, textDirection: 'rtl', padding: 10 }, ov.options.plugins.tooltip || {});
+                    ov.update();
+                    PD.charts['cases-chart'] = ov;
+                } else if (PD.ovTries < 8) {
+                    PD.ovTries++;
+                    setTimeout(pdRender, 700);
+                }
+
+                // 4) الجلسات القادمة — 14 يومًا
+                const start = new Date(); start.setHours(0, 0, 0, 0);
+                const upLabels = [], upKeys = [], upData = [];
+                for (let i = 0; i < 14; i++) {
+                    const dt = new Date(start); dt.setDate(start.getDate() + i);
+                    const key = pdISO(dt);
+                    upKeys.push(key);
+                    upLabels.push(PD.days[dt.getDay()] + ' ' + String(dt.getDate()).padStart(2, '0') + '/' + String(dt.getMonth() + 1).padStart(2, '0'));
+                    upData.push(k.upcoming.filter(c => c.sessionDate === key).length);
+                }
+                PD.upcomingKeys = upKeys;
+                const upSum = upData.reduce((a, b) => a + b, 0);
+                pdDraw('pd-chart-upcoming', {
+                    type: 'bar',
+                    data: { labels: upLabels, datasets: [{ label: 'عدد القضايا', data: upData, borderRadius: 6, backgroundColor: upKeys.map((key, i) => i === 0 ? '#e67e22' : '#1976d2') }] },
+                    options: pdBase({
+                        plugins: Object.assign(pdBase().plugins, { legend: { display: false } }),
+                        scales: { x: { reverse: true, grid: { display: false }, ticks: { maxRotation: 60, minRotation: 30, font: { size: 11 } } }, y: { position: 'right', beginAtZero: true, ticks: { precision: 0 } } },
+                        onClick: (evt, els) => { if (els && els.length) pdShowDay(PD.upcomingKeys[els[0].index]); },
+                        onHover: (evt, els) => { evt.native && evt.native.target && (evt.native.target.style.cursor = els.length ? 'pointer' : 'default'); }
+                    })
+                }, upSum === 0);
+
+                // 5) القضايا حسب الدائرة (مكدّس)
+                const deptMap = {};
+                const bump = (arr, key) => arr.forEach(r => { const n = pdDeptOf(r) || 'غير محدد'; (deptMap[n] = deptMap[n] || { current: 0, reserved: 0, suspended: 0, cancelled: 0, archived: 0, fav: 0, against: 0 })[key]++; });
+                bump(d.cases, 'current'); bump(d.reserved, 'reserved'); bump(d.suspended, 'suspended'); bump(d.cancelled, 'cancelled'); bump(d.archived, 'archived'); bump(d.fav, 'fav'); bump(d.against, 'against');
+                const tot = o => o.current + o.reserved + o.suspended + o.cancelled + o.archived;
+                const dNames = Object.keys(deptMap).sort((a, b) => tot(deptMap[b]) - tot(deptMap[a]) || a.localeCompare(b, 'ar'));
+                const top = dNames.slice(0, 12);
+                const dsOf = (label, key, color) => ({ label, data: top.map(n => deptMap[n][key]), backgroundColor: color, borderRadius: 3, borderSkipped: false });
+                pdDraw('pd-chart-dept', {
+                    type: 'bar',
+                    data: { labels: top, datasets: [dsOf('متداولة', 'current', C.current), dsOf('محجوزة', 'reserved', C.reserved), dsOf('موقوفة', 'suspended', C.suspended), dsOf('مشطوبة', 'cancelled', C.cancelled), dsOf('مؤرشفة', 'archived', C.archived)] },
+                    options: pdBase({
+                        indexAxis: 'y',
+                        plugins: Object.assign(pdBase().plugins, { tooltip: Object.assign({ rtl: true, textDirection: 'rtl', padding: 10, mode: 'index', intersect: false }) }),
+                        scales: { x: { stacked: true, reverse: true, beginAtZero: true, ticks: { precision: 0 } }, y: { stacked: true, position: 'right', grid: { display: false } } }
+                    })
+                }, top.length === 0);
+
+                // 6) الجلسات القادمة حسب أيام الأسبوع
+                const wd = [0, 0, 0, 0, 0, 0, 0];
+                k.upcoming.forEach(c => { if (c.sessionDate) wd[pdDateFromISO(c.sessionDate).getDay()]++; });
+                const wdSum = wd.reduce((a, b) => a + b, 0);
+                pdDraw('pd-chart-weekday', {
+                    type: 'bar',
+                    data: { labels: PD.days, datasets: [{ label: 'عدد القضايا', data: wd, borderRadius: 6, backgroundColor: ['#1976d2', '#0d9488', '#8e44ad', '#e67e22', '#2980b9', '#7f8c8d', '#16a085'] }] },
+                    options: pdBase({
+                        plugins: Object.assign(pdBase().plugins, { legend: { display: false } }),
+                        scales: { x: { reverse: true, grid: { display: false }, ticks: { font: { size: 11 } } }, y: { position: 'right', beginAtZero: true, ticks: { precision: 0 } } }
+                    })
+                }, wdSum === 0);
+
+                // 7) الأحكام خلال آخر 12 شهرًا
+                const mKeys = [], mLabels = [];
+                const now = new Date();
+                for (let i = 11; i >= 0; i--) {
+                    const dt = new Date(now.getFullYear(), now.getMonth() - i, 1);
+                    mKeys.push(dt.getFullYear() + '-' + String(dt.getMonth() + 1).padStart(2, '0'));
+                    mLabels.push(PD.months[dt.getMonth()] + ' ' + String(dt.getFullYear()).slice(2));
+                }
+                const perMonth = arr => { const o = {}; mKeys.forEach(m => o[m] = 0); arr.forEach(j => { const m = String(j.date || j.createdAt || '').slice(0, 7); if (m in o) o[m]++; }); return mKeys.map(m => o[m]); };
+                const mFav = perMonth(d.fav), mAg = perMonth(d.against);
+                const mSum = mFav.concat(mAg).reduce((a, b) => a + b, 0);
+                pdDraw('pd-chart-monthly', {
+                    type: 'line',
+                    data: { labels: mLabels, datasets: [
+                        { label: 'أحكام لصالح', data: mFav, borderColor: C.fav, backgroundColor: 'rgba(39,174,96,.15)', fill: true, tension: .35, pointRadius: 4, pointHoverRadius: 6 },
+                        { label: 'أحكام ضد', data: mAg, borderColor: C.against, backgroundColor: 'rgba(192,57,43,.12)', fill: true, tension: .35, pointRadius: 4, pointHoverRadius: 6 }
+                    ] },
+                    options: pdBase({
+                        interaction: { mode: 'index', intersect: false },
+                        scales: { x: { reverse: true, grid: { display: false }, ticks: { font: { size: 11 } } }, y: { position: 'right', beginAtZero: true, ticks: { precision: 0 } } }
+                    })
+                }, mSum === 0);
+
+                // 8) القضايا حسب سنة الدعوى (تتجاهل تصفية السنة)
+                const dy = pdCollect(true);
+                const yMap = {};
+                [].concat(dy.cases, dy.reserved, dy.suspended, dy.cancelled, dy.archived).forEach(r => { const y = pdYearOf(r) || 'غير محدد'; yMap[y] = (yMap[y] || 0) + 1; });
+                const yKeys = Object.keys(yMap).sort();
+                pdDraw('pd-chart-year', {
+                    type: 'bar',
+                    data: { labels: yKeys, datasets: [{ label: 'عدد القضايا', data: yKeys.map(y => yMap[y]), borderRadius: 6, backgroundColor: yKeys.map(y => y === PD.filters.year ? '#e67e22' : '#0b3d91') }] },
+                    options: pdBase({
+                        plugins: Object.assign(pdBase().plugins, { legend: { display: false } }),
+                        scales: { x: { reverse: true, grid: { display: false } }, y: { position: 'right', beginAtZero: true, ticks: { precision: 0 } } },
+                        onClick: (evt, els) => { if (els && els.length) { const y = yKeys[els[0].index]; PD.filters.year = (PD.filters.year === y || y === 'غير محدد') ? 'all' : y; pdRender(); } }
+                    })
+                }, yKeys.length === 0);
+
+                // 9) قسم «تحت الرفع»
+                const ufCount = (arr, st) => arr.filter(x => (x.status || 'pending') === st).length;
+                const ufSum = ufC.length + ufA.length;
+                pdDraw('pd-chart-uf', {
+                    type: 'bar',
+                    data: { labels: ['قضايا', 'استئنافات'], datasets: [
+                        { label: 'قيد الإجراء', data: [ufCount(ufC, 'pending'), ufCount(ufA, 'pending')], backgroundColor: C.pending, borderRadius: 4 },
+                        { label: 'تم القيد', data: [ufCount(ufC, 'filed'), ufCount(ufA, 'filed')], backgroundColor: C.filed, borderRadius: 4 }
+                    ] },
+                    options: pdBase({
+                        scales: { x: { stacked: true, reverse: true, grid: { display: false } }, y: { stacked: true, position: 'right', beginAtZero: true, ticks: { precision: 0 } } }
+                    })
+                }, ufSum === 0);
+
+                // 10) جدول ملخص الدوائر
+                pdRenderDeptTable(deptMap, dNames);
+
+                // تحديث تفاصيل اليوم المفتوح إن وُجد
+                if (PD.selectedDay) pdShowDay(PD.selectedDay, true);
+            } catch (err) {
+                console.warn('تعذر تحديث لوحة التحكم:', err);
+            }
+        }
+
+        function pdRenderDeptTable(deptMap, names) {
+            const tb = document.querySelector('#pd-dept-table tbody');
+            if (!tb) return;
+            const keys = ['current', 'reserved', 'suspended', 'cancelled', 'archived', 'fav', 'against'];
+            const sum = { current: 0, reserved: 0, suspended: 0, cancelled: 0, archived: 0, fav: 0, against: 0, total: 0 };
+            if (!names.length) {
+                tb.innerHTML = '<tr><td colspan="9" style="text-align:center;color:#94a0b3;padding:18px;cursor:default;">لا توجد بيانات</td></tr>';
+                const tf = document.querySelector('#pd-dept-table tfoot'); if (tf) tf.remove();
+                return;
+            }
+            tb.innerHTML = names.map(n => {
+                const o = deptMap[n];
+                const total = o.current + o.reserved + o.suspended + o.cancelled + o.archived;
+                keys.forEach(x => sum[x] += o[x]); sum.total += total;
+                return '<tr data-dept="' + pdEsc(n) + '" class="' + (PD.filters.dept === n ? 'pd-sel' : '') + '"><td>' + pdEsc(n) + '</td><td>' + pdNum(o.current) + '</td><td>' + pdNum(o.reserved) + '</td><td>' + pdNum(o.suspended) + '</td><td>' + pdNum(o.cancelled) + '</td><td>' + pdNum(o.archived) + '</td><td>' + pdNum(o.fav) + '</td><td>' + pdNum(o.against) + '</td><td><strong>' + pdNum(total) + '</strong></td></tr>';
+            }).join('');
+            let tf = document.querySelector('#pd-dept-table tfoot');
+            if (!tf) { tf = document.createElement('tfoot'); document.getElementById('pd-dept-table').appendChild(tf); }
+            tf.innerHTML = '<tr><td>الإجمالي</td><td>' + pdNum(sum.current) + '</td><td>' + pdNum(sum.reserved) + '</td><td>' + pdNum(sum.suspended) + '</td><td>' + pdNum(sum.cancelled) + '</td><td>' + pdNum(sum.archived) + '</td><td>' + pdNum(sum.fav) + '</td><td>' + pdNum(sum.against) + '</td><td>' + pdNum(sum.total) + '</td></tr>';
+            PD.deptRows = { names: names, map: deptMap, sum: sum };
+        }
+
+        function pdShowDay(key, silent) {
+            const box = document.getElementById('pd-day-detail');
+            if (!box || !key) return;
+            PD.selectedDay = key;
+            const list = pdArr(cases).filter(c => pdMatch(c) && c.sessionDate === key);
+            const dt = pdDateFromISO(key);
+            let html = '<div class="pd-day-title"><i class="fas fa-calendar-day"></i> ' + pdEsc(PD.days[dt.getDay()]) + ' ' + pdEsc(key.split('-').reverse().join('/')) + ' — ' + pdNum(list.length) + ' قضية</div>';
+            if (!list.length) html += '<p class="pd-muted">لا توجد قضايا منظورة في هذا اليوم.</p>';
+            list.forEach(c => {
+                html += '<div class="pd-day-item"><strong>' + pdEsc(c.number) + ' / ' + pdEsc(c.year) + '</strong> — ' + pdEsc(c.subject) +
+                    '<span>' + pdEsc(c.plaintiff) + ' ضد ' + pdEsc(c.defendant) + '</span>' +
+                    (c.department ? '<span><i class="fas fa-building"></i> ' + pdEsc(c.department) + '</span>' : '') + '</div>';
+            });
+            box.innerHTML = html;
+        }
+
+        // ================= الطباعة =================
+        function pdReportCSS() {
+            return '@page{size:A4 portrait;margin:12mm}*{box-sizing:border-box}body{font-family:"Segoe UI",Tahoma,Arial,sans-serif;direction:rtl;color:#1b2a41;margin:0;font-size:12px}' +
+                '.hd{text-align:center;border-bottom:3px double #0b3d91;padding-bottom:10px;margin-bottom:12px}.hd h1{margin:0;font-size:20px;color:#0b3d91}.hd h2{margin:4px 0;font-size:15px}.hd p{margin:2px 0;color:#555;font-size:11px}' +
+                '.kp{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:10px 0}.kp div{border:1px solid #cfd8e6;border-radius:6px;padding:8px;text-align:center}.kp b{display:block;font-size:19px;color:#0b3d91}.kp span{font-size:11px;color:#41546f}' +
+                'h3{font-size:13px;color:#0b3d91;border-right:4px solid #0b3d91;padding-right:8px;margin:14px 0 8px}.ch{display:grid;grid-template-columns:1fr 1fr;gap:10px}.box{border:1px solid #cfd8e6;border-radius:6px;padding:8px;page-break-inside:avoid;text-align:center}.box h4{margin:0 0 6px;font-size:12px}.box img{max-width:100%;height:auto}.full{grid-column:1 / -1}' +
+                'table{width:100%;border-collapse:collapse;margin:6px 0;font-size:11px;page-break-inside:auto}tr{page-break-inside:avoid}th,td{border:1px solid #9fb0c8;padding:4px 6px;text-align:center}th{background:#e8eef8}td.r{text-align:right}tfoot td{font-weight:700;background:#f3f6fb}' +
+                '.ft{margin-top:14px;padding-top:6px;border-top:1px solid #ccc;text-align:center;color:#777;font-size:10px}';
+        }
+        function pdOpenPrint(title, body) {
+            const html = '<!DOCTYPE html><html dir="rtl" lang="ar"><head><meta charset="utf-8"><title>' + pdEsc(title) + '</title><style>' + pdReportCSS() + '</style></head><body>' + body +
+                '<script>window.onload=function(){setTimeout(function(){window.print();},500);}<\/script></body></html>';
+            const w = window.open('', '_blank', 'width=1100,height=800');
+            if (!w) { if (typeof showAlert === 'function') showAlert('تعذر فتح نافذة الطباعة. يرجى السماح بالنوافذ المنبثقة.', 'warning'); return; }
+            w.document.open(); w.document.write(html); w.document.close();
+        }
+        function pdReportHeader(sub) {
+            const filt = [];
+            if (PD.filters.year !== 'all') filt.push('سنة الدعوى: ' + PD.filters.year);
+            if (PD.filters.dept !== 'all') filt.push('الدائرة: ' + PD.filters.dept);
+            const now = new Date();
+            return '<div class="hd"><h1>هيئة قضايا الدولة</h1><h2>' + pdEsc(sub) + '</h2><p>تاريخ الطباعة: ' + pdEsc(now.toLocaleDateString('ar-EG', { year: 'numeric', month: 'long', day: 'numeric' })) + ' — ' + pdEsc(now.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' })) + '</p><p>' + (filt.length ? 'التصفية: ' + pdEsc(filt.join(' | ')) : 'بدون تصفية (جميع البيانات)') + '</p></div>';
+        }
+        function pdChartTableHTML(ch) {
+            if (!ch) return '';
+            const labels = ch.data.labels || [], ds = ch.data.datasets || [];
+            const single = ds.length === 1;
+            let h = '<table><thead><tr><th>البند</th>' + ds.map(x => '<th>' + pdEsc(x.label || 'العدد') + '</th>').join('') + (single ? '<th>النسبة</th>' : '') + '</tr></thead><tbody>';
+            const total = single ? (ds[0].data || []).reduce((a, b) => a + Number(b || 0), 0) : 0;
+            labels.forEach((lb, i) => {
+                h += '<tr><td class="r">' + pdEsc(lb) + '</td>' + ds.map(x => '<td>' + pdNum(x.data[i]) + '</td>').join('') + (single ? '<td>' + (total ? Math.round(Number(ds[0].data[i] || 0) * 100 / total) + '%' : '-') + '</td>' : '') + '</tr>';
+            });
+            return h + '</tbody></table>';
+        }
+        function pdImg(id) {
+            const ch = PD.charts[id];
+            if (!ch) return '';
+            try {
+                const src = document.createElement('canvas'); src.width = ch.canvas.width; src.height = ch.canvas.height;
+                const c = src.getContext('2d'); c.fillStyle = '#fff'; c.fillRect(0, 0, src.width, src.height); c.drawImage(ch.canvas, 0, 0);
+                return src.toDataURL('image/png');
+            } catch (e) { return ''; }
+        }
+        function pdPrintChart(id, title) {
+            const ch = PD.charts[id];
+            if (!ch) { if (typeof showAlert === 'function') showAlert('لا يوجد رسم بياني لطباعته حاليًا.', 'warning'); return; }
+            const body = pdReportHeader(title) + '<div class="box"><img src="' + pdImg(id) + '" alt=""></div><h3>البيانات التفصيلية</h3>' + pdChartTableHTML(ch) + '<div class="ft">صادر عن نظام إدارة القضايا — المستشار محمود العوابدي</div>';
+            pdOpenPrint(title, body);
+        }
+        function pdPrintAll() {
+            const d = pdCollect(false), k = pdCalc(d);
+            const ufC = pdArr(underFilingCases), ufA = pdArr(underFilingAppeals);
+            const kp = (v, l) => '<div><b>' + pdEsc(v) + '</b><span>' + pdEsc(l) + '</span></div>';
+            let body = pdReportHeader('تقرير إحصائيات لوحة التحكم');
+            body += '<div class="kp">' +
+                kp(pdNum(d.cases.length + d.reserved.length + d.suspended.length + d.cancelled.length), 'إجمالي القضايا (بدون المؤرشفة)') + kp(pdNum(k.upcoming.length), 'قضايا قادمة') + kp(pdNum(k.expired.length), 'جلسات منقضية') + kp(pdNum(k.week.length), 'جلسات خلال 7 أيام') +
+                kp(pdNum(d.fav.length), 'أحكام لصالح') + kp(pdNum(d.against.length), 'أحكام ضد') + kp(k.win + '%', 'نسبة الأحكام لصالح') + kp(pdNum(d.reserved.length), 'قضايا محجوزة للحكم') +
+                kp(pdNum(d.suspended.length), 'قضايا موقوفة') + kp(pdNum(d.cancelled.length), 'قضايا مشطوبة') + kp(pdNum(d.archived.length), 'قضايا مؤرشفة') + kp(pdNum(ufC.length + ufA.length), 'تحت الرفع (قضايا + استئنافات)') + '</div>';
+            body += '<h3>الرسوم البيانية</h3><div class="ch">';
+            [['pd-chart-status', 'توزيع القضايا حسب الحالة'], ['pd-chart-judg', 'نتائج الأحكام'], ['cases-chart', 'إحصائيات القضايا'], ['pd-chart-weekday', 'الجلسات القادمة حسب أيام الأسبوع'], ['pd-chart-upcoming', 'الجلسات القادمة خلال 14 يومًا', 1], ['pd-chart-dept', 'القضايا حسب الدائرة', 1], ['pd-chart-monthly', 'الأحكام خلال آخر 12 شهرًا', 1], ['pd-chart-year', 'القضايا حسب سنة الدعوى'], ['pd-chart-uf', 'تحت الرفع']].forEach(x => {
+                const src = pdImg(x[0]);
+                if (src) body += '<div class="box' + (x[2] ? ' full' : '') + '"><h4>' + pdEsc(x[1]) + '</h4><img src="' + src + '" alt=""></div>';
+            });
+            body += '</div>';
+            if (PD.deptRows && PD.deptRows.names.length) {
+                const r = PD.deptRows;
+                body += '<h3>ملخص الدوائر</h3><table><thead><tr><th>الدائرة</th><th>متداولة</th><th>محجوزة</th><th>موقوفة</th><th>مشطوبة</th><th>مؤرشفة</th><th>أحكام صالح</th><th>أحكام ضد</th><th>الإجمالي</th></tr></thead><tbody>';
+                r.names.forEach(n => { const o = r.map[n]; body += '<tr><td class="r">' + pdEsc(n) + '</td><td>' + o.current + '</td><td>' + o.reserved + '</td><td>' + o.suspended + '</td><td>' + o.cancelled + '</td><td>' + o.archived + '</td><td>' + o.fav + '</td><td>' + o.against + '</td><td><b>' + (o.current + o.reserved + o.suspended + o.cancelled + o.archived) + '</b></td></tr>'; });
+                body += '</tbody><tfoot><tr><td>الإجمالي</td><td>' + r.sum.current + '</td><td>' + r.sum.reserved + '</td><td>' + r.sum.suspended + '</td><td>' + r.sum.cancelled + '</td><td>' + r.sum.archived + '</td><td>' + r.sum.fav + '</td><td>' + r.sum.against + '</td><td>' + r.sum.total + '</td></tr></tfoot></table>';
+            }
+            const end = new Date(); end.setDate(end.getDate() + 13);
+            const soon = k.upcoming.filter(c => c.sessionDate <= pdISO(end)).sort((a, b) => a.sessionDate.localeCompare(b.sessionDate));
+            if (soon.length) {
+                body += '<h3>الجلسات القادمة خلال 14 يومًا (' + soon.length + ')</h3><table><thead><tr><th>م</th><th>تاريخ الجلسة</th><th>رقم/سنة الدعوى</th><th>الموضوع</th><th>المدعي</th><th>المدعى عليه</th><th>الدائرة</th></tr></thead><tbody>';
+                soon.slice(0, 150).forEach((c, i) => { body += '<tr><td>' + (i + 1) + '</td><td>' + pdEsc(c.sessionDate.split('-').reverse().join('/')) + '</td><td>' + pdEsc(c.number) + '/' + pdEsc(c.year) + '</td><td class="r">' + pdEsc(c.subject) + '</td><td class="r">' + pdEsc(c.plaintiff) + '</td><td class="r">' + pdEsc(c.defendant) + '</td><td>' + pdEsc(c.department) + '</td></tr>'; });
+                body += '</tbody></table>';
+            }
+            body += '<div class="ft">صادر عن نظام إدارة القضايا — المستشار محمود العوابدي — هيئة قضايا الدولة</div>';
+            pdOpenPrint('تقرير إحصائيات لوحة التحكم', body);
+        }
+
+        // ================= التهيئة والربط =================
+        function pdSchedule(now) {
+            clearTimeout(PD.timer);
+            PD.timer = setTimeout(pdRender, now ? 0 : 180);
+        }
+        function pdInit() {
+            const $ = id => document.getElementById(id);
+            if (!$('pd-year') || PD.ready) return;
+            PD.ready = true;
+            $('pd-year').addEventListener('change', e => { PD.filters.year = e.target.value; pdRender(); });
+            $('pd-dept').addEventListener('change', e => { PD.filters.dept = e.target.value; pdRender(); });
+            $('pd-reset-filters').addEventListener('click', () => { PD.filters = { year: 'all', dept: 'all' }; PD.selectedDay = null; pdRender(); });
+            $('pd-refresh').addEventListener('click', () => { PD.filterSig = null; pdRender(); });
+            $('pd-print-all').addEventListener('click', pdPrintAll);
+            document.querySelectorAll('[data-print-chart]').forEach(b => b.addEventListener('click', () => pdPrintChart(b.getAttribute('data-print-chart'), b.getAttribute('data-title') || 'رسم بياني')));
+            document.querySelectorAll('.pd-kpi[data-go]').forEach(card => card.addEventListener('click', () => {
+                const link = document.querySelector('.nav-link[data-section="' + card.getAttribute('data-go') + '"]');
+                if (link) link.click();
+            }));
+            const tb = document.querySelector('#pd-dept-table tbody');
+            if (tb) tb.addEventListener('click', e => {
+                const tr = e.target.closest('tr[data-dept]'); if (!tr) return;
+                const n = tr.getAttribute('data-dept');
+                PD.filters.dept = (PD.filters.dept === n) ? 'all' : (n === 'غير محدد' ? 'all' : n);
+                pdRender();
+            });
+            const dashLink = document.querySelector('.nav-link[data-section="dashboard"]');
+            if (dashLink) dashLink.addEventListener('click', () => { pdSchedule(true); setTimeout(() => Object.keys(PD.charts).forEach(k => { try { PD.charts[k].resize(); } catch (e) {} }), 120); });
+            pdRender();
+        }
+        if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', pdInit); else pdInit();
         
         // ========== وظائف المشاركة عبر WhatsApp ==========
         function shareViaWhatsApp(text) {
@@ -6205,6 +7156,9 @@
                 case 'suspended': return 'موقوفة';
                 case 'returned': return 'إعادة للرول';
                 case 'judgment': return 'حكم';
+                case 'interim_judgment': return 'حكم تمهيدي';
+                case 'suspend': return 'وقف حكم';
+                case 'judgment-type-changed': return 'تعديل نوع الحكم';
                 default: return type || '-';
             }
         }
@@ -6219,6 +7173,9 @@
                 case 'suspended': return 'session-type-postponed';
                 case 'returned': return 'session-type-completed';
                 case 'judgment': return 'session-type-completed';
+                case 'interim_judgment': return 'session-type-completed';
+                case 'suspend': return 'session-type-postponed';
+                case 'judgment-type-changed': return 'session-type-reserved';
                 default: return '';
             }
         }
@@ -6595,7 +7552,7 @@
             return {
                 previousDate: lastEntry.date || null,
                 lastDate: lastEntry.newDate || lastEntry.judgmentDate || caseItem.sessionDate || null,
-                reason: lastEntry.reason || (lastEntry.type === 'judgment' ? (lastEntry.judgmentText || '-') : '-')
+                reason: lastEntry.reason || (lastEntry.judgmentText || '-')
             };
         }
         
@@ -6952,6 +7909,8 @@
                         archivedCases = data.archivedCases || [];
                         notifications = data.notifications || [];
                         departments = data.departments || [];
+                        underFilingCases = data.underFilingCases || [];
+                        underFilingAppeals = data.underFilingAppeals || [];
                         programmerName = data.programmerName || programmerName;
                         
                         localStorage.setItem('cases', JSON.stringify(cases));
@@ -6963,6 +7922,8 @@
                         localStorage.setItem('archivedCases', JSON.stringify(archivedCases));
                         localStorage.setItem('notifications', JSON.stringify(notifications));
                         localStorage.setItem('departments', JSON.stringify(departments));
+                        localStorage.setItem('underFilingCases', JSON.stringify(underFilingCases));
+                        localStorage.setItem('underFilingAppeals', JSON.stringify(underFilingAppeals));
                         localStorage.setItem('programmerName', programmerName);
                         
                         // حفظ البيانات في التخزين الدائم (Electron app-data.json)
@@ -6975,6 +7936,8 @@
                         renderArchivedCasesTable();
                         renderDepartmentsTable();
                         refreshAllDepartmentSelects();
+                        renderUnderFilingCasesTable();
+                        renderUnderFilingAppealsTable();
                         updateStats();
                         updateDashboard();
                         
@@ -7019,19 +7982,14 @@
                 `;
                 
                 judgment.sessionHistory.forEach((session, index) => {
-                    let sessionType = '';
-                    if (session.type === 'postponement') sessionType = 'ترحيل';
-                    else if (session.type === 'initial') sessionType = 'مبدئية';
-                    else if (session.type === 'reserved') sessionType = 'محجوزة';
-                    else if (session.type === 'cancelled') sessionType = 'مشطوبة';
-                    else if (session.type === 'judgment') sessionType = 'حكم';
+                    const sessionType = getSessionTypeLabel(session.type);
                     
                     sessionHistoryHTML += `
                         <tr>
                             <td style="padding: 6px; border: 1px solid #ddd; text-align: center;">${index + 1}</td>
                             <td style="padding: 6px; border: 1px solid #ddd; text-align: center;">${formatDate(session.date)}</td>
                             <td style="padding: 6px; border: 1px solid #ddd; text-align: center;">${sessionType}</td>
-                            <td style="padding: 6px; border: 1px solid #ddd; text-align: right;">${session.reason || '-'}</td>
+                            <td style="padding: 6px; border: 1px solid #ddd; text-align: right;">${session.judgmentText ? session.judgmentText : (session.reason || '-')}</td>
                         </tr>
                     `;
                 });
@@ -7718,6 +8676,9 @@
                 } else if (targetSection === 'previous-sessions') {
                     renderPreviousSessionsDepartments();
                     renderPreviousSessionsTable();
+                } else if (targetSection === 'under-filing') {
+                    renderUnderFilingCasesTable();
+                    renderUnderFilingAppealsTable();
                 } else if (targetSection === 'departments-management') {
                     renderDepartmentsTable();
                     refreshAllDepartmentSelects();
@@ -8908,19 +9869,14 @@
                 `;
                 
                 caseItem.sessionHistory.forEach((session, index) => {
-                    let sessionType = '';
-                    if (session.type === 'postponement') sessionType = 'ترحيل';
-                    else if (session.type === 'initial') sessionType = 'مبدئية';
-                    else if (session.type === 'reserved') sessionType = 'محجوزة';
-                    else if (session.type === 'cancelled') sessionType = 'مشطوبة';
-                    else if (session.type === 'judgment') sessionType = 'حكم';
+                    const sessionType = getSessionTypeLabel(session.type);
                     
                     sessionHistoryHTML += `
                         <tr>
                             <td style="padding: 6px; border: 1px solid #ddd; text-align: center;">${index + 1}</td>
                             <td style="padding: 6px; border: 1px solid #ddd; text-align: center;">${formatDate(session.date)}</td>
                             <td style="padding: 6px; border: 1px solid #ddd; text-align: center;">${sessionType}</td>
-                            <td style="padding: 6px; border: 1px solid #ddd; text-align: right;">${session.reason || '-'}</td>
+                            <td style="padding: 6px; border: 1px solid #ddd; text-align: right;">${session.judgmentText ? session.judgmentText : (session.reason || '-')}</td>
                         </tr>
                     `;
                 });
@@ -9634,19 +10590,14 @@
                         `;
                         
                         caseItem.sessionHistory.forEach((session, index) => {
-                            let sessionType = '';
-                            if (session.type === 'postponement') sessionType = 'ترحيل';
-                            else if (session.type === 'initial') sessionType = 'مبدئية';
-                            else if (session.type === 'reserved') sessionType = 'محجوزة';
-                            else if (session.type === 'cancelled') sessionType = 'مشطوبة';
-                            else if (session.type === 'judgment') sessionType = 'حكم';
+                            const sessionType = getSessionTypeLabel(session.type);
                             
                             sessionHistoryHTML += `
                                 <tr>
                                     <td style="padding: 6px; border: 1px solid #ddd; text-align: center;">${index + 1}</td>
                                     <td style="padding: 6px; border: 1px solid #ddd; text-align: center;">${formatDate(session.date)}</td>
                                     <td style="padding: 6px; border: 1px solid #ddd; text-align: center;">${sessionType}</td>
-                                    <td style="padding: 6px; border: 1px solid #ddd; text-align: right;">${session.reason || '-'}</td>
+                                    <td style="padding: 6px; border: 1px solid #ddd; text-align: right;">${session.judgmentText ? session.judgmentText : (session.reason || '-')}</td>
                                 </tr>
                             `;
                         });
@@ -9898,7 +10849,7 @@
                             <td style="text-align: center;"><span class="session-type ${sessionTypeClass}">${sessionType}</span></td>
                             <td style="text-align: center;">${session.newDate ? formatDate(session.newDate) : (session.judgmentDate ? formatDate(session.judgmentDate) : '-')}</td>
                             <td class="session-history-notes">${session.reason || '-'}</td>
-                            <td class="session-history-notes">${session.type === 'judgment' ? (session.judgmentText || '-') : (session.notes || '-')}</td>
+                            <td class="session-history-notes">${session.judgmentText ? session.judgmentText : (session.notes || '-')}</td>
                             <td style="text-align: center;">${formatDate(session.recordedDate)}</td>
                             <td class="actions no-print" style="text-align: center;">
                                 <button class="btn-info btn-print-session" data-index="${index}" style="padding: 5px 10px; font-size: 12px;">
@@ -10007,10 +10958,10 @@
                                 <td style="padding: 8px; border: 1px solid #ddd;"><strong>سبب التأجيل:</strong></td>
                                 <td style="padding: 8px; border: 1px solid #ddd; min-height: 60px;">${session.reason || '-'}</td>
                             </tr>
-                            ${session.type === 'judgment' ? `
+                            ${session.judgmentText ? `
                             <tr>
                                 <td style="padding: 8px; border: 1px solid #ddd;"><strong>منطوق الحكم:</strong></td>
-                                <td style="padding: 8px; border: 1px solid #ddd; min-height: 100px; white-space: pre-wrap;">${session.judgmentText || '-'}</td>
+                                <td style="padding: 8px; border: 1px solid #ddd; min-height: 100px; white-space: pre-wrap;">${session.judgmentText}</td>
                             </tr>
                             ` : ''}
                             <tr>
@@ -10128,7 +11079,7 @@
                         <td style="padding: 6px; border: 1px solid #000; text-align: center;">${formatDate(session.date)}</td>
                         <td style="padding: 6px; border: 1px solid #000; text-align: center;">${sessionType}</td>
                         <td style="padding: 6px; border: 1px solid #000; text-align: center;">${session.newDate ? formatDate(session.newDate) : (session.judgmentDate ? formatDate(session.judgmentDate) : '-')}</td>
-                        <td style="padding: 6px; border: 1px solid #000; text-align: right;">${session.type === 'judgment' ? (session.judgmentText || '-') : (session.reason || '-')}</td>
+                        <td style="padding: 6px; border: 1px solid #000; text-align: right;">${session.judgmentText ? session.judgmentText : (session.reason || '-')}</td>
                         <td style="padding: 6px; border: 1px solid #000; text-align: right;">${session.notes || '-'}</td>
                         <td style="padding: 6px; border: 1px solid #000; text-align: center;">${formatDate(session.recordedDate)}</td>
                     </tr>
@@ -10199,7 +11150,7 @@
                         <td>${formatDate(session.date)}</td>
                         <td>${sessionType}</td>
                         <td>${session.newDate ? formatDate(session.newDate) : (session.judgmentDate ? formatDate(session.judgmentDate) : '-')}</td>
-                        <td>${session.type === 'judgment' ? (session.judgmentText || '-') : (session.reason || '-')}</td>
+                        <td>${session.judgmentText ? session.judgmentText : (session.reason || '-')}</td>
                         <td>${session.notes || '-'}</td>
                         <td>${formatDate(session.recordedDate)}</td>
                     </tr>
@@ -10307,19 +11258,14 @@
                 `;
                 
                 caseItem.sessionHistory.forEach((session, index) => {
-                    let sessionType = '';
-                    if (session.type === 'postponement') sessionType = 'ترحيل';
-                    else if (session.type === 'initial') sessionType = 'مبدئية';
-                    else if (session.type === 'reserved') sessionType = 'محجوزة';
-                    else if (session.type === 'cancelled') sessionType = 'مشطوبة';
-                    else if (session.type === 'judgment') sessionType = 'حكم';
+                    const sessionType = getSessionTypeLabel(session.type);
                     
                     sessionHistoryHTML += `
                         <tr>
                             <td style="padding: 6px; border: 1px solid #ddd; text-align: center;">${index + 1}</td>
                             <td style="padding: 6px; border: 1px solid #ddd; text-align: center;">${formatDate(session.date)}</td>
                             <td style="padding: 6px; border: 1px solid #ddd; text-align: center;">${sessionType}</td>
-                            <td style="padding: 6px; border: 1px solid #ddd; text-align: right;">${session.reason || '-'}</td>
+                            <td style="padding: 6px; border: 1px solid #ddd; text-align: right;">${session.judgmentText ? session.judgmentText : (session.reason || '-')}</td>
                         </tr>
                     `;
                 });
@@ -13568,6 +14514,8 @@
                 archivedCases: archivedCases,
                 notifications: notifications,
                 departments: departments,
+                underFilingCases: underFilingCases,
+                underFilingAppeals: underFilingAppeals,
                 programmerName: programmerName,
                 exportDate: new Date().toISOString()
             };
@@ -13813,12 +14761,1065 @@
         });
         
         // ========== إعادة رسم كل الشاشات بعد أي تحديث للبيانات ==========
+        // ========================================================================
+        // ==================  قسم "تحت الرفع" (مستقل بالكامل)  ===================
+        // ========================================================================
+        // ملحوظة: القسم ده مستقل تمامًا عن قوائم القضايا المتداولة وباقي أقسام
+        // البرنامج. القضايا والاستئنافات هنا بتفضل في هذا القسم فقط حتى بعد
+        // "رفعها"، ومفيش أي نقل تلقائي لها لقائمة القضايا المتداولة.
+
+        function getUfCaseStatusLabel(status) {
+            return status === 'filed' ? 'تم رفعها' : 'تحت الرفع';
+        }
+        function getUfAppealStatusLabel(status) {
+            return status === 'filed' ? 'تم رفعه' : 'تحت الرفع';
+        }
+
+        function getUfRecordArray(kind) {
+            return kind === 'appeal' ? underFilingAppeals : underFilingCases;
+        }
+        function findUfRecord(kind, id) {
+            return getUfRecordArray(kind).find(r => r.id === id);
+        }
+        function saveUfArray(kind) {
+            const key = kind === 'appeal' ? 'underFilingAppeals' : 'underFilingCases';
+            localStorage.setItem(key, JSON.stringify(getUfRecordArray(kind)));
+            saveDataToAPI();
+        }
+
+        // ---------- عرض قضايا تحت الرفع ----------
+        function renderUnderFilingCasesTable() {
+            const tbody = document.getElementById('uf-cases-table-body');
+            if (!tbody) return;
+
+            const searchInput = document.getElementById('uf-case-search');
+            const statusFilter = document.getElementById('uf-case-status-filter');
+            const searchTerm = searchInput ? searchInput.value.trim().toLowerCase() : '';
+            const statusValue = statusFilter ? statusFilter.value : '';
+
+            let filtered = underFilingCases.slice();
+            if (statusValue) filtered = filtered.filter(c => (c.status || 'pending') === statusValue);
+            if (searchTerm) {
+                filtered = filtered.filter(c => {
+                    const haystack = `${c.circulationNumber || ''} ${c.plaintiff || ''} ${c.defendant || ''} ${c.subject || ''}`.toLowerCase();
+                    return haystack.includes(searchTerm);
+                });
+            }
+
+            const summaryEl = document.getElementById('uf-cases-summary');
+            const countEl = document.getElementById('uf-cases-count');
+            if (summaryEl && countEl) {
+                summaryEl.style.display = 'block';
+                countEl.textContent = `عدد القضايا: ${filtered.length}`;
+            }
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="9" style="text-align:center; padding:20px; color:#999;">لا توجد قضايا تحت الرفع</td></tr>';
+                return;
+            }
+
+            filtered.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+
+            let rows = '';
+            filtered.forEach(c => {
+                const statusBadge = c.status === 'filed'
+                    ? '<span style="background:#d4edda;color:#155724;padding:3px 10px;border-radius:12px;font-size:12px;">تم رفعها</span>'
+                    : '<span style="background:#fff3cd;color:#856404;padding:3px 10px;border-radius:12px;font-size:12px;">تحت الرفع</span>';
+
+                rows += `
+                    <tr>
+                        <td style="text-align:center;">${c.circulationNumber || '-'}</td>
+                        <td>${c.plaintiff || '-'}</td>
+                        <td>${c.defendant || '-'}</td>
+                        <td>${c.subject || '-'}</td>
+                        <td style="text-align:center;">${statusBadge}</td>
+                        <td style="text-align:center;">${c.registrationNumber || '-'}</td>
+                        <td style="text-align:center;">${c.sessionDate ? formatDate(c.sessionDate) : '-'}</td>
+                        <td>${c.notes || '-'}</td>
+                        <td class="actions no-print">
+                            <button class="btn-info uf-edit-case-btn" data-id="${c.id}" style="padding:5px 8px;font-size:12px;"><i class="fas fa-edit"></i> فتح</button>
+                            <button class="btn-purple uf-case-actions-btn" data-id="${c.id}" style="padding:5px 8px;font-size:12px;"><i class="fas fa-tasks"></i> الإجراءات</button>
+                            <button class="btn-secondary uf-case-docs-btn" data-id="${c.id}" style="padding:5px 8px;font-size:12px;"><i class="fas fa-paperclip"></i> المستندات</button>
+                            ${c.status !== 'filed'
+                                ? `<button class="btn-success uf-file-case-btn" data-id="${c.id}" style="padding:5px 8px;font-size:12px;"><i class="fas fa-check-circle"></i> تم رفع القضية</button>`
+                                : `<button class="btn-warning uf-file-case-btn" data-id="${c.id}" style="padding:5px 8px;font-size:12px;"><i class="fas fa-edit"></i> تعديل بيانات الرفع</button>`}
+                            <button class="btn-danger uf-delete-case-btn" data-id="${c.id}" style="padding:5px 8px;font-size:12px;"><i class="fas fa-trash"></i> حذف</button>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            tbody.innerHTML = rows;
+        }
+
+        // ---------- عرض استئنافات تحت الرفع ----------
+        function renderUnderFilingAppealsTable() {
+            const tbody = document.getElementById('uf-appeals-table-body');
+            if (!tbody) return;
+
+            const searchInput = document.getElementById('uf-appeal-search');
+            const statusFilter = document.getElementById('uf-appeal-status-filter');
+            const searchTerm = searchInput ? searchInput.value.trim().toLowerCase() : '';
+            const statusValue = statusFilter ? statusFilter.value : '';
+
+            let filtered = underFilingAppeals.slice();
+            if (statusValue) filtered = filtered.filter(a => (a.status || 'pending') === statusValue);
+            if (searchTerm) {
+                filtered = filtered.filter(a => {
+                    const haystack = `${a.circulationNumber || ''} ${a.appellant || ''} ${a.appellee || ''}`.toLowerCase();
+                    return haystack.includes(searchTerm);
+                });
+            }
+
+            const summaryEl = document.getElementById('uf-appeals-summary');
+            const countEl = document.getElementById('uf-appeals-count');
+            if (summaryEl && countEl) {
+                summaryEl.style.display = 'block';
+                countEl.textContent = `عدد الاستئنافات: ${filtered.length}`;
+            }
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="11" style="text-align:center; padding:20px; color:#999;">لا توجد استئنافات تحت الرفع</td></tr>';
+                return;
+            }
+
+            filtered.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+
+            let rows = '';
+            filtered.forEach(a => {
+                const statusBadge = a.status === 'filed'
+                    ? '<span style="background:#d4edda;color:#155724;padding:3px 10px;border-radius:12px;font-size:12px;">تم رفعه</span>'
+                    : '<span style="background:#fff3cd;color:#856404;padding:3px 10px;border-radius:12px;font-size:12px;">تحت الرفع</span>';
+
+                rows += `
+                    <tr>
+                        <td style="text-align:center;">${a.circulationNumber || '-'}</td>
+                        <td style="text-align:center;">${a.judgmentNumber || '-'}</td>
+                        <td style="text-align:center;">${a.judgmentYear || '-'}</td>
+                        <td>${a.appellant || '-'}</td>
+                        <td>${a.appellee || '-'}</td>
+                        <td style="text-align:center;">${statusBadge}</td>
+                        <td style="text-align:center;">${a.appealNumber || '-'}</td>
+                        <td style="text-align:center;">${a.appealYear || '-'}</td>
+                        <td style="text-align:center;">${a.sessionDate ? formatDate(a.sessionDate) : '-'}</td>
+                        <td>${a.notes || '-'}</td>
+                        <td class="actions no-print">
+                            <button class="btn-info uf-edit-appeal-btn" data-id="${a.id}" style="padding:5px 8px;font-size:12px;"><i class="fas fa-edit"></i> فتح</button>
+                            <button class="btn-purple uf-appeal-actions-btn" data-id="${a.id}" style="padding:5px 8px;font-size:12px;"><i class="fas fa-tasks"></i> الإجراءات</button>
+                            <button class="btn-secondary uf-appeal-docs-btn" data-id="${a.id}" style="padding:5px 8px;font-size:12px;"><i class="fas fa-paperclip"></i> المستندات</button>
+                            ${a.status !== 'filed'
+                                ? `<button class="btn-success uf-file-appeal-btn" data-id="${a.id}" style="padding:5px 8px;font-size:12px;"><i class="fas fa-check-circle"></i> تم رفع الاستئناف</button>`
+                                : `<button class="btn-warning uf-file-appeal-btn" data-id="${a.id}" style="padding:5px 8px;font-size:12px;"><i class="fas fa-edit"></i> تعديل بيانات الرفع</button>`}
+                            <button class="btn-danger uf-delete-appeal-btn" data-id="${a.id}" style="padding:5px 8px;font-size:12px;"><i class="fas fa-trash"></i> حذف</button>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            tbody.innerHTML = rows;
+        }
+
+        // ---------- إضافة/تعديل قضية تحت الرفع ----------
+        function openUfCaseModal(id) {
+            const modal = document.getElementById('uf-case-modal');
+            const form = document.getElementById('uf-case-form');
+            form.reset();
+            document.getElementById('uf-case-id').value = id || '';
+
+            if (id) {
+                const item = underFilingCases.find(c => c.id === id);
+                if (!item) return;
+                document.getElementById('uf-case-modal-title').textContent = `تعديل قضية تحت الرفع: ${item.circulationNumber || ''}`;
+                document.getElementById('uf-case-circulation').value = item.circulationNumber || '';
+                document.getElementById('uf-case-plaintiff').value = item.plaintiff || '';
+                document.getElementById('uf-case-defendant').value = item.defendant || '';
+                document.getElementById('uf-case-subject').value = item.subject || '';
+                document.getElementById('uf-case-notes').value = item.notes || '';
+            } else {
+                document.getElementById('uf-case-modal-title').textContent = 'إضافة قضية تحت الرفع';
+            }
+
+            modal.style.display = 'flex';
+        }
+
+        const ufCaseForm = document.getElementById('uf-case-form');
+        if (ufCaseForm) {
+            ufCaseForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const id = document.getElementById('uf-case-id').value;
+                const circulationNumber = document.getElementById('uf-case-circulation').value.trim();
+                const plaintiff = document.getElementById('uf-case-plaintiff').value.trim();
+                const defendant = document.getElementById('uf-case-defendant').value.trim();
+                const subject = document.getElementById('uf-case-subject').value.trim();
+                const notes = document.getElementById('uf-case-notes').value.trim();
+
+                if (id) {
+                    const item = underFilingCases.find(c => c.id === id);
+                    if (item) {
+                        item.circulationNumber = circulationNumber;
+                        item.plaintiff = plaintiff;
+                        item.defendant = defendant;
+                        item.subject = subject;
+                        item.notes = notes;
+                    }
+                    showAlert('تم تحديث بيانات القضية بنجاح', 'success');
+                    addNotification(`تم تعديل بيانات قضية تحت الرفع: ${circulationNumber}`, 'info');
+                } else {
+                    underFilingCases.push({
+                        id: Date.now().toString(),
+                        circulationNumber,
+                        plaintiff,
+                        defendant,
+                        subject,
+                        notes,
+                        status: 'pending',
+                        registrationNumber: '',
+                        sessionDate: '',
+                        actions: [],
+                        createdAt: Date.now()
+                    });
+                    showAlert('تم حفظ القضية بنجاح', 'success');
+                    addNotification(`تم إضافة قضية جديدة تحت الرفع: ${circulationNumber}`, 'success');
+                }
+
+                saveUfArray('case');
+                document.getElementById('uf-case-modal').style.display = 'none';
+                renderUnderFilingCasesTable();
+            });
+        }
+
+        function deleteUnderFilingCase(id) {
+            const item = underFilingCases.find(c => c.id === id);
+            if (!item) return;
+            if (!confirm(`هل أنت متأكد من حذف القضية "${item.circulationNumber}"؟ سيتم حذف كل إجراءاتها ومستنداتها نهائيًا.`)) return;
+
+            underFilingCases = underFilingCases.filter(c => c.id !== id);
+            saveUfArray('case');
+
+            if (window.electronAPI && window.electronAPI.listFiles) {
+                window.electronAPI.listFiles({ caseId: id }).then(res => {
+                    if (res && res.success && Array.isArray(res.files)) {
+                        res.files.forEach(f => window.electronAPI.deleteFile({ caseId: id, id: f.id }));
+                    }
+                }).catch(() => {});
+            }
+
+            showAlert('تم حذف القضية بنجاح', 'success');
+            renderUnderFilingCasesTable();
+        }
+
+        // ---------- إضافة/تعديل استئناف تحت الرفع ----------
+        function openUfAppealModal(id) {
+            const modal = document.getElementById('uf-appeal-modal');
+            const form = document.getElementById('uf-appeal-form');
+            form.reset();
+            document.getElementById('uf-appeal-id').value = id || '';
+
+            if (id) {
+                const item = underFilingAppeals.find(a => a.id === id);
+                if (!item) return;
+                document.getElementById('uf-appeal-modal-title').textContent = `تعديل استئناف تحت الرفع: ${item.circulationNumber || ''}`;
+                document.getElementById('uf-appeal-circulation').value = item.circulationNumber || '';
+                document.getElementById('uf-appeal-judgment-number').value = item.judgmentNumber || '';
+                document.getElementById('uf-appeal-judgment-year').value = item.judgmentYear || '';
+                document.getElementById('uf-appeal-appellant').value = item.appellant || '';
+                document.getElementById('uf-appeal-appellee').value = item.appellee || '';
+                document.getElementById('uf-appeal-notes').value = item.notes || '';
+            } else {
+                document.getElementById('uf-appeal-modal-title').textContent = 'إضافة استئناف تحت الرفع';
+            }
+
+            modal.style.display = 'flex';
+        }
+
+        const ufAppealForm = document.getElementById('uf-appeal-form');
+        if (ufAppealForm) {
+            ufAppealForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const id = document.getElementById('uf-appeal-id').value;
+                const circulationNumber = document.getElementById('uf-appeal-circulation').value.trim();
+                const judgmentNumber = document.getElementById('uf-appeal-judgment-number').value.trim();
+                const judgmentYear = document.getElementById('uf-appeal-judgment-year').value.trim();
+                const appellant = document.getElementById('uf-appeal-appellant').value.trim();
+                const appellee = document.getElementById('uf-appeal-appellee').value.trim();
+                const notes = document.getElementById('uf-appeal-notes').value.trim();
+
+                if (id) {
+                    const item = underFilingAppeals.find(a => a.id === id);
+                    if (item) {
+                        item.circulationNumber = circulationNumber;
+                        item.judgmentNumber = judgmentNumber;
+                        item.judgmentYear = judgmentYear;
+                        item.appellant = appellant;
+                        item.appellee = appellee;
+                        item.notes = notes;
+                    }
+                    showAlert('تم تحديث بيانات الاستئناف بنجاح', 'success');
+                    addNotification(`تم تعديل بيانات استئناف تحت الرفع: ${circulationNumber}`, 'info');
+                } else {
+                    underFilingAppeals.push({
+                        id: Date.now().toString(),
+                        circulationNumber,
+                        judgmentNumber,
+                        judgmentYear,
+                        appellant,
+                        appellee,
+                        notes,
+                        status: 'pending',
+                        appealNumber: '',
+                        appealYear: '',
+                        sessionDate: '',
+                        actions: [],
+                        createdAt: Date.now()
+                    });
+                    showAlert('تم حفظ الاستئناف بنجاح', 'success');
+                    addNotification(`تم إضافة استئناف جديد تحت الرفع: ${circulationNumber}`, 'success');
+                }
+
+                saveUfArray('appeal');
+                document.getElementById('uf-appeal-modal').style.display = 'none';
+                renderUnderFilingAppealsTable();
+            });
+        }
+
+        function deleteUnderFilingAppeal(id) {
+            const item = underFilingAppeals.find(a => a.id === id);
+            if (!item) return;
+            if (!confirm(`هل أنت متأكد من حذف الاستئناف "${item.circulationNumber}"؟ سيتم حذف كل إجراءاته ومستنداته نهائيًا.`)) return;
+
+            underFilingAppeals = underFilingAppeals.filter(a => a.id !== id);
+            saveUfArray('appeal');
+
+            if (window.electronAPI && window.electronAPI.listFiles) {
+                window.electronAPI.listFiles({ caseId: id }).then(res => {
+                    if (res && res.success && Array.isArray(res.files)) {
+                        res.files.forEach(f => window.electronAPI.deleteFile({ caseId: id, id: f.id }));
+                    }
+                }).catch(() => {});
+            }
+
+            showAlert('تم حذف الاستئناف بنجاح', 'success');
+            renderUnderFilingAppealsTable();
+        }
+
+        // ---------- إجراءات القضية/الاستئناف (نافذة مشتركة بين النوعين) ----------
+        let currentUfActionsKind = null;
+        let currentUfActionsRecordId = null;
+
+        function openUfActionsModal(kind, id) {
+            const record = findUfRecord(kind, id);
+            if (!record) return;
+            if (!Array.isArray(record.actions)) record.actions = [];
+
+            currentUfActionsKind = kind;
+            currentUfActionsRecordId = id;
+
+            document.getElementById('uf-actions-kind').value = kind;
+            document.getElementById('uf-actions-record-id').value = id;
+            document.getElementById('uf-actions-modal-title').textContent =
+                `إجراءات ${kind === 'appeal' ? 'الاستئناف' : 'القضية'}: ${record.circulationNumber || ''}`;
+
+            document.getElementById('uf-action-form').reset();
+            document.getElementById('uf-action-edit-id').value = '';
+            document.getElementById('uf-action-submit-btn').innerHTML = '<i class="fas fa-plus-circle"></i> إضافة الإجراء';
+            document.getElementById('uf-action-date').value = getDateKey(new Date().toISOString());
+
+            renderUfActionsList();
+            document.getElementById('uf-actions-modal').style.display = 'flex';
+        }
+
+        function renderUfActionsList() {
+            const container = document.getElementById('uf-actions-list');
+            const record = findUfRecord(currentUfActionsKind, currentUfActionsRecordId);
+            if (!record || !container) { if (container) container.innerHTML = ''; return; }
+
+            const actions = (record.actions || []).slice().sort((a, b) => new Date(a.date) - new Date(b.date));
+
+            if (actions.length === 0) {
+                container.innerHTML = '<p style="text-align:center;color:#999;padding:15px;">لا توجد إجراءات مسجلة بعد</p>';
+                return;
+            }
+
+            let html = '<h4 style="margin-bottom:10px;">الإجراءات المسجلة (بالترتيب الزمني)</h4>';
+            actions.forEach((a, idx) => {
+                html += `
+                    <div style="display:flex; justify-content:space-between; align-items:flex-start; padding:10px; border-bottom:1px solid #eee;">
+                        <div>
+                            <strong>${idx + 1}. ${formatDate(a.date)}</strong>
+                            <p style="margin:4px 0 0; color:#444;">${a.details}</p>
+                        </div>
+                        <div style="display:flex; gap:6px; flex-shrink:0;">
+                            <button type="button" class="btn-warning uf-edit-action-btn" data-action-id="${a.id}" style="padding:4px 8px; font-size:12px;"><i class="fas fa-edit"></i></button>
+                            <button type="button" class="btn-danger uf-delete-action-btn" data-action-id="${a.id}" style="padding:4px 8px; font-size:12px;"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+        }
+
+        const ufActionForm = document.getElementById('uf-action-form');
+        if (ufActionForm) {
+            ufActionForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const record = findUfRecord(currentUfActionsKind, currentUfActionsRecordId);
+                if (!record) return;
+                if (!Array.isArray(record.actions)) record.actions = [];
+
+                const editId = document.getElementById('uf-action-edit-id').value;
+                const date = document.getElementById('uf-action-date').value;
+                const details = document.getElementById('uf-action-details').value.trim();
+
+                if (editId) {
+                    const action = record.actions.find(a => a.id === editId);
+                    if (action) {
+                        action.date = date;
+                        action.details = details;
+                    }
+                    showAlert('تم تحديث الإجراء بنجاح', 'success');
+                } else {
+                    record.actions.push({
+                        id: `${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+                        date,
+                        details,
+                        recordedAt: Date.now()
+                    });
+                    showAlert('تم إضافة الإجراء بنجاح', 'success');
+                }
+
+                saveUfArray(currentUfActionsKind);
+
+                ufActionForm.reset();
+                document.getElementById('uf-action-edit-id').value = '';
+                document.getElementById('uf-action-submit-btn').innerHTML = '<i class="fas fa-plus-circle"></i> إضافة الإجراء';
+                document.getElementById('uf-action-date').value = getDateKey(new Date().toISOString());
+                renderUfActionsList();
+            });
+        }
+
+        const ufActionsListContainer = document.getElementById('uf-actions-list');
+        if (ufActionsListContainer) {
+            ufActionsListContainer.addEventListener('click', (e) => {
+                const editBtn = e.target.closest('.uf-edit-action-btn');
+                const deleteBtn = e.target.closest('.uf-delete-action-btn');
+                if (!editBtn && !deleteBtn) return;
+
+                const record = findUfRecord(currentUfActionsKind, currentUfActionsRecordId);
+                if (!record) return;
+
+                if (editBtn) {
+                    const actionId = editBtn.getAttribute('data-action-id');
+                    const action = record.actions.find(a => a.id === actionId);
+                    if (!action) return;
+                    document.getElementById('uf-action-edit-id').value = actionId;
+                    document.getElementById('uf-action-date').value = getDateKey(action.date);
+                    document.getElementById('uf-action-details').value = action.details;
+                    document.getElementById('uf-action-submit-btn').innerHTML = '<i class="fas fa-save"></i> حفظ التعديل';
+                } else if (deleteBtn) {
+                    const actionId = deleteBtn.getAttribute('data-action-id');
+                    if (!confirm('هل أنت متأكد من حذف هذا الإجراء؟')) return;
+                    record.actions = record.actions.filter(a => a.id !== actionId);
+                    saveUfArray(currentUfActionsKind);
+                    showAlert('تم حذف الإجراء', 'success');
+                    renderUfActionsList();
+                }
+            });
+        }
+
+        // ---------- تسجيل / تعديل رفع القضية ----------
+        function openUfFileCaseModal(id) {
+            const item = underFilingCases.find(c => c.id === id);
+            if (!item) return;
+
+            document.getElementById('uf-file-case-form').reset();
+            document.getElementById('uf-file-case-id').value = id;
+
+            const isEdit = item.status === 'filed';
+            document.getElementById('uf-file-case-modal-title').textContent = isEdit
+                ? `تعديل بيانات رفع القضية: ${item.circulationNumber || ''}`
+                : 'تسجيل رفع القضية';
+            document.getElementById('uf-file-case-submit-btn').innerHTML = isEdit
+                ? '<i class="fas fa-save"></i> حفظ التعديل'
+                : '<i class="fas fa-check-circle"></i> تأكيد رفع القضية';
+
+            document.getElementById('uf-file-case-registration-number').value = item.registrationNumber || '';
+            document.getElementById('uf-file-case-session-date').value = item.sessionDate ? getDateKey(item.sessionDate) : '';
+            document.getElementById('uf-file-case-department').value = item.department || '';
+            document.getElementById('uf-file-case-court').value = item.court || '';
+
+            document.getElementById('uf-file-case-modal').style.display = 'flex';
+        }
+
+        const ufFileCaseForm = document.getElementById('uf-file-case-form');
+        if (ufFileCaseForm) {
+            ufFileCaseForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const id = document.getElementById('uf-file-case-id').value;
+                const item = underFilingCases.find(c => c.id === id);
+                if (!item) return;
+
+                const wasAlreadyFiled = item.status === 'filed';
+
+                item.registrationNumber = document.getElementById('uf-file-case-registration-number').value.trim();
+                item.sessionDate = document.getElementById('uf-file-case-session-date').value;
+                item.department = document.getElementById('uf-file-case-department').value.trim();
+                item.court = document.getElementById('uf-file-case-court').value.trim();
+                item.status = 'filed';
+                if (!wasAlreadyFiled) item.filedAt = Date.now();
+
+                saveUfArray('case');
+
+                document.getElementById('uf-file-case-modal').style.display = 'none';
+
+                if (wasAlreadyFiled) {
+                    showAlert('تم تحديث بيانات رفع القضية بنجاح', 'success');
+                    addNotification(`تم تعديل بيانات رفع القضية: ${item.circulationNumber}`, 'info');
+                } else {
+                    showAlert('تم تسجيل رفع القضية بنجاح', 'success');
+                    addNotification(`تم رفع القضية: ${item.circulationNumber} برقم قيد ${item.registrationNumber}`, 'success');
+                }
+                renderUnderFilingCasesTable();
+            });
+        }
+
+        // ---------- تسجيل / تعديل رفع الاستئناف ----------
+        function openUfFileAppealModal(id) {
+            const item = underFilingAppeals.find(a => a.id === id);
+            if (!item) return;
+
+            document.getElementById('uf-file-appeal-form').reset();
+            document.getElementById('uf-file-appeal-id').value = id;
+
+            const isEdit = item.status === 'filed';
+            document.getElementById('uf-file-appeal-modal-title').textContent = isEdit
+                ? `تعديل بيانات رفع الاستئناف: ${item.circulationNumber || ''}`
+                : 'تسجيل رفع الاستئناف';
+            document.getElementById('uf-file-appeal-submit-btn').innerHTML = isEdit
+                ? '<i class="fas fa-save"></i> حفظ التعديل'
+                : '<i class="fas fa-check-circle"></i> تأكيد رفع الاستئناف';
+
+            document.getElementById('uf-file-appeal-number').value = item.appealNumber || '';
+            document.getElementById('uf-file-appeal-year').value = item.appealYear || '';
+            document.getElementById('uf-file-appeal-session-date').value = item.sessionDate ? getDateKey(item.sessionDate) : '';
+            document.getElementById('uf-file-appeal-department').value = item.department || '';
+            document.getElementById('uf-file-appeal-court').value = item.court || '';
+
+            document.getElementById('uf-file-appeal-modal').style.display = 'flex';
+        }
+
+        const ufFileAppealForm = document.getElementById('uf-file-appeal-form');
+        if (ufFileAppealForm) {
+            ufFileAppealForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const id = document.getElementById('uf-file-appeal-id').value;
+                const item = underFilingAppeals.find(a => a.id === id);
+                if (!item) return;
+
+                const wasAlreadyFiled = item.status === 'filed';
+
+                item.appealNumber = document.getElementById('uf-file-appeal-number').value.trim();
+                item.appealYear = document.getElementById('uf-file-appeal-year').value.trim();
+                item.sessionDate = document.getElementById('uf-file-appeal-session-date').value;
+                item.department = document.getElementById('uf-file-appeal-department').value.trim();
+                item.court = document.getElementById('uf-file-appeal-court').value.trim();
+                item.status = 'filed';
+                if (!wasAlreadyFiled) item.filedAt = Date.now();
+
+                saveUfArray('appeal');
+
+                document.getElementById('uf-file-appeal-modal').style.display = 'none';
+
+                if (wasAlreadyFiled) {
+                    showAlert('تم تحديث بيانات رفع الاستئناف بنجاح', 'success');
+                    addNotification(`تم تعديل بيانات رفع الاستئناف: ${item.circulationNumber}`, 'info');
+                } else {
+                    showAlert('تم تسجيل رفع الاستئناف بنجاح', 'success');
+                    addNotification(`تم رفع الاستئناف: ${item.circulationNumber} برقم ${item.appealNumber}/${item.appealYear}`, 'success');
+                }
+                renderUnderFilingAppealsTable();
+            });
+        }
+
+        // ---------- مستندات القضية/الاستئناف (نافذة مشتركة، وتُستخدم نفس آلية
+        // مستندات القضايا العادية في البرنامج، لكن بمعرّف مستقل لكل سجل حتى لا
+        // تختلط مستنداته بمستندات أي قضية أو استئناف آخر) ----------
+        let currentUfDocumentsKind = null;
+
+        function openUfDocumentsModal(kind, id) {
+            const record = findUfRecord(kind, id);
+            if (!record) return;
+
+            currentUfDocumentsKind = kind;
+            document.getElementById('uf-documents-record-id').value = id;
+            document.getElementById('uf-documents-modal-title').textContent =
+                `مستندات ${kind === 'appeal' ? 'الاستئناف' : 'القضية'}: ${record.circulationNumber || ''}`;
+            document.getElementById('uf-document-type').value = '';
+            document.getElementById('uf-document-file').value = '';
+
+            const listContainer = document.getElementById('uf-documents-list');
+            listContainer.id = `doc-list-${id}`;
+            refreshDocuments(id);
+
+            document.getElementById('uf-documents-modal').style.display = 'flex';
+        }
+
+        const ufDocumentUploadBtn = document.getElementById('uf-document-upload-btn');
+        if (ufDocumentUploadBtn) {
+            ufDocumentUploadBtn.addEventListener('click', async () => {
+                const id = document.getElementById('uf-documents-record-id').value;
+                const fileInput = document.getElementById('uf-document-file');
+                const docType = document.getElementById('uf-document-type').value.trim();
+                const file = fileInput.files && fileInput.files[0];
+
+                if (!file) {
+                    showAlert('من فضلك اختر ملفًا للرفع', 'warning');
+                    return;
+                }
+
+                const record = findUfRecord(currentUfDocumentsKind, id);
+                if (!record) return;
+
+                // بيانات بناء اسم المجلد جوه "تحت الرفع": بالرقم الرسمي (رقم القيد/رقم
+                // الاستئناف) لو موجود، وإلا بأسماء الخصوم بس (زي ما هو مطلوب بالظبط)
+                const caseDataForFolder = currentUfDocumentsKind === 'appeal'
+                    ? {
+                        number: record.appealNumber || '',
+                        plaintiff: record.appellant || '',
+                        defendant: record.appellee || '',
+                        underFiling: true
+                    }
+                    : {
+                        number: record.registrationNumber || '',
+                        plaintiff: record.plaintiff || '',
+                        defendant: record.defendant || '',
+                        underFiling: true
+                    };
+
+                try {
+                    const reader = new FileReader();
+                    reader.onload = async function(e) {
+                        const arrayBuffer = e.target.result;
+                        const bytes = new Uint8Array(arrayBuffer);
+                        let binary = '';
+                        const chunkSize = 0x8000;
+                        for (let i = 0; i < bytes.length; i += chunkSize) {
+                            binary += String.fromCharCode.apply(null, bytes.subarray(i, i + chunkSize));
+                        }
+                        const dataBase64 = btoa(binary);
+
+                        const res = await window.electronAPI.saveFile({
+                            caseId: id,
+                            filename: file.name,
+                            dataBase64,
+                            docType: docType,
+                            caseData: caseDataForFolder
+                        });
+
+                        if (res && res.success) {
+                            showAlert('تم رفع المستند بنجاح', 'success');
+                            fileInput.value = '';
+                            document.getElementById('uf-document-type').value = '';
+                            refreshDocuments(id);
+                        } else {
+                            showAlert('فشل رفع المستند' + (res && res.error ? (': ' + res.error) : ''), 'error');
+                        }
+                    };
+                    reader.readAsArrayBuffer(file);
+                } catch (err) {
+                    console.error(err);
+                    showAlert('خطأ أثناء رفع الملف', 'error');
+                }
+            });
+        }
+
+        // ---------- طباعة قضايا/استئنافات تحت الرفع ----------
+        function printUnderFilingCases() {
+            const searchInput = document.getElementById('uf-case-search');
+            const statusFilter = document.getElementById('uf-case-status-filter');
+            const searchTerm = searchInput ? searchInput.value.trim().toLowerCase() : '';
+            const statusValue = statusFilter ? statusFilter.value : '';
+
+            let filtered = underFilingCases.slice();
+            if (statusValue) filtered = filtered.filter(c => (c.status || 'pending') === statusValue);
+            if (searchTerm) {
+                filtered = filtered.filter(c => {
+                    const haystack = `${c.circulationNumber || ''} ${c.plaintiff || ''} ${c.defendant || ''} ${c.subject || ''}`.toLowerCase();
+                    return haystack.includes(searchTerm);
+                });
+            }
+
+            if (filtered.length === 0) {
+                showAlert('لا توجد قضايا لطباعتها', 'warning');
+                return;
+            }
+
+            let rows = '';
+            filtered.forEach((c, idx) => {
+                rows += `
+                    <tr>
+                        <td>${idx + 1}</td>
+                        <td>${c.circulationNumber || '-'}</td>
+                        <td>${c.plaintiff || '-'}</td>
+                        <td>${c.defendant || '-'}</td>
+                        <td>${c.subject || '-'}</td>
+                        <td>${getUfCaseStatusLabel(c.status)}</td>
+                        <td>${c.registrationNumber || '-'}</td>
+                        <td>${c.sessionDate ? formatDate(c.sessionDate) : '-'}</td>
+                        <td>${c.department || '-'}</td>
+                        <td>${c.court || '-'}</td>
+                        <td>${c.notes || '-'}</td>
+                    </tr>
+                `;
+            });
+
+            const content = `
+                <!DOCTYPE html>
+                <html lang="ar" dir="rtl">
+                <head>
+                    <meta charset="UTF-8">
+                    <title>كشف القضايا تحت الرفع</title>
+                    <style>
+                        @page { size: A4 landscape; margin: 1.5cm; }
+                        body { font-family: Arial, sans-serif; direction: rtl; }
+                        .header { text-align:center; margin-bottom:20px; border-bottom:2px solid #000; padding-bottom:15px; }
+                        table { width:100%; border-collapse: collapse; font-size: 11px; }
+                        th, td { border: 1px solid #000; padding:6px; text-align:center; }
+                        th { background:#f2f2f2; }
+                    </style>
+                </head>
+                <body>
+                    <div class="header">
+                        <h2>هيئة قضايا الدولة</h2>
+                        <h3>كشف القضايا تحت الرفع</h3>
+                        <p>تاريخ التقرير: ${formatDate(new Date().toISOString().split('T')[0])} | عدد القضايا: ${filtered.length}</p>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>م</th><th>رقم المتداول</th><th>المدعي</th><th>المدعى عليه</th>
+                                <th>الموضوع</th><th>الحالة</th><th>رقم القيد</th><th>تاريخ الجلسة</th>
+                                <th>الدائرة</th><th>المحكمة</th><th>ملاحظات</th>
+                            </tr>
+                        </thead>
+                        <tbody>${rows}</tbody>
+                    </table>
+                    <script>window.onload = function(){ window.print(); }<\/script>
+                </body>
+                </html>
+            `;
+
+            const printWindow = window.open('', '_blank', 'width=1100,height=800');
+            printWindow.document.write(content);
+            printWindow.document.close();
+        }
+
+        function printUnderFilingAppeals() {
+            const searchInput = document.getElementById('uf-appeal-search');
+            const statusFilter = document.getElementById('uf-appeal-status-filter');
+            const searchTerm = searchInput ? searchInput.value.trim().toLowerCase() : '';
+            const statusValue = statusFilter ? statusFilter.value : '';
+
+            let filtered = underFilingAppeals.slice();
+            if (statusValue) filtered = filtered.filter(a => (a.status || 'pending') === statusValue);
+            if (searchTerm) {
+                filtered = filtered.filter(a => {
+                    const haystack = `${a.circulationNumber || ''} ${a.appellant || ''} ${a.appellee || ''}`.toLowerCase();
+                    return haystack.includes(searchTerm);
+                });
+            }
+
+            if (filtered.length === 0) {
+                showAlert('لا توجد استئنافات لطباعتها', 'warning');
+                return;
+            }
+
+            let rows = '';
+            filtered.forEach((a, idx) => {
+                rows += `
+                    <tr>
+                        <td>${idx + 1}</td>
+                        <td>${a.circulationNumber || '-'}</td>
+                        <td>${a.judgmentNumber || '-'}</td>
+                        <td>${a.judgmentYear || '-'}</td>
+                        <td>${a.appellant || '-'}</td>
+                        <td>${a.appellee || '-'}</td>
+                        <td>${getUfAppealStatusLabel(a.status)}</td>
+                        <td>${a.appealNumber || '-'}</td>
+                        <td>${a.appealYear || '-'}</td>
+                        <td>${a.sessionDate ? formatDate(a.sessionDate) : '-'}</td>
+                        <td>${a.department || '-'}</td>
+                        <td>${a.court || '-'}</td>
+                        <td>${a.notes || '-'}</td>
+                    </tr>
+                `;
+            });
+
+            const content = `
+                <!DOCTYPE html>
+                <html lang="ar" dir="rtl">
+                <head>
+                    <meta charset="UTF-8">
+                    <title>كشف الاستئنافات تحت الرفع</title>
+                    <style>
+                        @page { size: A4 landscape; margin: 1.5cm; }
+                        body { font-family: Arial, sans-serif; direction: rtl; }
+                        .header { text-align:center; margin-bottom:20px; border-bottom:2px solid #000; padding-bottom:15px; }
+                        table { width:100%; border-collapse: collapse; font-size: 10px; }
+                        th, td { border: 1px solid #000; padding:6px; text-align:center; }
+                        th { background:#f2f2f2; }
+                    </style>
+                </head>
+                <body>
+                    <div class="header">
+                        <h2>هيئة قضايا الدولة</h2>
+                        <h3>كشف الاستئنافات تحت الرفع</h3>
+                        <p>تاريخ التقرير: ${formatDate(new Date().toISOString().split('T')[0])} | عدد الاستئنافات: ${filtered.length}</p>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>م</th><th>رقم المتداول</th><th>رقم الحكم</th><th>سنة الحكم</th>
+                                <th>المستأنف</th><th>المستأنف ضده</th><th>الحالة</th>
+                                <th>رقم الاستئناف</th><th>سنة الاستئناف</th><th>تاريخ الجلسة</th>
+                                <th>الدائرة</th><th>المحكمة</th><th>ملاحظات</th>
+                            </tr>
+                        </thead>
+                        <tbody>${rows}</tbody>
+                    </table>
+                    <script>window.onload = function(){ window.print(); }<\/script>
+                </body>
+                </html>
+            `;
+
+            const printWindow = window.open('', '_blank', 'width=1100,height=800');
+            printWindow.document.write(content);
+            printWindow.document.close();
+        }
+
+        // ---------- تصدير قضايا/استئنافات تحت الرفع إلى Word ----------
+        function exportUnderFilingCasesToWord() {
+            const searchInput = document.getElementById('uf-case-search');
+            const statusFilter = document.getElementById('uf-case-status-filter');
+            const searchTerm = searchInput ? searchInput.value.trim().toLowerCase() : '';
+            const statusValue = statusFilter ? statusFilter.value : '';
+
+            let filtered = underFilingCases.slice();
+            if (statusValue) filtered = filtered.filter(c => (c.status || 'pending') === statusValue);
+            if (searchTerm) {
+                filtered = filtered.filter(c => {
+                    const haystack = `${c.circulationNumber || ''} ${c.plaintiff || ''} ${c.defendant || ''} ${c.subject || ''}`.toLowerCase();
+                    return haystack.includes(searchTerm);
+                });
+            }
+
+            if (filtered.length === 0) {
+                showAlert('لا توجد قضايا للتصدير', 'warning');
+                return;
+            }
+
+            let rows = '';
+            filtered.forEach((c, idx) => {
+                rows += `
+                    <tr>
+                        <td>${idx + 1}</td>
+                        <td>${c.circulationNumber || '-'}</td>
+                        <td>${c.plaintiff || '-'}</td>
+                        <td>${c.defendant || '-'}</td>
+                        <td>${c.subject || '-'}</td>
+                        <td>${getUfCaseStatusLabel(c.status)}</td>
+                        <td>${c.registrationNumber || '-'}</td>
+                        <td>${c.sessionDate ? formatDate(c.sessionDate) : '-'}</td>
+                        <td>${c.department || '-'}</td>
+                        <td>${c.court || '-'}</td>
+                        <td>${c.notes || '-'}</td>
+                    </tr>
+                `;
+            });
+
+            const content = `
+                <div class="header">
+                    <h1>هيئة قضايا الدولة</h1>
+                    <h2>نظام إدارة القضايا</h2>
+                    <h3>كشف القضايا تحت الرفع</h3>
+                    <p>عدد القضايا: ${filtered.length}</p>
+                    <p>تاريخ التصدير: ${formatDate(new Date().toISOString().split('T')[0])}</p>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>م</th><th>رقم المتداول</th><th>المدعي</th><th>المدعى عليه</th>
+                            <th>الموضوع</th><th>الحالة</th><th>رقم القيد</th><th>تاريخ الجلسة</th>
+                            <th>الدائرة</th><th>المحكمة</th><th>ملاحظات</th>
+                        </tr>
+                    </thead>
+                    <tbody>${rows}</tbody>
+                </table>
+            `;
+
+            exportToWord(content, `القضايا_تحت_الرفع_${new Date().toISOString().split('T')[0]}`);
+        }
+
+        function exportUnderFilingAppealsToWord() {
+            const searchInput = document.getElementById('uf-appeal-search');
+            const statusFilter = document.getElementById('uf-appeal-status-filter');
+            const searchTerm = searchInput ? searchInput.value.trim().toLowerCase() : '';
+            const statusValue = statusFilter ? statusFilter.value : '';
+
+            let filtered = underFilingAppeals.slice();
+            if (statusValue) filtered = filtered.filter(a => (a.status || 'pending') === statusValue);
+            if (searchTerm) {
+                filtered = filtered.filter(a => {
+                    const haystack = `${a.circulationNumber || ''} ${a.appellant || ''} ${a.appellee || ''}`.toLowerCase();
+                    return haystack.includes(searchTerm);
+                });
+            }
+
+            if (filtered.length === 0) {
+                showAlert('لا توجد استئنافات للتصدير', 'warning');
+                return;
+            }
+
+            let rows = '';
+            filtered.forEach((a, idx) => {
+                rows += `
+                    <tr>
+                        <td>${idx + 1}</td>
+                        <td>${a.circulationNumber || '-'}</td>
+                        <td>${a.judgmentNumber || '-'}</td>
+                        <td>${a.judgmentYear || '-'}</td>
+                        <td>${a.appellant || '-'}</td>
+                        <td>${a.appellee || '-'}</td>
+                        <td>${getUfAppealStatusLabel(a.status)}</td>
+                        <td>${a.appealNumber || '-'}</td>
+                        <td>${a.appealYear || '-'}</td>
+                        <td>${a.sessionDate ? formatDate(a.sessionDate) : '-'}</td>
+                        <td>${a.department || '-'}</td>
+                        <td>${a.court || '-'}</td>
+                        <td>${a.notes || '-'}</td>
+                    </tr>
+                `;
+            });
+
+            const content = `
+                <div class="header">
+                    <h1>هيئة قضايا الدولة</h1>
+                    <h2>نظام إدارة القضايا</h2>
+                    <h3>كشف الاستئنافات تحت الرفع</h3>
+                    <p>عدد الاستئنافات: ${filtered.length}</p>
+                    <p>تاريخ التصدير: ${formatDate(new Date().toISOString().split('T')[0])}</p>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>م</th><th>رقم المتداول</th><th>رقم الحكم</th><th>سنة الحكم</th>
+                            <th>المستأنف</th><th>المستأنف ضده</th><th>الحالة</th>
+                            <th>رقم الاستئناف</th><th>سنة الاستئناف</th><th>تاريخ الجلسة</th>
+                            <th>الدائرة</th><th>المحكمة</th><th>ملاحظات</th>
+                        </tr>
+                    </thead>
+                    <tbody>${rows}</tbody>
+                </table>
+            `;
+
+            exportToWord(content, `الاستئنافات_تحت_الرفع_${new Date().toISOString().split('T')[0]}`);
+        }
+
+        // ---------- التنقل بين تبويبي "قضية تحت الرفع" و"استئناف تحت الرفع" ----------
+        const ufTabCasesBtn = document.getElementById('uf-tab-cases-btn');
+        const ufTabAppealsBtn = document.getElementById('uf-tab-appeals-btn');
+        const ufCasesView = document.getElementById('uf-cases-view');
+        const ufAppealsView = document.getElementById('uf-appeals-view');
+
+        if (ufTabCasesBtn && ufTabAppealsBtn && ufCasesView && ufAppealsView) {
+            ufTabCasesBtn.addEventListener('click', () => {
+                ufCasesView.style.display = 'block';
+                ufAppealsView.style.display = 'none';
+                ufTabCasesBtn.classList.add('btn-primary');
+                ufTabCasesBtn.classList.remove('btn-secondary');
+                ufTabAppealsBtn.classList.add('btn-secondary');
+                ufTabAppealsBtn.classList.remove('btn-primary');
+            });
+            ufTabAppealsBtn.addEventListener('click', () => {
+                ufAppealsView.style.display = 'block';
+                ufCasesView.style.display = 'none';
+                ufTabAppealsBtn.classList.add('btn-primary');
+                ufTabAppealsBtn.classList.remove('btn-secondary');
+                ufTabCasesBtn.classList.add('btn-secondary');
+                ufTabCasesBtn.classList.remove('btn-primary');
+            });
+        }
+
+        // ---------- ربط الأزرار والبحث والفلاتر ----------
+        const ufAddCaseBtn = document.getElementById('uf-add-case-btn');
+        if (ufAddCaseBtn) ufAddCaseBtn.addEventListener('click', () => openUfCaseModal(null));
+
+        const ufAddAppealBtn = document.getElementById('uf-add-appeal-btn');
+        if (ufAddAppealBtn) ufAddAppealBtn.addEventListener('click', () => openUfAppealModal(null));
+
+        const ufPrintCasesBtn = document.getElementById('uf-print-cases-btn');
+        if (ufPrintCasesBtn) ufPrintCasesBtn.addEventListener('click', printUnderFilingCases);
+
+        const ufExportCasesWordBtn = document.getElementById('uf-export-cases-word-btn');
+        if (ufExportCasesWordBtn) ufExportCasesWordBtn.addEventListener('click', exportUnderFilingCasesToWord);
+
+        const ufPrintAppealsBtn = document.getElementById('uf-print-appeals-btn');
+        if (ufPrintAppealsBtn) ufPrintAppealsBtn.addEventListener('click', printUnderFilingAppeals);
+
+        const ufExportAppealsWordBtn = document.getElementById('uf-export-appeals-word-btn');
+        if (ufExportAppealsWordBtn) ufExportAppealsWordBtn.addEventListener('click', exportUnderFilingAppealsToWord);
+
+        const ufCaseSearchInput = document.getElementById('uf-case-search');
+        if (ufCaseSearchInput) ufCaseSearchInput.addEventListener('input', renderUnderFilingCasesTable);
+
+        const ufCaseStatusFilterSelect = document.getElementById('uf-case-status-filter');
+        if (ufCaseStatusFilterSelect) ufCaseStatusFilterSelect.addEventListener('change', renderUnderFilingCasesTable);
+
+        const ufAppealSearchInput = document.getElementById('uf-appeal-search');
+        if (ufAppealSearchInput) ufAppealSearchInput.addEventListener('input', renderUnderFilingAppealsTable);
+
+        const ufAppealStatusFilterSelect = document.getElementById('uf-appeal-status-filter');
+        if (ufAppealStatusFilterSelect) ufAppealStatusFilterSelect.addEventListener('change', renderUnderFilingAppealsTable);
+
+        // تفويض ضغطات أزرار كل صف (مستقل تمامًا عن معالج الأحداث العام الكبير
+        // في باقي البرنامج، حتى لا يتأثر أي جزء آخر من التطبيق بهذه الإضافة)
+        const ufCasesTableBody = document.getElementById('uf-cases-table-body');
+        if (ufCasesTableBody) {
+            ufCasesTableBody.addEventListener('click', (e) => {
+                const btn = e.target.closest('button');
+                if (!btn) return;
+                const id = btn.getAttribute('data-id');
+                if (!id) return;
+                if (btn.classList.contains('uf-edit-case-btn')) openUfCaseModal(id);
+                else if (btn.classList.contains('uf-case-actions-btn')) openUfActionsModal('case', id);
+                else if (btn.classList.contains('uf-case-docs-btn')) openUfDocumentsModal('case', id);
+                else if (btn.classList.contains('uf-file-case-btn')) openUfFileCaseModal(id);
+                else if (btn.classList.contains('uf-delete-case-btn')) deleteUnderFilingCase(id);
+            });
+        }
+
+        const ufAppealsTableBody = document.getElementById('uf-appeals-table-body');
+        if (ufAppealsTableBody) {
+            ufAppealsTableBody.addEventListener('click', (e) => {
+                const btn = e.target.closest('button');
+                if (!btn) return;
+                const id = btn.getAttribute('data-id');
+                if (!id) return;
+                if (btn.classList.contains('uf-edit-appeal-btn')) openUfAppealModal(id);
+                else if (btn.classList.contains('uf-appeal-actions-btn')) openUfActionsModal('appeal', id);
+                else if (btn.classList.contains('uf-appeal-docs-btn')) openUfDocumentsModal('appeal', id);
+                else if (btn.classList.contains('uf-file-appeal-btn')) openUfFileAppealModal(id);
+                else if (btn.classList.contains('uf-delete-appeal-btn')) deleteUnderFilingAppeal(id);
+            });
+        }
+
         function refreshAllViews() {
             try {
                 reapplyActiveCasesFilterSilently();
                 renderJudgmentsTables();
                 renderReservedAndCancelledCases();
                 renderArchivedCasesTable();
+                renderUnderFilingCasesTable();
+                renderUnderFilingAppealsTable();
                 updateStats();
                 updateDashboard();
             } catch (e) {
