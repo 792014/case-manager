@@ -7149,6 +7149,7 @@
         function getSessionTypeLabel(type) {
             switch (type) {
                 case 'postponement': return 'ترحيل';
+                case 'postponed': return 'مد أجل الحكم';
                 case 'initial': return 'مبدئية';
                 case 'final': return 'نهائية';
                 case 'reserved': return 'محجوزة';
@@ -7158,6 +7159,7 @@
                 case 'judgment': return 'حكم';
                 case 'interim_judgment': return 'حكم تمهيدي';
                 case 'suspend': return 'وقف حكم';
+                case 'return_to_pleading_judgment': return 'حكم بإعادة الدعوى للمرافعة';
                 case 'judgment-type-changed': return 'تعديل نوع الحكم';
                 default: return type || '-';
             }
@@ -7166,6 +7168,7 @@
         function getSessionTypeClass(type) {
             switch (type) {
                 case 'postponement': return 'session-type-postponed';
+                case 'postponed': return 'session-type-postponed';
                 case 'initial': return 'session-type-scheduled';
                 case 'final': return 'session-type-completed';
                 case 'reserved': return 'session-type-reserved';
@@ -7175,6 +7178,7 @@
                 case 'judgment': return 'session-type-completed';
                 case 'interim_judgment': return 'session-type-completed';
                 case 'suspend': return 'session-type-postponed';
+                case 'return_to_pleading_judgment': return 'session-type-completed';
                 case 'judgment-type-changed': return 'session-type-reserved';
                 default: return '';
             }
