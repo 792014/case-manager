@@ -16033,6 +16033,7 @@
                 renderArchivedCasesTable();
                 renderUnderFilingCasesTable();
                 renderUnderFilingAppealsTable();
+                try { renderDepartmentsTable(); refreshAllDepartmentSelects(); } catch (e2) {}
                 updateStats();
                 updateDashboard();
             } catch (e) {
@@ -16062,6 +16063,11 @@
                         suspendedCases = remote.suspendedCases || [];
                         archivedCases = remote.archivedCases || [];
                         notifications = remote.notifications || [];
+                        // قسم "تحت الرفع" والدوائر كانت ناقصة من المزامنة التلقائية، فكانت أي قضية/استئناف
+                        // تحت الرفع تُضاف من جهاز لا تظهر على الجهاز الآخر (الموبايل) إلا بعد إعادة تشغيل التطبيق.
+                        if (Array.isArray(remote.departments)) departments = remote.departments;
+                        underFilingCases = Array.isArray(remote.underFilingCases) ? remote.underFilingCases : [];
+                        underFilingAppeals = Array.isArray(remote.underFilingAppeals) ? remote.underFilingAppeals : [];
 
                         // نمنع أن تُشعل كتابة localStorage هنا حفظًا جديدًا عبر Firebase
                         // (window.__savingToAPI) لأن هذه البيانات نازلة من السيرفر أصلاً
@@ -16078,6 +16084,9 @@
                             localStorage.setItem('suspendedCases', JSON.stringify(suspendedCases));
                             localStorage.setItem('archivedCases', JSON.stringify(archivedCases));
                             localStorage.setItem('notifications', JSON.stringify(notifications));
+                            localStorage.setItem('departments', JSON.stringify(departments));
+                            localStorage.setItem('underFilingCases', JSON.stringify(underFilingCases));
+                            localStorage.setItem('underFilingAppeals', JSON.stringify(underFilingAppeals));
                             localStorage.setItem('lastSavedAt', String(remoteTS));
                         } finally {
                             window.__savingToAPI = false;
