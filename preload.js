@@ -22,7 +22,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
     readClipboard: () => ipcRenderer.invoke('readClipboard'),
     writeClipboard: (args) => ipcRenderer.invoke('writeClipboard', args),
     scanStorageFolders: () => ipcRenderer.invoke('scanStorageFolders'),
-    importCaseFolder: (args) => ipcRenderer.invoke('importCaseFolder', args)
+    importCaseFolder: (args) => ipcRenderer.invoke('importCaseFolder', args),
+    exportHtmlToPdf: (args) => ipcRenderer.invoke('exportHtmlToPdf', args)
 
     // ملحوظة: تعمدنا عدم إضافة saveData/loadData هنا. بيانات القضايا والأحكام
     // بتفضل بتتزامن حصريًا عبر Firebase (بنفس طريقة الموبايل بالظبط)، وده اللي

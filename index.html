@@ -124,6 +124,11 @@
     </script>
     <script src="vendor/chart.umd.min.js"></script>
     <script>window.Chart || document.write('<script src="https://cdn.jsdelivr.net/npm/chart.js"><\/script>');</script>
+    <!-- مكتبتان محليتان لتصدير تقرير لوحة التحكم إلى PDF مباشرة (بديل المتصفح عند تعذّر تصدير Electron) -->
+    <script src="vendor/jspdf.umd.min.js"></script>
+    <script>window.jspdf || document.write('<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js"><\/script>');</script>
+    <script src="vendor/html2canvas.min.js"></script>
+    <script>window.html2canvas || document.write('<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"><\/script>');</script>
     <!-- Mammoth removed: offline behavior uses system apps to open files natively -->
     
     <style>
@@ -2094,6 +2099,7 @@
         .pd-card-h { display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:10px; padding-bottom:10px; border-bottom:1px solid #eef2f8; }
         .pd-card-h h3 { margin:0; padding:0; border:0; font-size:15px; color:var(--primary-color); display:flex; align-items:center; flex-wrap:wrap; gap:6px; }
         .pd-hint { font-size:11px; font-weight:400; color:#94a0b3; }
+        .pd-badge-count { font-size:12px; font-weight:700; color:#1565c0; background:#e8f1fd; padding:1px 9px; border-radius:20px; }
         .pd-mini { flex:0 0 auto; width:30px; height:30px; border-radius:8px; border:1px solid #dbe3f0; background:#fff; color:#5b6b83; cursor:pointer; }
         .pd-mini:hover { background:var(--primary-color); color:#fff; border-color:var(--primary-color); }
         .pd-chart { position:relative; height:260px; }
@@ -2113,6 +2119,7 @@
         .pd-table th { background:#eef3fb; color:#22324a; padding:9px 8px; text-align:center; white-space:nowrap; border-bottom:2px solid #d5deed; }
         .pd-table td { padding:8px; text-align:center; border-bottom:1px solid #edf1f7; }
         .pd-table td:first-child { text-align:right; font-weight:600; color:#0b3d91; }
+        .pd-table td.r { text-align:right; }
         .pd-table tbody tr { cursor:pointer; transition:background .15s; }
         .pd-table tbody tr:hover { background:#f3f7fd; }
         .pd-table tbody tr.pd-sel { background:#e3eefc; }
@@ -2247,6 +2254,7 @@
                     </label>
                     <button type="button" class="pd-btn pd-btn-ghost" id="pd-reset-filters" title="إلغاء التصفية"><i class="fas fa-filter-circle-xmark"></i></button>
                     <button type="button" class="pd-btn pd-btn-ghost" id="pd-refresh" title="تحديث"><i class="fas fa-rotate"></i></button>
+                    <button type="button" class="pd-btn pd-btn-ghost" id="pd-export-pdf"><i class="fas fa-file-pdf"></i> تصدير PDF</button>
                     <button type="button" class="pd-btn pd-btn-main" id="pd-print-all"><i class="fas fa-print"></i> طباعة الإحصائيات</button>
                 </div>
             </div>
@@ -2288,6 +2296,16 @@
                 <div class="pd-card pd-c4">
                     <div class="pd-card-h"><h3><i class="fas fa-list-check"></i> قضايا اليوم المحدد</h3></div>
                     <div class="pd-day" id="pd-day-detail"><p class="pd-muted">اضغط على أي عمود في مخطط الجلسات لعرض القضايا المنظورة في ذلك اليوم.</p></div>
+                </div>
+
+                <div class="pd-card pd-c12">
+                    <div class="pd-card-h"><h3><i class="fas fa-list-ol"></i> الجلسات القادمة خلال 14 يومًا <span class="pd-badge-count" id="pd-upcoming-count">(0)</span></h3><button type="button" class="pd-mini" id="pd-print-upcoming-list" title="طباعة القائمة"><i class="fas fa-print"></i></button></div>
+                    <div class="pd-table-wrap pd-scroll" style="max-height:360px;">
+                        <table class="pd-table" id="pd-upcoming-list-table">
+                            <thead><tr><th>م</th><th>تاريخ الجلسة</th><th>رقم/سنة الدعوى</th><th>الموضوع</th><th>المدعي</th><th>المدعى عليه</th><th>الدائرة</th></tr></thead>
+                            <tbody><tr><td colspan="7" style="text-align:center;color:#94a0b3;padding:18px;cursor:default;">لا توجد جلسات قادمة خلال 14 يومًا</td></tr></tbody>
+                        </table>
+                    </div>
                 </div>
 
                 <div class="pd-card pd-c8">
@@ -6588,6 +6606,15 @@
             return { today, upcoming, expired, week, judgTotal, win: judgTotal ? Math.round(d.fav.length * 100 / judgTotal) : 0 };
         }
 
+        // قائمة الجلسات القادمة خلال 14 يومًا — مصدر موحّد تستخدمه اللوحة والتقرير المطبوع وتصدير PDF معًا
+        function pdSoon14(k) {
+            const end = new Date(); end.setDate(end.getDate() + 13);
+            return k.upcoming.filter(c => c.sessionDate <= pdISO(end)).sort((a, b) => a.sessionDate.localeCompare(b.sessionDate));
+        }
+        function pdUpcomingListRowsHTML(list, limit) {
+            return (limit ? list.slice(0, limit) : list).map((c, i) => '<tr><td>' + (i + 1) + '</td><td>' + pdEsc(c.sessionDate.split('-').reverse().join('/')) + '</td><td>' + pdEsc(c.number) + '/' + pdEsc(c.year) + '</td><td class="r">' + pdEsc(c.subject) + '</td><td class="r">' + pdEsc(c.plaintiff) + '</td><td class="r">' + pdEsc(c.defendant) + '</td><td>' + pdEsc(c.department) + '</td></tr>').join('');
+        }
+
         function pdRender() {
             try {
                 if (typeof cases === 'undefined' || !document.getElementById('pd-year')) return;
@@ -6768,6 +6795,13 @@
                 // 10) جدول ملخص الدوائر
                 pdRenderDeptTable(deptMap, dNames);
 
+                // 11) قائمة الجلسات القادمة خلال 14 يومًا (نفس البيانات التي تظهر في التقرير المطبوع)
+                PD.soon14 = pdSoon14(k);
+                const countEl = document.getElementById('pd-upcoming-count');
+                if (countEl) countEl.textContent = '(' + pdNum(PD.soon14.length) + ')';
+                const listBody = document.querySelector('#pd-upcoming-list-table tbody');
+                if (listBody) listBody.innerHTML = PD.soon14.length ? pdUpcomingListRowsHTML(PD.soon14) : '<tr><td colspan="7" style="text-align:center;color:#94a0b3;padding:18px;cursor:default;">لا توجد جلسات قادمة خلال 14 يومًا</td></tr>';
+
                 // تحديث تفاصيل اليوم المفتوح إن وُجد
                 if (PD.selectedDay) pdShowDay(PD.selectedDay, true);
             } catch (err) {
@@ -6815,12 +6849,19 @@
 
         // ================= الطباعة =================
         function pdReportCSS() {
+            // ملحوظة مهمة عن التنسيق: محرك طباعة Chromium (المستخدم في تصدير PDF)
+            // بيتجاهل page-break-inside/break-inside جوه عناصر CSS Grid أو Flexbox
+            // بشكل شبه كامل — ده قيد معروف فيه، مش في كود البرنامج. عشان كده بطاقات
+            // الإحصائيات والرسوم البيانية هنا متبنية بـ inline-block داخل تدفق عادي
+            // للمستند (مش display:grid)، وده اللي بيخلي break-inside:avoid يشتغل
+            // صح فعليًا ويمنع قطع أي بطاقة أو رسم بياني أو صف جدول بين صفحتين.
             return '@page{size:A4 portrait;margin:12mm}*{box-sizing:border-box}body{font-family:"Segoe UI",Tahoma,Arial,sans-serif;direction:rtl;color:#1b2a41;margin:0;font-size:12px}' +
-                '.hd{text-align:center;border-bottom:3px double #0b3d91;padding-bottom:10px;margin-bottom:12px}.hd h1{margin:0;font-size:20px;color:#0b3d91}.hd h2{margin:4px 0;font-size:15px}.hd p{margin:2px 0;color:#555;font-size:11px}' +
-                '.kp{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:10px 0}.kp div{border:1px solid #cfd8e6;border-radius:6px;padding:8px;text-align:center}.kp b{display:block;font-size:19px;color:#0b3d91}.kp span{font-size:11px;color:#41546f}' +
-                'h3{font-size:13px;color:#0b3d91;border-right:4px solid #0b3d91;padding-right:8px;margin:14px 0 8px}.ch{display:grid;grid-template-columns:1fr 1fr;gap:10px}.box{border:1px solid #cfd8e6;border-radius:6px;padding:8px;page-break-inside:avoid;text-align:center}.box h4{margin:0 0 6px;font-size:12px}.box img{max-width:100%;height:auto}.full{grid-column:1 / -1}' +
-                'table{width:100%;border-collapse:collapse;margin:6px 0;font-size:11px;page-break-inside:auto}tr{page-break-inside:avoid}th,td{border:1px solid #9fb0c8;padding:4px 6px;text-align:center}th{background:#e8eef8}td.r{text-align:right}tfoot td{font-weight:700;background:#f3f6fb}' +
-                '.ft{margin-top:14px;padding-top:6px;border-top:1px solid #ccc;text-align:center;color:#777;font-size:10px}';
+                '.hd{text-align:center;border-bottom:3px double #0b3d91;padding-bottom:10px;margin-bottom:12px;page-break-inside:avoid;break-inside:avoid}.hd h1{margin:0;font-size:20px;color:#0b3d91}.hd h2{margin:4px 0;font-size:15px}.hd p{margin:2px 0;color:#555;font-size:11px}' +
+                '.kp{margin:10px 0;font-size:0}.kp div{display:inline-block;vertical-align:top;width:23.5%;margin:0 0.5% 8px;font-size:12px;border:1px solid #cfd8e6;border-radius:6px;padding:8px;text-align:center;page-break-inside:avoid;break-inside:avoid-page}.kp b{display:block;font-size:19px;color:#0b3d91}.kp span{font-size:11px;color:#41546f}' +
+                'h3{font-size:13px;color:#0b3d91;border-right:4px solid #0b3d91;padding-right:8px;margin:14px 0 8px;page-break-after:avoid;break-after:avoid-page}' +
+                '.ch{font-size:0}.box{display:inline-block;vertical-align:top;width:48.5%;margin:0 0.5% 10px;font-size:12px;border:1px solid #cfd8e6;border-radius:6px;padding:8px;page-break-inside:avoid;break-inside:avoid-page;text-align:center}.box h4{margin:0 0 6px;font-size:12px}.box img{max-width:100%;height:auto;display:block;margin:0 auto}.full{width:99%}' +
+                'table{width:100%;border-collapse:collapse;margin:6px 0;font-size:11px;page-break-inside:auto;break-inside:auto}thead{display:table-header-group}tr{page-break-inside:avoid;break-inside:avoid-page}th,td{border:1px solid #9fb0c8;padding:4px 6px;text-align:center}th{background:#e8eef8}td.r{text-align:right}tfoot td{font-weight:700;background:#f3f6fb}' +
+                '.ft{margin-top:14px;padding-top:6px;border-top:1px solid #ccc;text-align:center;color:#777;font-size:10px;page-break-inside:avoid;break-inside:avoid}';
         }
         function pdOpenPrint(title, body) {
             const html = '<!DOCTYPE html><html dir="rtl" lang="ar"><head><meta charset="utf-8"><title>' + pdEsc(title) + '</title><style>' + pdReportCSS() + '</style></head><body>' + body +
@@ -6862,7 +6903,7 @@
             const body = pdReportHeader(title) + '<div class="box"><img src="' + pdImg(id) + '" alt=""></div><h3>البيانات التفصيلية</h3>' + pdChartTableHTML(ch) + '<div class="ft">صادر عن نظام إدارة القضايا — المستشار محمود العوابدي</div>';
             pdOpenPrint(title, body);
         }
-        function pdPrintAll() {
+        function pdFullReportBody() {
             const d = pdCollect(false), k = pdCalc(d);
             const ufC = pdArr(underFilingCases), ufA = pdArr(underFilingAppeals);
             const kp = (v, l) => '<div><b>' + pdEsc(v) + '</b><span>' + pdEsc(l) + '</span></div>';
@@ -6883,15 +6924,181 @@
                 r.names.forEach(n => { const o = r.map[n]; body += '<tr><td class="r">' + pdEsc(n) + '</td><td>' + o.current + '</td><td>' + o.reserved + '</td><td>' + o.suspended + '</td><td>' + o.cancelled + '</td><td>' + o.archived + '</td><td>' + o.fav + '</td><td>' + o.against + '</td><td><b>' + (o.current + o.reserved + o.suspended + o.cancelled + o.archived) + '</b></td></tr>'; });
                 body += '</tbody><tfoot><tr><td>الإجمالي</td><td>' + r.sum.current + '</td><td>' + r.sum.reserved + '</td><td>' + r.sum.suspended + '</td><td>' + r.sum.cancelled + '</td><td>' + r.sum.archived + '</td><td>' + r.sum.fav + '</td><td>' + r.sum.against + '</td><td>' + r.sum.total + '</td></tr></tfoot></table>';
             }
-            const end = new Date(); end.setDate(end.getDate() + 13);
-            const soon = k.upcoming.filter(c => c.sessionDate <= pdISO(end)).sort((a, b) => a.sessionDate.localeCompare(b.sessionDate));
+            const soon = pdSoon14(k);
             if (soon.length) {
-                body += '<h3>الجلسات القادمة خلال 14 يومًا (' + soon.length + ')</h3><table><thead><tr><th>م</th><th>تاريخ الجلسة</th><th>رقم/سنة الدعوى</th><th>الموضوع</th><th>المدعي</th><th>المدعى عليه</th><th>الدائرة</th></tr></thead><tbody>';
-                soon.slice(0, 150).forEach((c, i) => { body += '<tr><td>' + (i + 1) + '</td><td>' + pdEsc(c.sessionDate.split('-').reverse().join('/')) + '</td><td>' + pdEsc(c.number) + '/' + pdEsc(c.year) + '</td><td class="r">' + pdEsc(c.subject) + '</td><td class="r">' + pdEsc(c.plaintiff) + '</td><td class="r">' + pdEsc(c.defendant) + '</td><td>' + pdEsc(c.department) + '</td></tr>'; });
-                body += '</tbody></table>';
+                body += '<h3>الجلسات القادمة خلال 14 يومًا (' + soon.length + ')</h3><table><thead><tr><th>م</th><th>تاريخ الجلسة</th><th>رقم/سنة الدعوى</th><th>الموضوع</th><th>المدعي</th><th>المدعى عليه</th><th>الدائرة</th></tr></thead><tbody>' + pdUpcomingListRowsHTML(soon, 150) + '</tbody></table>';
             }
             body += '<div class="ft">صادر عن نظام إدارة القضايا — المستشار محمود العوابدي — هيئة قضايا الدولة</div>';
-            pdOpenPrint('تقرير إحصائيات لوحة التحكم', body);
+            return body;
+        }
+        function pdPrintAll() {
+            pdOpenPrint('تقرير إحصائيات لوحة التحكم', pdFullReportBody());
+        }
+        function pdPrintUpcomingList() {
+            const list = PD.soon14 || [];
+            if (!list.length) { if (typeof showAlert === 'function') showAlert('لا توجد جلسات قادمة خلال 14 يومًا لطباعتها.', 'warning'); return; }
+            const title = 'الجلسات القادمة خلال 14 يومًا (' + list.length + ')';
+            const body = pdReportHeader(title) + '<table><thead><tr><th>م</th><th>تاريخ الجلسة</th><th>رقم/سنة الدعوى</th><th>الموضوع</th><th>المدعي</th><th>المدعى عليه</th><th>الدائرة</th></tr></thead><tbody>' + pdUpcomingListRowsHTML(list) + '</tbody></table><div class="ft">صادر عن نظام إدارة القضايا — المستشار محمود العوابدي</div>';
+            pdOpenPrint(title, body);
+        }
+        // نسخة من تنسيق التقرير مُقيَّدة داخل حاوية .pd-export-sandbox فقط، حتى لا تتسرب أنماطها
+        // (table/h3/إلخ) إلى بقية صفحة التطبيق أثناء الالتقاط الصامت لإنشاء PDF في المتصفح العادي.
+        function pdExportSandboxCSS() {
+            // نفس تنسيق pdReportCSS (مبني بـ inline-block بدل CSS Grid)، للتناسق
+            // بين نسخة الطباعة/PDF الأصلية ونسخة الالتقاط الاحتياطية في المتصفح
+            return '.pd-export-sandbox{font-family:"Segoe UI",Tahoma,Arial,sans-serif;direction:rtl;color:#1b2a41;font-size:12px;background:#fff}' +
+                '.pd-export-sandbox *{box-sizing:border-box}' +
+                '.pd-export-sandbox .hd{text-align:center;border-bottom:3px double #0b3d91;padding-bottom:10px;margin-bottom:12px}.pd-export-sandbox .hd h1{margin:0;font-size:20px;color:#0b3d91}.pd-export-sandbox .hd h2{margin:4px 0;font-size:15px}.pd-export-sandbox .hd p{margin:2px 0;color:#555;font-size:11px}' +
+                '.pd-export-sandbox .kp{margin:10px 0;font-size:0}.pd-export-sandbox .kp div{display:inline-block;vertical-align:top;width:23.5%;margin:0 0.5% 8px;font-size:12px;border:1px solid #cfd8e6;border-radius:6px;padding:8px;text-align:center}.pd-export-sandbox .kp b{display:block;font-size:19px;color:#0b3d91}.pd-export-sandbox .kp span{font-size:11px;color:#41546f}' +
+                '.pd-export-sandbox h3{font-size:13px;color:#0b3d91;border-right:4px solid #0b3d91;padding-right:8px;margin:14px 0 8px}.pd-export-sandbox .ch{font-size:0}.pd-export-sandbox .box{display:inline-block;vertical-align:top;width:48.5%;margin:0 0.5% 10px;font-size:12px;border:1px solid #cfd8e6;border-radius:6px;padding:8px;text-align:center}.pd-export-sandbox .box h4{margin:0 0 6px;font-size:12px}.pd-export-sandbox .box img{max-width:100%;height:auto;display:block;margin:0 auto}.pd-export-sandbox .full{width:99%}' +
+                '.pd-export-sandbox table{width:100%;border-collapse:collapse;margin:6px 0;font-size:11px}.pd-export-sandbox th,.pd-export-sandbox td{border:1px solid #9fb0c8;padding:4px 6px;text-align:center}.pd-export-sandbox th{background:#e8eef8}.pd-export-sandbox td.r{text-align:right}.pd-export-sandbox tfoot td{font-weight:700;background:#f3f6fb}' +
+                '.pd-export-sandbox .ft{margin-top:14px;padding-top:6px;border-top:1px solid #ccc;text-align:center;color:#777;font-size:10px}';
+        }
+
+        // تصدير مباشر من داخل المتصفح (بدون Electron): يلتقط التقرير كصورة محليًا ثم يبنى منها
+        // ملف PDF ويُنزَّل مباشرة — دون فتح أي نافذة طباعة أو معاينة طباعة.
+        async function pdExportPDFviaBrowser(fileName) {
+            if (typeof html2canvas !== 'function' || !window.jspdf || !window.jspdf.jsPDF) {
+                if (typeof showAlert === 'function') showAlert('تعذر تحميل مكوّنات تصدير PDF. يرجى التأكد من الاتصال بالإنترنت والمحاولة مجددًا.', 'danger');
+                return;
+            }
+            if (!document.getElementById('pd-export-sandbox-style')) {
+                const styleTag = document.createElement('style');
+                styleTag.id = 'pd-export-sandbox-style';
+                styleTag.textContent = pdExportSandboxCSS();
+                document.head.appendChild(styleTag);
+            }
+            // أبعاد صفحة A4 بالمليمتر: هوامش 12مم من الأعلى والجانبين، و16مم من الأسفل لترقيم الصفحات
+            const PG_W = 210, PG_H = 297, M_SIDE = 12, M_TOP = 12, M_BOTTOM = 16;
+            const CONTENT_W = PG_W - 2 * M_SIDE;            // 186مم
+            const CONTENT_H = PG_H - M_TOP - M_BOTTOM;      // 269مم
+            const SB_W = Math.round(CONTENT_W * 96 / 25.4); // عرض الحاوية بالبكسل (≈703) = عرض منطقة الطباعة
+            const PAGE_PX = CONTENT_H * SB_W / CONTENT_W;   // ارتفاع منطقة المحتوى بالبكسل
+
+            const sandbox = document.createElement('div');
+            sandbox.className = 'pd-export-sandbox';
+            sandbox.style.cssText = 'position:fixed; top:0; left:-99999px; width:' + SB_W + 'px; padding:0; background:#fff; z-index:-1;';
+            sandbox.innerHTML = pdFullReportBody();
+            document.body.appendChild(sandbox);
+            try {
+                const imgs = Array.from(sandbox.querySelectorAll('img'));
+                await Promise.all(imgs.map(img => (img.decode ? img.decode().catch(() => {}) : Promise.resolve())));
+                if (document.fonts && document.fonts.ready) { try { await document.fonts.ready; } catch (e) {} }
+
+                // ---- 1) قياس مواضع العناصر التي يجب ألا تُقطع أبدًا بين صفحتين ----
+                const sbTop = sandbox.getBoundingClientRect().top;
+                const totalH = sandbox.getBoundingClientRect().height;
+                const rel = el => { const r = el.getBoundingClientRect(); return [r.top - sbTop, r.bottom - sbTop]; };
+                const blocks = [];
+                sandbox.querySelectorAll('.hd, .kp > div, .box, tr, .ft').forEach(el => blocks.push(rel(el)));
+                const tables = Array.from(sandbox.querySelectorAll('table')).map(t => {
+                    const head = t.tHead ? rel(t.tHead) : null;
+                    const firstRow = t.querySelector('tbody tr');
+                    // ترويسة الجدول + أول صف معًا (حتى لا تبقى الترويسة وحدها أسفل صفحة)
+                    if (head && firstRow) blocks.push([head[0], rel(firstRow)[1]]);
+                    const r = rel(t);
+                    return { top: r[0], bottom: r[1], head: head };
+                });
+                // العنوان يلازم أول عنصر بعده (أول صف جدول / أول رسم بياني)
+                sandbox.querySelectorAll('h3').forEach(h => {
+                    const hr = rel(h);
+                    const nxt = h.nextElementSibling;
+                    let end = hr[1];
+                    if (nxt) {
+                        let first = nxt;
+                        if (nxt.tagName === 'TABLE') first = nxt.querySelector('tbody tr') || nxt;
+                        else if (nxt.classList.contains('ch')) first = nxt.querySelector('.box') || nxt;
+                        end = Math.max(end, rel(first)[1]);
+                    }
+                    blocks.push([hr[0], end]);
+                });
+
+                // ---- 2) تحديد نقاط القطع: دائمًا بين العناصر، مع إعادة ترويسة الجدول في الصفحة التالية ----
+                const pages = [];
+                let y = 0;
+                while (y < totalH - 1 && pages.length < 200) {
+                    let hdr = null;
+                    for (const t of tables) {
+                        if (t.head && y > t.top + 1 && y < t.bottom - 1 && y >= t.head[1] - 1) { hdr = t.head; break; }
+                    }
+                    const hdrH = hdr ? hdr[1] - hdr[0] : 0;
+                    const limit = y + PAGE_PX - hdrH;
+                    if (limit >= totalH - 1) { pages.push({ y0: y, y1: totalH, hdr: hdr }); break; }
+                    let cut = limit, moved = true, guard = 0;
+                    while (moved && guard++ < 500) {
+                        moved = false;
+                        for (let i = 0; i < blocks.length; i++) {
+                            const t = blocks[i][0], b = blocks[i][1];
+                            if (t < cut - 0.5 && b > cut + 0.5 && t > y + 4) { cut = t; moved = true; }
+                        }
+                    }
+                    if (cut <= y + 24) cut = limit; // عنصر أطول من الصفحة نفسها: لا مفر من قطعه
+                    pages.push({ y0: y, y1: cut, hdr: hdr });
+                    y = cut;
+                }
+
+                // ---- 3) التقاط التقرير مرة واحدة ثم تركيب كل صفحة بهوامشها وترقيمها ----
+                const scale = Math.max(1, Math.min(2, 30000 / Math.max(totalH, 1)));
+                const canvas = await html2canvas(sandbox, { scale: scale, backgroundColor: '#ffffff', useCORS: true });
+                const k = canvas.width / sandbox.getBoundingClientRect().width; // نسبة التكبير الفعلية
+                const mmPx = canvas.width / CONTENT_W;                         // بكسل لكل مليمتر
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF('p', 'mm', 'a4');
+                const total = pages.length;
+                pages.forEach((pg, idx) => {
+                    const pc = document.createElement('canvas');
+                    pc.width = Math.round(PG_W * mmPx); pc.height = Math.round(PG_H * mmPx);
+                    const ctx = pc.getContext('2d');
+                    ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, pc.width, pc.height);
+                    let dy = M_TOP * mmPx;
+                    const dx = M_SIDE * mmPx;
+                    if (pg.hdr) {
+                        const hh = (pg.hdr[1] - pg.hdr[0]) * k;
+                        ctx.drawImage(canvas, 0, pg.hdr[0] * k, canvas.width, hh, dx, dy, canvas.width, hh);
+                        dy += hh;
+                    }
+                    const sh = Math.min((pg.y1 - pg.y0) * k, canvas.height - pg.y0 * k);
+                    if (sh > 0) ctx.drawImage(canvas, 0, pg.y0 * k, canvas.width, sh, dx, dy, canvas.width, sh);
+                    // التذييل: خط رفيع + رقم الصفحة
+                    ctx.strokeStyle = '#cfd8e6'; ctx.lineWidth = Math.max(1, mmPx * 0.2);
+                    ctx.beginPath(); ctx.moveTo(dx, (PG_H - M_BOTTOM + 3) * mmPx); ctx.lineTo(dx + canvas.width, (PG_H - M_BOTTOM + 3) * mmPx); ctx.stroke();
+                    ctx.fillStyle = '#777'; ctx.textAlign = 'center'; ctx.direction = 'rtl';
+                    ctx.font = Math.round(3.4 * mmPx) + 'px "Segoe UI", Tahoma, Arial, sans-serif';
+                    ctx.fillText('صفحة ' + (idx + 1) + ' من ' + total, pc.width / 2, (PG_H - M_BOTTOM + 9) * mmPx);
+                    if (idx > 0) pdf.addPage();
+                    pdf.addImage(pc.toDataURL('image/jpeg', 0.93), 'JPEG', 0, 0, PG_W, PG_H, undefined, 'FAST');
+                });
+                pdf.save(fileName);
+                if (typeof showAlert === 'function') showAlert('تم تصدير الإحصائيات إلى PDF بنجاح', 'success');
+            } catch (err) {
+                console.warn('تعذر تصدير PDF من المتصفح:', err);
+                if (typeof showAlert === 'function') showAlert('تعذر تصدير PDF.', 'danger');
+            } finally {
+                sandbox.remove();
+            }
+        }
+
+        async function pdExportPDF() {
+            const btn = document.getElementById('pd-export-pdf');
+            const fileName = 'تقرير-لوحة-التحكم-' + pdISO(new Date()) + '.pdf';
+            if (btn) { btn.disabled = true; btn.dataset.orig = btn.innerHTML; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جارٍ التصدير...'; }
+            try {
+                // المسار الأول (تطبيق سطح المكتب): يُنتج ملف PDF حقيقيًا عبر محرك Electron مباشرة دون أي واجهة طباعة
+                if (window.electronAPI && typeof window.electronAPI.exportHtmlToPdf === 'function') {
+                    const html = '<!DOCTYPE html><html dir="rtl" lang="ar"><head><meta charset="utf-8"><title>تقرير إحصائيات لوحة التحكم</title><style>' + pdReportCSS() + '</style></head><body>' + pdFullReportBody() + '</body></html>';
+                    const res = await window.electronAPI.exportHtmlToPdf({ html, defaultFileName: fileName });
+                    if (res && res.success) {
+                        if (typeof showAlert === 'function') showAlert('تم تصدير الإحصائيات إلى PDF بنجاح', 'success');
+                    } else if (res && res.error !== 'cancelled') {
+                        if (typeof showAlert === 'function') showAlert('تعذر تصدير PDF: ' + (res && res.error ? res.error : 'خطأ غير معروف'), 'danger');
+                    }
+                    return;
+                }
+                // المسار الثاني (تشغيل داخل متصفح عادي بدون Electron): تصدير مباشر محليًا دون فتح نافذة طباعة
+                await pdExportPDFviaBrowser(fileName);
+            } finally {
+                if (btn) { btn.disabled = false; btn.innerHTML = btn.dataset.orig; }
+            }
         }
 
         // ================= التهيئة والربط =================
@@ -6908,6 +7115,8 @@
             $('pd-reset-filters').addEventListener('click', () => { PD.filters = { year: 'all', dept: 'all' }; PD.selectedDay = null; pdRender(); });
             $('pd-refresh').addEventListener('click', () => { PD.filterSig = null; pdRender(); });
             $('pd-print-all').addEventListener('click', pdPrintAll);
+            if ($('pd-export-pdf')) $('pd-export-pdf').addEventListener('click', pdExportPDF);
+            if ($('pd-print-upcoming-list')) $('pd-print-upcoming-list').addEventListener('click', pdPrintUpcomingList);
             document.querySelectorAll('[data-print-chart]').forEach(b => b.addEventListener('click', () => pdPrintChart(b.getAttribute('data-print-chart'), b.getAttribute('data-title') || 'رسم بياني')));
             document.querySelectorAll('.pd-kpi[data-go]').forEach(card => card.addEventListener('click', () => {
                 const link = document.querySelector('.nav-link[data-section="' + card.getAttribute('data-go') + '"]');

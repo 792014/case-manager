@@ -1015,6 +1015,46 @@ ipcMain.handle('openPdfInBrowser', async (event, { caseId, id }) => {
     }
 });
 
+// تصدير تقرير إحصائيات لوحة التحكم إلى ملف PDF حقيقي باستخدام محرك الطباعة المدمج في Electron
+// (الصفحة تُحمَّل في نافذة مخفية بنفس خط/تنسيق التقرير المطبوع، ثم تُحوَّل مباشرة إلى PDF)
+ipcMain.handle('exportHtmlToPdf', async (event, { html, defaultFileName }) => {
+    let pdfWindow = null;
+    let tempHtmlPath = null;
+    try {
+        const { canceled, filePath } = await dialog.showSaveDialog(mainWindow, {
+            title: 'تصدير الإحصائيات إلى PDF',
+            defaultPath: defaultFileName || 'تقرير-لوحة-التحكم.pdf',
+            filters: [{ name: 'PDF', extensions: ['pdf'] }]
+        });
+        if (canceled || !filePath) return { success: false, error: 'cancelled' };
+
+        tempHtmlPath = path.join(app.getPath('temp'), `dashboard-export-${Date.now()}-${Math.random().toString(36).slice(2)}.html`);
+        fs.writeFileSync(tempHtmlPath, html, 'utf-8');
+
+        pdfWindow = new BrowserWindow({
+            show: false,
+            webPreferences: { contextIsolation: true, nodeIntegration: false, sandbox: true }
+        });
+        await pdfWindow.loadURL(pathToFileURL(tempHtmlPath).toString());
+        // مهلة قصيرة لضمان اكتمال رسم الرسوم البيانية (المضمّنة كصور) والخطوط قبل التصدير
+        await new Promise(resolve => setTimeout(resolve, 350));
+
+        const pdfBuffer = await pdfWindow.webContents.printToPDF({
+            printBackground: true,
+            preferCSSPageSize: true,
+            landscape: false
+        });
+        fs.writeFileSync(filePath, pdfBuffer);
+        return { success: true, filePath };
+    } catch (e) {
+        console.error('exportHtmlToPdf error:', e);
+        return { success: false, error: e.message };
+    } finally {
+        if (pdfWindow && !pdfWindow.isDestroyed()) pdfWindow.destroy();
+        if (tempHtmlPath) { try { fs.unlinkSync(tempHtmlPath); } catch (e) {} }
+    }
+});
+
 ipcMain.handle('chooseStorageFolder', async () => {
     try {
         const { canceled, filePaths } = await dialog.showOpenDialog(mainWindow, {
