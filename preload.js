@@ -23,7 +23,12 @@ contextBridge.exposeInMainWorld('electronAPI', {
     writeClipboard: (args) => ipcRenderer.invoke('writeClipboard', args),
     scanStorageFolders: () => ipcRenderer.invoke('scanStorageFolders'),
     importCaseFolder: (args) => ipcRenderer.invoke('importCaseFolder', args),
-    exportHtmlToPdf: (args) => ipcRenderer.invoke('exportHtmlToPdf', args)
+    exportHtmlToPdf: (args) => ipcRenderer.invoke('exportHtmlToPdf', args),
+    readTemplate: (args) => ipcRenderer.invoke('readTemplate', args),
+    letterDraftWrite: (args) => ipcRenderer.invoke('letterDraftWrite', args),
+    letterDraftOpen: (args) => ipcRenderer.invoke('letterDraftOpen', args),
+    letterDraftRead: (args) => ipcRenderer.invoke('letterDraftRead', args),
+    letterDraftSaveAs: (args) => ipcRenderer.invoke('letterDraftSaveAs', args)
 
     // ملحوظة: تعمدنا عدم إضافة saveData/loadData هنا. بيانات القضايا والأحكام
     // بتفضل بتتزامن حصريًا عبر Firebase (بنفس طريقة الموبايل بالظبط)، وده اللي

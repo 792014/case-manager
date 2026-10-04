@@ -129,6 +129,8 @@
     <script>window.jspdf || document.write('<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js"><\/script>');</script>
     <script src="vendor/html2canvas.min.js"></script>
     <script>window.html2canvas || document.write('<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"><\/script>');</script>
+    <script src="vendor/jszip.min.js"></script>
+    <script>window.JSZip || document.write('<script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"><\/script>');</script>
     <!-- Mammoth removed: offline behavior uses system apps to open files natively -->
     
     <style>
@@ -330,7 +332,7 @@
 
         .logo i {
             font-size: 26px !important;
-            color: #ffffff;
+            color: #0b3d91 !important;
         }
         
         .header-text {
@@ -1767,6 +1769,33 @@
             gap: 10px;
             flex-wrap: wrap;
         }
+
+        .letters-modal-content { width: min(1180px, 96vw); max-width: 1180px !important; max-height: 92vh; overflow: auto; }
+        .letters-context { margin: 0 0 14px; padding: 10px 12px; border: 1px solid #dbe5f2; border-radius: 8px; background: #f6f9fd; color: #33445b; }
+        .letters-template-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 9px; margin: 12px 0 20px; }
+        .letters-template-btn { min-height: 48px; padding: 9px 12px; text-align: right; color: #164a77; background: #fff; border: 1px solid #cbd9e9; border-radius: 7px; cursor: pointer; overflow-wrap: anywhere; }
+        .letters-template-btn:hover { background: #edf5fc; border-color: #3282b8; }
+        .letters-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 14px; }
+        .letters-field { display: flex; flex-direction: column; gap: 5px; }
+        .letters-field label { font-weight: 600; color: #34445a; }
+        .letters-field input, .letters-field textarea { width: 100%; padding: 9px 10px; border: 1px solid #ccd7e5; border-radius: 6px; font: inherit; }
+        .letters-field textarea { min-height: 78px; resize: vertical; }
+        .letters-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+                                .letters-preview-frame { min-height: 55vh; max-height: 68vh; overflow: auto; padding: 12px; border: 1px solid #d8dee8; background: #e9edf2; direction: ltr; }
+        #letter-preview-document { min-height: 100%; }
+        .letters-note { padding: 9px 11px; margin: 10px 0; border-radius: 6px; background: #fff8e6; color: #795c12; font-size: 13px; line-height: 1.7; }
+        @media print {
+            body * { visibility: hidden !important; }
+            #letters-modal, #letters-modal * { visibility: visible !important; }
+            #letters-modal { display: block !important; position: static !important; overflow: visible !important; background: #fff !important; }
+            #letters-modal .modal-content { width: 100% !important; max-width: none !important; max-height: none !important; margin: 0 !important; padding: 0 !important; overflow: visible !important; border: 0 !important; box-shadow: none !important; }
+            #letters-preview-panel { display: block !important; }
+            #letters-preview-title, #letters-preview-warning, #letters-preview-panel .letters-actions, #letters-preview-panel > .letters-note { display: none !important; }
+            .letters-preview-frame { min-height: 0 !important; max-height: none !important; overflow: visible !important; padding: 0 !important; border: 0 !important; background: #fff !important; }
+            .docx-wrapper { padding: 0 !important; background: #fff !important; }
+            .docx { margin: 0 auto !important; box-shadow: none !important; page-break-after: always; }
+        }
+        @media (max-width: 700px) { .letters-fields { grid-template-columns: 1fr; } .letters-actions .btn-primary, .letters-actions .btn-secondary { flex: 1 1 auto; } }
         
         .btn-share-print {
             background: linear-gradient(to right, #f39c12, #d35400);
@@ -1883,6 +1912,7 @@
             max-width: 200px;
             word-wrap: break-word;
             text-align: right;
+            white-space: pre-wrap;
         }
         
         @media (max-width: 768px) {
@@ -2099,7 +2129,6 @@
         .pd-card-h { display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:10px; padding-bottom:10px; border-bottom:1px solid #eef2f8; }
         .pd-card-h h3 { margin:0; padding:0; border:0; font-size:15px; color:var(--primary-color); display:flex; align-items:center; flex-wrap:wrap; gap:6px; }
         .pd-hint { font-size:11px; font-weight:400; color:#94a0b3; }
-        .pd-badge-count { font-size:12px; font-weight:700; color:#1565c0; background:#e8f1fd; padding:1px 9px; border-radius:20px; }
         .pd-mini { flex:0 0 auto; width:30px; height:30px; border-radius:8px; border:1px solid #dbe3f0; background:#fff; color:#5b6b83; cursor:pointer; }
         .pd-mini:hover { background:var(--primary-color); color:#fff; border-color:var(--primary-color); }
         .pd-chart { position:relative; height:260px; }
@@ -2113,13 +2142,19 @@
         .pd-day-item strong { color:#0b3d91; }
         .pd-day-item span { display:block; color:#6b7a90; font-size:12px; margin-top:2px; }
         .pd-day-title { margin-bottom:10px; font-weight:700; color:#22324a; font-size:14px; }
+        .pd-upcoming-list { margin-top:12px; }
+        .pd-upcoming-table-wrap { max-height:360px; overflow:auto; border:1px solid #e6ecf5; border-radius:8px; }
+        .pd-upcoming-table { width:100%; border-collapse:collapse; font-size:12px; }
+        .pd-upcoming-table th { position:sticky; top:0; z-index:1; background:#eef3fb; color:#22324a; padding:8px 6px; white-space:nowrap; }
+        .pd-upcoming-table td { padding:7px 6px; text-align:center; border-bottom:1px solid #edf1f7; }
+        .pd-upcoming-table td.r { text-align:right; }
+        .pd-upcoming-table tbody tr:hover { background:#f3f7fd; }
 
         .pd-table-wrap { overflow-x:auto; }
         .pd-table { width:100%; border-collapse:collapse; font-size:13px; }
         .pd-table th { background:#eef3fb; color:#22324a; padding:9px 8px; text-align:center; white-space:nowrap; border-bottom:2px solid #d5deed; }
         .pd-table td { padding:8px; text-align:center; border-bottom:1px solid #edf1f7; }
         .pd-table td:first-child { text-align:right; font-weight:600; color:#0b3d91; }
-        .pd-table td.r { text-align:right; }
         .pd-table tbody tr { cursor:pointer; transition:background .15s; }
         .pd-table tbody tr:hover { background:#f3f7fd; }
         .pd-table tbody tr.pd-sel { background:#e3eefc; }
@@ -2206,7 +2241,7 @@
             <!-- الشعار في المنتصف -->
             <div class="logo-container">
                 <div class="logo">
-                    <img src="icon-512.png" alt="شعار هيئة قضايا الدولة" class="logo-img"
+                    <img src="assets/images/shaar_1.jpg" onerror="this.onerror=null;this.src='icon-512.png'" alt="شعار هيئة قضايا الدولة" class="logo-img"
                          onerror="this.onerror=null;this.replaceWith(Object.assign(document.createElement('i'),{className:'fas fa-balance-scale icon-primary'}));">
                 </div>
                 <div class="header-text">
@@ -2254,8 +2289,8 @@
                     </label>
                     <button type="button" class="pd-btn pd-btn-ghost" id="pd-reset-filters" title="إلغاء التصفية"><i class="fas fa-filter-circle-xmark"></i></button>
                     <button type="button" class="pd-btn pd-btn-ghost" id="pd-refresh" title="تحديث"><i class="fas fa-rotate"></i></button>
-                    <button type="button" class="pd-btn pd-btn-ghost" id="pd-export-pdf"><i class="fas fa-file-pdf"></i> تصدير PDF</button>
                     <button type="button" class="pd-btn pd-btn-main" id="pd-print-all"><i class="fas fa-print"></i> طباعة الإحصائيات</button>
+                    <button type="button" class="pd-btn pd-btn-main" id="pd-export-pdf"><i class="fas fa-file-pdf"></i> تصدير PDF</button>
                 </div>
             </div>
             <div class="pd-filter-note" id="pd-filter-note" hidden></div>
@@ -2290,22 +2325,13 @@
                 </div>
 
                 <div class="pd-card pd-c8">
-                    <div class="pd-card-h"><h3><i class="fas fa-calendar-days"></i> الجلسات القادمة — 14 يومًا <span class="pd-hint">(اضغط على عمود لعرض قضايا اليوم)</span></h3><button type="button" class="pd-mini" data-print-chart="pd-chart-upcoming" data-title="الجلسات القادمة خلال 14 يومًا" title="طباعة"><i class="fas fa-print"></i></button></div>
+                    <div class="pd-card-h"><h3><i class="fas fa-calendar-days"></i> الجلسات القادمة — 14 يومًا (<span id="pd-upcoming-count">0</span>) <span class="pd-hint">(اضغط على عمود لعرض قضايا اليوم)</span></h3><button type="button" class="pd-mini" data-print-chart="pd-chart-upcoming" data-title="الجلسات القادمة خلال 14 يومًا" title="طباعة"><i class="fas fa-print"></i></button></div>
                     <div class="pd-chart"><canvas id="pd-chart-upcoming"></canvas><div class="pd-empty" hidden>لا توجد جلسات قادمة</div></div>
+                    <div id="pd-upcoming-list" class="pd-upcoming-list"></div>
                 </div>
                 <div class="pd-card pd-c4">
                     <div class="pd-card-h"><h3><i class="fas fa-list-check"></i> قضايا اليوم المحدد</h3></div>
                     <div class="pd-day" id="pd-day-detail"><p class="pd-muted">اضغط على أي عمود في مخطط الجلسات لعرض القضايا المنظورة في ذلك اليوم.</p></div>
-                </div>
-
-                <div class="pd-card pd-c12">
-                    <div class="pd-card-h"><h3><i class="fas fa-list-ol"></i> الجلسات القادمة خلال 14 يومًا <span class="pd-badge-count" id="pd-upcoming-count">(0)</span></h3><button type="button" class="pd-mini" id="pd-print-upcoming-list" title="طباعة القائمة"><i class="fas fa-print"></i></button></div>
-                    <div class="pd-table-wrap pd-scroll" style="max-height:360px;">
-                        <table class="pd-table" id="pd-upcoming-list-table">
-                            <thead><tr><th>م</th><th>تاريخ الجلسة</th><th>رقم/سنة الدعوى</th><th>الموضوع</th><th>المدعي</th><th>المدعى عليه</th><th>الدائرة</th></tr></thead>
-                            <tbody><tr><td colspan="7" style="text-align:center;color:#94a0b3;padding:18px;cursor:default;">لا توجد جلسات قادمة خلال 14 يومًا</td></tr></tbody>
-                        </table>
-                    </div>
                 </div>
 
                 <div class="pd-card pd-c8">
@@ -2665,6 +2691,19 @@
                     <button id="export-by-date-range" class="btn-word">
                         <i class="fas fa-file-word"></i> تصدير إلى Word
                     </button>
+                </div>
+            </div>
+
+            <div class="print-controls">
+                <h4><i class="fas fa-archive icon-primary"></i> أرشفة القضايا المتداولة حسب الدائرة</h4>
+                <div class="date-range-controls">
+                    <div class="form-group">
+                        <label for="archive-active-department">الدائرة</label>
+                        <select id="archive-active-department">
+                            <option value="">-- اختر الدائرة --</option>
+                        </select>
+                    </div>
+                    <button type="button" id="archive-active-department-btn" class="btn-archive"><i class="fas fa-archive"></i> أرشفة جميع قضايا الدائرة</button>
                 </div>
             </div>
             
@@ -3375,6 +3414,18 @@
                     </div>
                 </div>
 
+                <div class="date-range-controls" style="margin:12px 0;">
+                    <div class="form-group">
+                        <label for="uf-cases-start-date">تاريخ التسجيل من</label>
+                        <input type="date" id="uf-cases-start-date">
+                    </div>
+                    <div class="form-group">
+                        <label for="uf-cases-end-date">تاريخ التسجيل إلى</label>
+                        <input type="date" id="uf-cases-end-date">
+                    </div>
+                    <small>تُحسب الفترة من تاريخ إضافة القضية إلى قسم تحت الرفع.</small>
+                </div>
+
                 <div class="share-buttons" style="margin:15px 0;">
                     <button type="button" id="uf-print-cases-btn" class="btn-print"><i class="fas fa-print"></i> طباعة</button>
                     <button type="button" id="uf-export-cases-word-btn" class="btn-word"><i class="fas fa-file-word"></i> تصدير إلى Word</button>
@@ -3426,6 +3477,18 @@
                             <button type="button" id="uf-add-appeal-btn" class="btn-success"><i class="fas fa-plus-circle"></i> إضافة استئناف تحت الرفع</button>
                         </div>
                     </div>
+                </div>
+
+                <div class="date-range-controls" style="margin:12px 0;">
+                    <div class="form-group">
+                        <label for="uf-appeals-start-date">تاريخ التسجيل من</label>
+                        <input type="date" id="uf-appeals-start-date">
+                    </div>
+                    <div class="form-group">
+                        <label for="uf-appeals-end-date">تاريخ التسجيل إلى</label>
+                        <input type="date" id="uf-appeals-end-date">
+                    </div>
+                    <small>تُحسب الفترة من تاريخ إضافة الاستئناف إلى قسم تحت الرفع.</small>
                 </div>
 
                 <div class="share-buttons" style="margin:15px 0;">
@@ -3770,6 +3833,55 @@
             <div id="case-details-content">
                 <!-- سيتم ملؤها بالبيانات -->
             </div>
+        </div>
+    </div>
+
+    <div id="letters-modal" class="modal" dir="rtl">
+        <div class="modal-content letters-modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-envelope-open-text"></i> خطابات وإخطارات</h3>
+                <div class="letters-actions" style="margin:0;">
+                    <button type="button" id="letters-back-to-case" class="btn-secondary" hidden><i class="fas fa-arrow-right"></i> العودة للقضية</button>
+                    <button type="button" class="close-modal" aria-label="إغلاق">&times;</button>
+                </div>
+            </div>
+            <div id="letters-case-context" class="letters-context"></div>
+            <section id="letters-library-panel">
+                <div class="form-group">
+                    <label for="letters-template-search">البحث في أسماء النماذج</label>
+                    <input type="search" id="letters-template-search" placeholder="اكتب جزءًا من اسم ملف Word...">
+                </div>
+                <div id="letters-template-list" class="letters-template-list" aria-live="polite"></div>
+                <div id="letters-library-message" class="letters-note" hidden></div>
+                <p class="letters-note">يُنشأ الخطاب من القالب الأصلي (دون تعديله) كمسودة مؤقتة لا تُحفظ داخل البرنامج ولا ضمن ملفات القضية. افتحها في Word وعدّلها كما تشاء، ثم اختر «حفظ الخطاب على الجهاز» لتحفظ نسختك النهائية في المكان الذي تريده.</p>
+                
+            </section>
+            <section id="letters-editor-panel" hidden>
+                <h4 id="letters-selected-template"></h4>
+                <div id="letters-data-note" class="letters-note">تُملأ البيانات المتاحة من القضية، وتبقى الخانات غير المسجلة فارغة. راجع البيانات قبل إنشاء المسودة.</div>
+                <div id="letters-fields" class="letters-fields"></div>
+                <div class="letters-field" style="margin-top:12px;">
+                    <label for="letters-output-name">اسم ملف الخطاب</label>
+                    <input type="text" id="letters-output-name" autocomplete="off">
+                </div>
+                <div class="letters-actions">
+                    <button type="button" id="letters-create-draft" class="btn-primary"><i class="fas fa-file-circle-plus"></i> إنشاء مسودة ومعاينة</button>
+                    <button type="button" id="letters-editor-back" class="btn-secondary"><i class="fas fa-arrow-right"></i> العودة للنماذج</button>
+                </div>
+            </section>
+            <section id="letters-preview-panel" hidden>
+                <h4 id="letters-preview-title"></h4>
+                <div id="letters-preview-warning" class="letters-note" hidden></div>
+                <div class="letters-preview-frame"><div id="letter-preview-document"></div></div>
+                <div class="letters-actions">
+                    <button type="button" id="letters-open-word" class="btn-primary"><i class="fas fa-file-word"></i> فتح في Word للتعديل</button>
+                    <button type="button" id="letters-refresh-preview" class="btn-info"><i class="fas fa-rotate"></i> تحديث المعاينة بعد التعديل</button>
+                    <button type="button" id="letters-print" class="btn-secondary"><i class="fas fa-print"></i> طباعة المعاينة</button>
+                    <button type="button" id="letters-save-to-device" class="btn-success"><i class="fas fa-download"></i> حفظ الخطاب على الجهاز</button>
+                    <button type="button" id="letters-preview-back" class="btn-secondary"><i class="fas fa-arrow-right"></i> العودة للنماذج</button>
+                </div>
+                <p class="letters-note">بعد التعديل في Word احفظه هناك (Ctrl+S) ثم حدّث المعاينة. زر «حفظ الخطاب على الجهاز» هو الحفظ الوحيد، ويحفظ آخر نسخة معدّلة. على الموبايل/المتصفح يُنزَّل الملف ليُفتح في Word.</p>
+            </section>
         </div>
     </div>
 
@@ -4524,6 +4636,7 @@
         </div>
     </div>
 
+    <script src="vendor/docx-preview.min.js"></script>
     <script>
         // ==================== إعدادات المزامنة عبر Firebase ====================
         // بيانات القضايا بتتخزن في جذر قاعدة بيانات Firebase Realtime Database مباشرة
@@ -4689,7 +4802,7 @@
                                 caseData: caseData || null
                             });
 
-                            return { success: true };
+                            return { success: true, id: fileId, name: displayName };
                         } catch (e) {
                             console.error('saveFile (web) error:', e);
                             return { success: false, error: e.message };
@@ -5017,6 +5130,8 @@
                     localStorage.setItem('archivedCases', JSON.stringify(archivedCases));
                     localStorage.setItem('notifications', JSON.stringify(notifications));
                     localStorage.setItem('departments', JSON.stringify(departments));
+                    localStorage.setItem('underFilingCases', JSON.stringify(underFilingCases));
+                    localStorage.setItem('underFilingAppeals', JSON.stringify(underFilingAppeals));
                     localStorage.setItem('lastSavedAt', String(data.lastSavedAt));
                 } catch (e) {
                     console.warn('localStorage backup failed', e);
@@ -5295,6 +5410,11 @@
         let currentArchiveJudgmentType = null;
         let currentRollCases = [];
         let currentSessionHistoryCaseId = null;
+        let activeLetterCaseId = null;
+        let activeLetterCaseData = null;
+        let activeLetterTemplate = null;
+        let activeLetterDocument = null;
+        let lettersReturnToDetails = false;
         let rollData = [];
         
         // تعيين بيانات النسخ الاحتياطي
@@ -6252,6 +6372,70 @@
         // ========== دالة موحدة لتوحيد بيانات القضية أيًا كانت مرحلتها (عادية/محجوزة/موقوفة/مشطوبة/حكم/مؤرشفة) ==========
         // تُستخدم في كل من الطباعة والتصدير إلى Word حتى تظهر نفس البيانات (رقم الدعوي، السنة، رقم المتداول، التاريخ...)
         // بغض النظر عن المرحلة التي وصلت إليها القضية، وحتى لا تُفقد أي بيانات مسجلة بها.
+        function getCaseFirstSessionDate(caseItem) {
+            const explicitFirstDate = caseItem.firstSessionDate || caseItem.initialSessionDate || caseItem.originalSessionDate;
+            if (explicitFirstDate) return explicitFirstDate;
+
+            const historyDates = (Array.isArray(caseItem.sessionHistory) ? caseItem.sessionHistory : [])
+                .map(session => getDateKey(session && (session.date || session.sessionDate)))
+                .filter(Boolean)
+                .sort();
+            return historyDates[0] || caseItem.originalDate || caseItem.sessionDate || caseItem.reserveDate ||
+                caseItem.cancelDate || caseItem.suspendDate || caseItem.archiveDate || caseItem.judgmentDate || caseItem.date || '';
+        }
+
+        function getAllCaseRecordsForPrint() {
+            const judgmentRecords = (favorableJudgments || []).concat(againstJudgments || []).map(judgment => {
+                const parts = String(judgment.caseNumber || '').split('/');
+                return {
+                    ...judgment,
+                    caseNumber: parts[0] || '',
+                    caseYear: parts.slice(1).join('/') || judgment.caseYear || '',
+                    number: judgment.number || parts[0] || '',
+                    year: judgment.year || parts.slice(1).join('/') || judgment.caseYear || ''
+                };
+            });
+            const records = []
+                .concat(cases || [], reservedCases || [], cancelledCases || [], suspendedCases || [], archivedCases || [], judgmentRecords);
+            const uniqueCases = new Map();
+
+            records.forEach(record => {
+                const caseNumber = String(record.number || record.caseNumber || '');
+                const parts = caseNumber.split('/');
+                const normalized = {
+                    ...record,
+                    number: record.number || parts[0] || '',
+                    year: record.year || record.caseYear || parts.slice(1).join('/') || '',
+                    sessionHistory: Array.isArray(record.sessionHistory) ? record.sessionHistory : []
+                };
+                const identity = String(record.caseId || record.id || `${normalized.number}/${normalized.year}/${record.plaintiff || ''}/${record.defendant || ''}`);
+                const previous = uniqueCases.get(identity);
+                if (!previous) {
+                    uniqueCases.set(identity, { ...normalized, reportIdentity: identity });
+                    return;
+                }
+
+                const history = [...previous.sessionHistory, ...normalized.sessionHistory];
+                const seenSessions = new Set();
+                const mergedHistory = history.filter(session => {
+                    const key = `${session && (session.date || session.sessionDate) || ''}|${session && session.type || ''}|${session && (session.judgmentId || session.reason) || ''}`;
+                    if (seenSessions.has(key)) return false;
+                    seenSessions.add(key);
+                    return true;
+                });
+                const merged = { ...previous };
+                Object.keys(normalized).forEach(key => {
+                    const value = normalized[key];
+                    if (value !== undefined && value !== null && value !== '' && (!Array.isArray(value) || value.length)) merged[key] = value;
+                });
+                merged.sessionHistory = mergedHistory;
+                merged.reportIdentity = identity;
+                uniqueCases.set(identity, merged);
+            });
+
+            return Array.from(uniqueCases.values());
+        }
+
         function normalizeCaseRowForDisplay(caseItem) {
             const number = caseItem.number || caseItem.caseNumber || '';
             const year = caseItem.year || caseItem.caseYear || '';
@@ -6260,9 +6444,7 @@
             const defendant = caseItem.defendant || '';
             const circulation = caseItem.circulationNumber || caseItem.circulation || '';
             const department = caseItem.department || '';
-            const date = (Array.isArray(caseItem.sessionHistory) && caseItem.sessionHistory.length)
-                ? caseItem.sessionHistory[0].date
-                : (caseItem.sessionDate || caseItem.date || caseItem.reserveDate || caseItem.cancelDate || caseItem.suspendDate || caseItem.archiveDate || caseItem.judgmentDate || '');
+            const date = getCaseFirstSessionDate(caseItem);
             const notes = caseItem.notes || caseItem.archiveNotes || caseItem.suspendNotes || '';
 
             return { number, year, subject, plaintiff, defendant, circulation, department, date, notes };
@@ -6606,13 +6788,31 @@
             return { today, upcoming, expired, week, judgTotal, win: judgTotal ? Math.round(d.fav.length * 100 / judgTotal) : 0 };
         }
 
-        // قائمة الجلسات القادمة خلال 14 يومًا — مصدر موحّد تستخدمه اللوحة والتقرير المطبوع وتصدير PDF معًا
-        function pdSoon14(k) {
-            const end = new Date(); end.setDate(end.getDate() + 13);
-            return k.upcoming.filter(c => c.sessionDate <= pdISO(end)).sort((a, b) => a.sessionDate.localeCompare(b.sessionDate));
+        function pdUpcoming14Days(records) {
+            const end = new Date();
+            end.setHours(0, 0, 0, 0);
+            end.setDate(end.getDate() + 13);
+            return pdArr(records)
+                .filter(c => c.sessionDate && c.sessionDate <= pdISO(end))
+                .sort((a, b) => a.sessionDate.localeCompare(b.sessionDate));
         }
-        function pdUpcomingListRowsHTML(list, limit) {
-            return (limit ? list.slice(0, limit) : list).map((c, i) => '<tr><td>' + (i + 1) + '</td><td>' + pdEsc(c.sessionDate.split('-').reverse().join('/')) + '</td><td>' + pdEsc(c.number) + '/' + pdEsc(c.year) + '</td><td class="r">' + pdEsc(c.subject) + '</td><td class="r">' + pdEsc(c.plaintiff) + '</td><td class="r">' + pdEsc(c.defendant) + '</td><td>' + pdEsc(c.department) + '</td></tr>').join('');
+
+        // forReport=true: جدول عادي بلا حاوية التمرير (حتى لا يُقطع في الطباعة/PDF) وبكل الجلسات؛ وإلا نسخة اللوحة (حتى 150 صفًا داخل حاوية قابلة للتمرير)
+        function pdUpcomingTableHTML(soon, forReport) {
+            if (!soon.length) return '<p class="pd-muted">لا توجد جلسات قادمة خلال 14 يومًا.</p>';
+            const rows = forReport ? soon : soon.slice(0, 150);
+            let html = (forReport ? '<table>' : '<div class="pd-upcoming-table-wrap"><table class="pd-upcoming-table">') + '<thead><tr><th>م</th><th>تاريخ الجلسة</th><th>رقم/سنة الدعوى</th><th>الموضوع</th><th>المدعي</th><th>المدعى عليه</th><th>الدائرة</th></tr></thead><tbody>';
+            rows.forEach((c, i) => {
+                html += '<tr><td>' + (i + 1) + '</td><td>' + pdEsc(c.sessionDate.split('-').reverse().join('/')) + '</td><td>' + pdEsc(c.number) + '/' + pdEsc(c.year) + '</td><td class="r">' + pdEsc(c.subject) + '</td><td class="r">' + pdEsc(c.plaintiff) + '</td><td class="r">' + pdEsc(c.defendant) + '</td><td>' + pdEsc(c.department) + '</td></tr>';
+            });
+            return html + (forReport ? '</tbody></table>' : '</tbody></table></div>');
+        }
+
+        function pdRenderUpcomingList(records) {
+            const soon = pdUpcoming14Days(records);
+            pdSetText('pd-upcoming-count', pdNum(soon.length));
+            const list = document.getElementById('pd-upcoming-list');
+            if (list) list.innerHTML = pdUpcomingTableHTML(soon);
         }
 
         function pdRender() {
@@ -6621,6 +6821,7 @@
                 pdFillFilters();
                 const d = pdCollect(false);
                 const k = pdCalc(d);
+                pdRenderUpcomingList(k.upcoming);
                 const ufC = pdArr(underFilingCases), ufA = pdArr(underFilingAppeals);
                 const totalNoArchive = d.cases.length + d.reserved.length + d.suspended.length + d.cancelled.length;
 
@@ -6795,13 +6996,6 @@
                 // 10) جدول ملخص الدوائر
                 pdRenderDeptTable(deptMap, dNames);
 
-                // 11) قائمة الجلسات القادمة خلال 14 يومًا (نفس البيانات التي تظهر في التقرير المطبوع)
-                PD.soon14 = pdSoon14(k);
-                const countEl = document.getElementById('pd-upcoming-count');
-                if (countEl) countEl.textContent = '(' + pdNum(PD.soon14.length) + ')';
-                const listBody = document.querySelector('#pd-upcoming-list-table tbody');
-                if (listBody) listBody.innerHTML = PD.soon14.length ? pdUpcomingListRowsHTML(PD.soon14) : '<tr><td colspan="7" style="text-align:center;color:#94a0b3;padding:18px;cursor:default;">لا توجد جلسات قادمة خلال 14 يومًا</td></tr>';
-
                 // تحديث تفاصيل اليوم المفتوح إن وُجد
                 if (PD.selectedDay) pdShowDay(PD.selectedDay, true);
             } catch (err) {
@@ -6924,22 +7118,14 @@
                 r.names.forEach(n => { const o = r.map[n]; body += '<tr><td class="r">' + pdEsc(n) + '</td><td>' + o.current + '</td><td>' + o.reserved + '</td><td>' + o.suspended + '</td><td>' + o.cancelled + '</td><td>' + o.archived + '</td><td>' + o.fav + '</td><td>' + o.against + '</td><td><b>' + (o.current + o.reserved + o.suspended + o.cancelled + o.archived) + '</b></td></tr>'; });
                 body += '</tbody><tfoot><tr><td>الإجمالي</td><td>' + r.sum.current + '</td><td>' + r.sum.reserved + '</td><td>' + r.sum.suspended + '</td><td>' + r.sum.cancelled + '</td><td>' + r.sum.archived + '</td><td>' + r.sum.fav + '</td><td>' + r.sum.against + '</td><td>' + r.sum.total + '</td></tr></tfoot></table>';
             }
-            const soon = pdSoon14(k);
-            if (soon.length) {
-                body += '<h3>الجلسات القادمة خلال 14 يومًا (' + soon.length + ')</h3><table><thead><tr><th>م</th><th>تاريخ الجلسة</th><th>رقم/سنة الدعوى</th><th>الموضوع</th><th>المدعي</th><th>المدعى عليه</th><th>الدائرة</th></tr></thead><tbody>' + pdUpcomingListRowsHTML(soon, 150) + '</tbody></table>';
-            }
-            body += '<div class="ft">صادر عن نظام إدارة القضايا — المستشار محمود العوابدي — هيئة قضايا الدولة</div>';
+            const soon = pdUpcoming14Days(k.upcoming);
+            body += '<h3>الجلسات القادمة خلال 14 يومًا (' + soon.length + ')</h3>' + pdUpcomingTableHTML(soon, true);
             return body;
         }
-        function pdPrintAll() {
+        // زر "طباعة" يفتح معاينة الطباعة، وزر "تصدير PDF" يُنتج ملف PDF مباشرة (Electron أو المتصفح)
+        async function pdPrintAll(exportPdf) {
+            if (exportPdf) { await pdExportPDF(); return; }
             pdOpenPrint('تقرير إحصائيات لوحة التحكم', pdFullReportBody());
-        }
-        function pdPrintUpcomingList() {
-            const list = PD.soon14 || [];
-            if (!list.length) { if (typeof showAlert === 'function') showAlert('لا توجد جلسات قادمة خلال 14 يومًا لطباعتها.', 'warning'); return; }
-            const title = 'الجلسات القادمة خلال 14 يومًا (' + list.length + ')';
-            const body = pdReportHeader(title) + '<table><thead><tr><th>م</th><th>تاريخ الجلسة</th><th>رقم/سنة الدعوى</th><th>الموضوع</th><th>المدعي</th><th>المدعى عليه</th><th>الدائرة</th></tr></thead><tbody>' + pdUpcomingListRowsHTML(list) + '</tbody></table><div class="ft">صادر عن نظام إدارة القضايا — المستشار محمود العوابدي</div>';
-            pdOpenPrint(title, body);
         }
         // نسخة من تنسيق التقرير مُقيَّدة داخل حاوية .pd-export-sandbox فقط، حتى لا تتسرب أنماطها
         // (table/h3/إلخ) إلى بقية صفحة التطبيق أثناء الالتقاط الصامت لإنشاء PDF في المتصفح العادي.
@@ -7114,9 +7300,8 @@
             $('pd-dept').addEventListener('change', e => { PD.filters.dept = e.target.value; pdRender(); });
             $('pd-reset-filters').addEventListener('click', () => { PD.filters = { year: 'all', dept: 'all' }; PD.selectedDay = null; pdRender(); });
             $('pd-refresh').addEventListener('click', () => { PD.filterSig = null; pdRender(); });
-            $('pd-print-all').addEventListener('click', pdPrintAll);
-            if ($('pd-export-pdf')) $('pd-export-pdf').addEventListener('click', pdExportPDF);
-            if ($('pd-print-upcoming-list')) $('pd-print-upcoming-list').addEventListener('click', pdPrintUpcomingList);
+            $('pd-print-all').addEventListener('click', () => pdPrintAll(false));
+            if ($('pd-export-pdf')) $('pd-export-pdf').addEventListener('click', () => pdPrintAll(true));
             document.querySelectorAll('[data-print-chart]').forEach(b => b.addEventListener('click', () => pdPrintChart(b.getAttribute('data-print-chart'), b.getAttribute('data-title') || 'رسم بياني')));
             document.querySelectorAll('.pd-kpi[data-go]').forEach(card => card.addEventListener('click', () => {
                 const link = document.querySelector('.nav-link[data-section="' + card.getAttribute('data-go') + '"]');
@@ -7358,7 +7543,6 @@
         function getSessionTypeLabel(type) {
             switch (type) {
                 case 'postponement': return 'ترحيل';
-                case 'postponed': return 'مد أجل الحكم';
                 case 'initial': return 'مبدئية';
                 case 'final': return 'نهائية';
                 case 'reserved': return 'محجوزة';
@@ -7367,9 +7551,10 @@
                 case 'returned': return 'إعادة للرول';
                 case 'judgment': return 'حكم';
                 case 'interim_judgment': return 'حكم تمهيدي';
-                case 'suspend': return 'وقف حكم';
                 case 'return_to_pleading_judgment': return 'حكم بإعادة الدعوى للمرافعة';
                 case 'judgment-type-changed': return 'تعديل نوع الحكم';
+                case 'suspend': return 'وقف للحكم';
+                case 'postponed': return 'ترحيل';
                 default: return type || '-';
             }
         }
@@ -7377,7 +7562,6 @@
         function getSessionTypeClass(type) {
             switch (type) {
                 case 'postponement': return 'session-type-postponed';
-                case 'postponed': return 'session-type-postponed';
                 case 'initial': return 'session-type-scheduled';
                 case 'final': return 'session-type-completed';
                 case 'reserved': return 'session-type-reserved';
@@ -7385,10 +7569,6 @@
                 case 'suspended': return 'session-type-postponed';
                 case 'returned': return 'session-type-completed';
                 case 'judgment': return 'session-type-completed';
-                case 'interim_judgment': return 'session-type-completed';
-                case 'suspend': return 'session-type-postponed';
-                case 'return_to_pleading_judgment': return 'session-type-completed';
-                case 'judgment-type-changed': return 'session-type-reserved';
                 default: return '';
             }
         }
@@ -7451,6 +7631,19 @@
         
         function refreshAllDepartmentSelects() {
             populateDepartmentSelectWithAllOption(printCasesDepartmentSelect, printCasesDepartmentSelect ? printCasesDepartmentSelect.value : '');
+            const archiveActiveDepartmentSelect = document.getElementById('archive-active-department');
+            if (archiveActiveDepartmentSelect) {
+                const selectedDepartment = normalizeDeptName(archiveActiveDepartmentSelect.value);
+                const activeDepartmentNames = [...new Set([
+                    ...(departments || []).map(department => normalizeDeptName(department.name)),
+                    ...(cases || []).map(caseItem => normalizeDeptName(caseItem.department))
+                ].filter(Boolean))].sort((first, second) => first.localeCompare(second, 'ar'));
+                archiveActiveDepartmentSelect.replaceChildren(new Option('-- اختر الدائرة --', ''));
+                activeDepartmentNames.forEach(departmentName => {
+                    archiveActiveDepartmentSelect.add(new Option(departmentName, departmentName));
+                });
+                archiveActiveDepartmentSelect.value = activeDepartmentNames.includes(selectedDepartment) ? selectedDepartment : '';
+            }
             populateDepartmentSelectWithAllOption(exportCasesDepartmentSelect, exportCasesDepartmentSelect ? exportCasesDepartmentSelect.value : '');
             populateDepartmentSelectWithAllOption(printDateRangeDepartmentSelect, printDateRangeDepartmentSelect ? printDateRangeDepartmentSelect.value : '');
             populateDepartmentSelectWithAllOption(prevSessionsPrintDepartmentSelect, prevSessionsPrintDepartmentSelect ? prevSessionsPrintDepartmentSelect.value : '');
@@ -7765,7 +7958,7 @@
             return {
                 previousDate: lastEntry.date || null,
                 lastDate: lastEntry.newDate || lastEntry.judgmentDate || caseItem.sessionDate || null,
-                reason: lastEntry.reason || (lastEntry.judgmentText || '-')
+                reason: lastEntry.reason || (lastEntry.type === 'judgment' ? (lastEntry.judgmentText || '-') : '-')
             };
         }
         
@@ -7831,6 +8024,7 @@
                             <button class="btn-purple btn-session-history" data-id="${caseItem.id}" style="padding:5px 10px; font-size:12px;">
                                 <i class="fas fa-history"></i> السجل الكامل
                             </button>
+                            <button class="btn-primary btn-case-letters" data-id="${caseItem.id}" style="padding:5px 10px; font-size:12px;"><i class="fas fa-envelope-open-text"></i> خطابات</button>
                         </td>
                     </tr>
                 `;
@@ -8188,21 +8382,26 @@
                                     <th style="padding: 8px; border: 1px solid #ddd; text-align: center;">رقم</th>
                                     <th style="padding: 8px; border: 1px solid #ddd; text-align: center;">التاريخ</th>
                                     <th style="padding: 8px; border: 1px solid #ddd; text-align: center;">النوع</th>
-                                    <th style="padding: 8px; border: 1px solid #ddd; text-align: center;">سبب التأجيل</th>
+                                    <th style="padding: 8px; border: 1px solid #ddd; text-align: center;">منطوق الحكم / السبب</th>
                                 </tr>
                             </thead>
                             <tbody>
                 `;
                 
                 judgment.sessionHistory.forEach((session, index) => {
-                    const sessionType = getSessionTypeLabel(session.type);
+                    let sessionType = '';
+                    if (session.type === 'postponement') sessionType = 'ترحيل';
+                    else if (session.type === 'initial') sessionType = 'مبدئية';
+                    else if (session.type === 'reserved') sessionType = 'محجوزة';
+                    else if (session.type === 'cancelled') sessionType = 'مشطوبة';
+                    else if (session.type === 'judgment') sessionType = 'حكم';
                     
                     sessionHistoryHTML += `
                         <tr>
                             <td style="padding: 6px; border: 1px solid #ddd; text-align: center;">${index + 1}</td>
                             <td style="padding: 6px; border: 1px solid #ddd; text-align: center;">${formatDate(session.date)}</td>
                             <td style="padding: 6px; border: 1px solid #ddd; text-align: center;">${sessionType}</td>
-                            <td style="padding: 6px; border: 1px solid #ddd; text-align: right;">${session.judgmentText ? session.judgmentText : (session.reason || '-')}</td>
+                            <td style="padding: 6px; border: 1px solid #ddd; text-align: right; white-space: pre-wrap;">${session.judgmentText || session.reason || '-'}</td>
                         </tr>
                     `;
                 });
@@ -8292,6 +8491,9 @@
                     ` : ''}
                     
                     <div class="case-actions" style="margin-top: 20px;">
+                        <button class="btn-primary btn-case-letters-from-judgment" data-id="${judgment.caseId || ''}" data-type="${type}">
+                            <i class="fas fa-envelope-open-text"></i> خطابات وإخطارات
+                        </button>
                         <button class="btn-archive" onclick="openArchiveModal('${judgmentId}', '${type}')">
                             <i class="fas fa-archive"></i> أرشفة القضية
                         </button>
@@ -8312,6 +8514,58 @@
         }
 
         // ========== دالة فتح نافذة الأرشفة ==========
+                function createArchivedCaseRecord(caseItem, reason, notes) {
+                    return {
+                        ...caseItem,
+                        id: `archive_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
+                        caseId: caseItem.caseId || caseItem.id,
+                        caseNumber: caseItem.caseNumber || caseItem.number || '',
+                        caseYear: caseItem.caseYear || caseItem.year || '',
+                        firstSessionDate: getCaseFirstSessionDate(caseItem),
+                        archiveDate: new Date().toISOString().split('T')[0],
+                        archiveReason: reason || '',
+                        archiveNotes: notes || '',
+                        sessionHistory: Array.isArray(caseItem.sessionHistory) ? [...caseItem.sessionHistory] : [],
+                        createdAt: new Date().toISOString()
+                    };
+                }
+
+                function archiveActiveCasesBatch(caseItems, reason) {
+                    const ids = new Set(caseItems.map(caseItem => caseItem.id));
+                    const matchingCases = cases.filter(caseItem => ids.has(caseItem.id));
+                    if (!matchingCases.length) return 0;
+
+                    archivedCases.push(...matchingCases.map(caseItem => createArchivedCaseRecord(caseItem, reason, '')));
+                    cases = cases.filter(caseItem => !ids.has(caseItem.id));
+                    localStorage.setItem('cases', JSON.stringify(cases));
+                    localStorage.setItem('archivedCases', JSON.stringify(archivedCases));
+                    saveDataToAPI();
+                    renderCasesTable();
+                    renderArchivedCasesTable();
+                    updateStats();
+                    updateDashboard();
+                    return matchingCases.length;
+                }
+
+                function archiveActiveCasesByDepartment() {
+                    const department = normalizeDeptName(document.getElementById('archive-active-department')?.value || '');
+                    if (!department) {
+                        showAlert('اختر الدائرة أولاً', 'warning');
+                        return;
+                    }
+                    const selectedCases = cases.filter(caseItem => normalizeDeptName(caseItem.department) === department);
+                    if (!selectedCases.length) {
+                        showAlert('لا توجد قضايا متداولة في هذه الدائرة', 'warning');
+                        return;
+                    }
+                    if (!confirm(`سيتم نقل ${selectedCases.length} قضية من دائرة «${department}» إلى الأرشيف. هل تريد المتابعة؟`)) return;
+                    const archivedCount = archiveActiveCasesBatch(selectedCases, `أرشفة جماعية لدائرة ${department}`);
+                    showAlert(`تمت أرشفة ${archivedCount} قضية من دائرة ${department}`, 'success');
+                }
+
+                document.getElementById('archive-active-department-btn')?.addEventListener('click', archiveActiveCasesByDepartment);
+
+                // ========== دالة فتح نافذة الأرشفة ==========
         // type: 'favorable' | 'against' (أحكام) أو 'cancelled' | 'suspended' (قضايا مباشرة)
         function openArchiveModal(itemId, type) {
             let item = null;
@@ -8328,6 +8582,9 @@
                 caseIdForModal = itemId;
             } else if (type === 'suspended') {
                 item = suspendedCases.find(c => c.id === itemId);
+                caseIdForModal = itemId;
+            } else if (type === 'active') {
+                item = cases.find(c => c.id === itemId);
                 caseIdForModal = itemId;
             }
 
@@ -8378,6 +8635,8 @@
                 archivedCase = {
                     id: Date.now().toString(),
                     caseId: judgment.caseId,
+                    archivedJudgmentId: judgment.id,
+                    judgmentSessionDate: judgment.sessionDate || '',
                     caseNumber: judgment.caseNumber ? judgment.caseNumber.split('/')[0] : ((originalCase && originalCase.number) || ''),
                     caseYear: judgment.caseNumber && judgment.caseNumber.includes('/') ? judgment.caseNumber.split('/')[1] : ((originalCase && originalCase.year) || new Date().getFullYear()),
                     subject: (originalCase && originalCase.subject) || judgment.subject || '',
@@ -8448,6 +8707,14 @@
                 
                 renderReservedAndCancelledCases();
                 renderSuspendedCasesTable();
+            } else if (type === 'active') {
+                const caseItem = cases.find(c => c.id === itemId);
+                if (!caseItem) return;
+                archivedCase = createArchivedCaseRecord(caseItem, reason, notes);
+                archivedCases.push(archivedCase);
+                cases = cases.filter(c => c.id !== itemId);
+                localStorage.setItem('cases', JSON.stringify(cases));
+                renderCasesTable();
             }
             
             if (!archivedCase) return;
@@ -8930,6 +9197,7 @@
                     year: caseYear,
                     circulationNumber: document.getElementById('circulation-number').value,
                     sessionDate: document.getElementById('session-date').value,
+                    firstSessionDate: document.getElementById('session-date').value,
                     department: document.getElementById('department').value,
                     notes: document.getElementById('case-notes').value,
                     status: 'pending',
@@ -9134,6 +9402,8 @@
                         <button class="btn-purple btn-session-history" data-id="${caseItem.id}"><i class="fas fa-history"></i> سجل الجلسات</button>
                         <button class="btn-warning btn-edit-case" data-id="${caseItem.id}"><i class="fas fa-edit"></i> تعديل البيانات</button>
                         <button class="btn-info btn-postpone-case" data-id="${caseItem.id}"><i class="fas fa-calendar-alt"></i> ترحيل الجلسة</button>
+                        <button class="btn-archive btn-archive-active-case" data-id="${caseItem.id}"><i class="fas fa-archive"></i> أرشفة</button>
+                        <button class="btn-primary btn-case-letters" data-id="${caseItem.id}"><i class="fas fa-envelope-open-text"></i> خطابات</button>
                         <button class="btn-success btn-share-whatsapp" data-id="${caseItem.id}"><i class="fab fa-whatsapp"></i> مشاركة</button>
                         <button class="btn-danger btn-delete-case" data-id="${caseItem.id}"><i class="fas fa-trash"></i> حذف</button>
                     </td>
@@ -9186,6 +9456,7 @@
                         <button class="btn-info btn-view-judgment" data-id="${judgment.id}" data-type="favorable"><i class="fas fa-eye"></i> عرض</button>
                         <button class="btn-warning btn-edit-judgment" data-id="${judgment.id}" data-type="favorable"><i class="fas fa-edit"></i> تعديل</button>
                         <button class="btn-purple btn-session-history" data-id="${judgment.caseId}"><i class="fas fa-history"></i> سجل الجلسات</button>
+                        <button class="btn-primary btn-case-letters-from-judgment" data-id="${judgment.caseId}" data-type="favorable"><i class="fas fa-envelope-open-text"></i> خطابات</button>
                         <button class="btn-archive btn-archive-judgment" data-id="${judgment.id}" data-type="favorable"><i class="fas fa-archive"></i> أرشفة</button>
                         <button class="btn-word btn-export-judgment" data-id="${judgment.id}" data-type="favorable"><i class="fas fa-file-word"></i> Word</button>
                         <button class="btn-success btn-share-judgment-whatsapp" data-id="${judgment.id}" data-type="favorable"><i class="fab fa-whatsapp"></i> مشاركة</button>
@@ -9223,6 +9494,7 @@
                         <button class="btn-info btn-view-judgment" data-id="${judgment.id}" data-type="against"><i class="fas fa-eye"></i> عرض</button>
                         <button class="btn-warning btn-edit-judgment" data-id="${judgment.id}" data-type="against"><i class="fas fa-edit"></i> تعديل</button>
                         <button class="btn-purple btn-session-history" data-id="${judgment.caseId}"><i class="fas fa-history"></i> سجل الجلسات</button>
+                        <button class="btn-primary btn-case-letters-from-judgment" data-id="${judgment.caseId}" data-type="against"><i class="fas fa-envelope-open-text"></i> خطابات</button>
                         <button class="btn-archive btn-archive-judgment" data-id="${judgment.id}" data-type="against"><i class="fas fa-archive"></i> أرشفة</button>
                         <button class="btn-word btn-export-judgment" data-id="${judgment.id}" data-type="against"><i class="fas fa-file-word"></i> Word</button>
                         <button class="btn-success btn-share-judgment-whatsapp" data-id="${judgment.id}" data-type="against"><i class="fab fa-whatsapp"></i> مشاركة</button>
@@ -9913,6 +10185,7 @@
                         <button class="btn-warning btn-edit-case" data-id="${caseItem.id}"><i class="fas fa-edit"></i> تعديل</button>
                         <button class="btn-purple btn-session-history" data-id="${caseItem.id}"><i class="fas fa-history"></i> سجل الجلسات</button>
                         <button class="btn-postpone btn-postpone-case" data-id="${caseItem.id}"><i class="fas fa-calendar-plus"></i> مد أجل الحكم</button>
+                        <button class="btn-primary btn-case-letters" data-id="${caseItem.id}"><i class="fas fa-envelope-open-text"></i> خطابات</button>
                         <button class="btn-judgment btn-judge-case" data-id="${caseItem.id}"><i class="fas fa-gavel"></i> الحكم</button>
                         <button class="btn-interim-judgment btn-interim-judgment-case" data-id="${caseItem.id}"><i class="fas fa-balance-scale"></i> أحكام تمهيدية</button>
                         <button class="btn-warning btn-suspend-judgment" data-id="${caseItem.id}"><i class="fas fa-pause-circle"></i> وقف الدعوي</button>
@@ -9940,6 +10213,7 @@
                         <button class="btn-info btn-view-case" data-id="${caseItem.id}"><i class="fas fa-eye"></i> عرض</button>
                         <button class="btn-warning btn-edit-case" data-id="${caseItem.id}"><i class="fas fa-edit"></i> تعديل</button>
                         <button class="btn-purple btn-session-history" data-id="${caseItem.id}"><i class="fas fa-history"></i> سجل الجلسات</button>
+                        <button class="btn-primary btn-case-letters" data-id="${caseItem.id}"><i class="fas fa-envelope-open-text"></i> خطابات</button>
                         <button class="btn-return btn-return-case" data-id="${caseItem.id}" data-type="cancelled"><i class="fas fa-redo"></i> تجديد من الشطب</button>
                         <button class="btn-archive btn-archive-judgment" data-id="${caseItem.id}" data-type="cancelled"><i class="fas fa-archive"></i> أرشفة</button>
                     </td>
@@ -9979,6 +10253,7 @@
                         <button class="btn-info btn-view-archived-case" data-id="${caseItem.id}"><i class="fas fa-eye"></i> عرض</button>
                         <button class="btn-warning btn-edit-archived-case" data-id="${caseItem.id}"><i class="fas fa-edit"></i> تعديل</button>
                         <button class="btn-purple btn-session-history" data-id="${caseItem.id}"><i class="fas fa-history"></i> سجل الجلسات</button>
+                        <button class="btn-primary btn-case-letters" data-id="${caseItem.id}"><i class="fas fa-envelope-open-text"></i> خطابات</button>
                         <button class="btn-word btn-export-archived-case" data-id="${caseItem.id}"><i class="fas fa-file-word"></i> Word</button>
                         <button class="btn-return btn-return-case" data-id="${caseItem.id}" data-type="archived"><i class="fas fa-redo"></i> إعادة للتداول</button>
                         <button class="btn-danger btn-delete-archived-case" data-id="${caseItem.id}"><i class="fas fa-trash"></i> حذف</button>
@@ -10011,6 +10286,7 @@
                         <button class="btn-info btn-view-case" data-id="${caseItem.id}"><i class="fas fa-eye"></i> عرض</button>
                         <button class="btn-warning btn-edit-case" data-id="${caseItem.id}"><i class="fas fa-edit"></i> تعديل</button>
                         <button class="btn-purple btn-session-history" data-id="${caseItem.id}"><i class="fas fa-history"></i> سجل الجلسات</button>
+                        <button class="btn-primary btn-case-letters" data-id="${caseItem.id}"><i class="fas fa-envelope-open-text"></i> خطابات</button>
                         <button class="btn-return btn-return-suspended-case" data-id="${caseItem.id}"><i class="fas fa-redo"></i> تعجيل من الوقف</button>
                         <button class="btn-archive btn-archive-judgment" data-id="${caseItem.id}" data-type="suspended"><i class="fas fa-archive"></i> أرشفة</button>
                     </td>
@@ -10082,14 +10358,19 @@
                 `;
                 
                 caseItem.sessionHistory.forEach((session, index) => {
-                    const sessionType = getSessionTypeLabel(session.type);
+                    let sessionType = '';
+                    if (session.type === 'postponement') sessionType = 'ترحيل';
+                    else if (session.type === 'initial') sessionType = 'مبدئية';
+                    else if (session.type === 'reserved') sessionType = 'محجوزة';
+                    else if (session.type === 'cancelled') sessionType = 'مشطوبة';
+                    else if (session.type === 'judgment') sessionType = 'حكم';
                     
                     sessionHistoryHTML += `
                         <tr>
                             <td style="padding: 6px; border: 1px solid #ddd; text-align: center;">${index + 1}</td>
                             <td style="padding: 6px; border: 1px solid #ddd; text-align: center;">${formatDate(session.date)}</td>
                             <td style="padding: 6px; border: 1px solid #ddd; text-align: center;">${sessionType}</td>
-                            <td style="padding: 6px; border: 1px solid #ddd; text-align: right;">${session.judgmentText ? session.judgmentText : (session.reason || '-')}</td>
+                            <td style="padding: 6px; border: 1px solid #ddd; text-align: right;">${session.reason || '-'}</td>
                         </tr>
                     `;
                 });
@@ -10178,6 +10459,9 @@
                     ` : ''}
                     
                     <div class="case-actions">
+                        <button class="btn-primary btn-case-letters" data-id="${caseItem.caseId || caseItem.id}">
+                            <i class="fas fa-envelope-open-text"></i> خطابات وإخطارات
+                        </button>
                         <button class="btn-word" onclick="exportArchivedCaseToWord('${caseItem.id}')">
                             <i class="fas fa-file-word"></i> تصدير إلى Word
                         </button>
@@ -10730,6 +11014,7 @@
                         defendant: caseItem.defendant || '',
                         department: caseItem.department || '',
                         sessionDate: newSessionDate,
+                        firstSessionDate: caseItem.firstSessionDate || getCaseFirstSessionDate(caseItem),
                         status: 'pending',
                         notes: '',
                         sessionHistory: caseItem.sessionHistory ? [...caseItem.sessionHistory] : []
@@ -10775,7 +11060,15 @@
             let handled = false;
             
             // معالجات الأزرار حسب الـ class
-            if (button.classList.contains('btn-view-case')) {
+            if (button.classList.contains('btn-case-letters')) {
+                e.preventDefault();
+                openLettersForCase(dataId);
+                handled = true;
+            } else if (button.classList.contains('btn-case-letters-from-judgment')) {
+                e.preventDefault();
+                openLettersForJudgment(dataId, dataType);
+                handled = true;
+            } else if (button.classList.contains('btn-view-case')) {
                 e.preventDefault();
                 // إذا كان الزر في القضايا الموقوفة ابحث في suspendedCases
                 let caseItem = suspendedCases && suspendedCases.find(c => c.id == dataId);
@@ -10803,14 +11096,19 @@
                         `;
                         
                         caseItem.sessionHistory.forEach((session, index) => {
-                            const sessionType = getSessionTypeLabel(session.type);
+                            let sessionType = '';
+                            if (session.type === 'postponement') sessionType = 'ترحيل';
+                            else if (session.type === 'initial') sessionType = 'مبدئية';
+                            else if (session.type === 'reserved') sessionType = 'محجوزة';
+                            else if (session.type === 'cancelled') sessionType = 'مشطوبة';
+                            else if (session.type === 'judgment') sessionType = 'حكم';
                             
                             sessionHistoryHTML += `
                                 <tr>
                                     <td style="padding: 6px; border: 1px solid #ddd; text-align: center;">${index + 1}</td>
                                     <td style="padding: 6px; border: 1px solid #ddd; text-align: center;">${formatDate(session.date)}</td>
                                     <td style="padding: 6px; border: 1px solid #ddd; text-align: center;">${sessionType}</td>
-                                    <td style="padding: 6px; border: 1px solid #ddd; text-align: right;">${session.judgmentText ? session.judgmentText : (session.reason || '-')}</td>
+                                    <td style="padding: 6px; border: 1px solid #ddd; text-align: right;">${session.reason || '-'}</td>
                                 </tr>
                             `;
                         });
@@ -10862,6 +11160,9 @@
                             
                             <h4 style="margin-top: 20px;">ملاحظات</h4>
                             <p style="padding: 15px; background: #f8f9fa; border-radius: 8px;">${caseItem.notes || ''}</p>
+                            <div class="case-actions">
+                                <button class="btn-primary btn-case-letters" data-id="${caseItem.id}"><i class="fas fa-envelope-open-text"></i> خطابات وإخطارات</button>
+                            </div>
                         </div>
                     `;
                     modal.style.display = 'flex';
@@ -10881,6 +11182,10 @@
             } else if (button.classList.contains('btn-postpone-case')) {
                 e.preventDefault();
                 openPostponeModal(dataId);
+                handled = true;
+            } else if (button.classList.contains('btn-archive-active-case')) {
+                e.preventDefault();
+                openArchiveModal(dataId, 'active');
                 handled = true;
             } else if (button.classList.contains('btn-share-whatsapp')) {
                 e.preventDefault();
@@ -11042,7 +11347,7 @@
                                     <th>نوع الجلسة</th>
                                     <th>تاريخ الجلسة الجديد</th>
                                     <th>سبب التأجيل</th>
-                                    <th>ملاحظات</th>
+                                    <th>منطوق الحكم / ملاحظات</th>
                                     <th>تاريخ التسجيل</th>
                                     <th class="no-print">الإجراءات</th>
                                 </tr>
@@ -11062,7 +11367,7 @@
                             <td style="text-align: center;"><span class="session-type ${sessionTypeClass}">${sessionType}</span></td>
                             <td style="text-align: center;">${session.newDate ? formatDate(session.newDate) : (session.judgmentDate ? formatDate(session.judgmentDate) : '-')}</td>
                             <td class="session-history-notes">${session.reason || '-'}</td>
-                            <td class="session-history-notes">${session.judgmentText ? session.judgmentText : (session.notes || '-')}</td>
+                            <td class="session-history-notes">${session.judgmentText || session.notes || '-'}</td>
                             <td style="text-align: center;">${formatDate(session.recordedDate)}</td>
                             <td class="actions no-print" style="text-align: center;">
                                 <button class="btn-info btn-print-session" data-index="${index}" style="padding: 5px 10px; font-size: 12px;">
@@ -11274,7 +11579,7 @@
                                     <th style="padding: 8px; border: 1px solid #000; text-align: center;">تاريخ الجلسة</th>
                                     <th style="padding: 8px; border: 1px solid #000; text-align: center;">نوع الجلسة</th>
                                     <th style="padding: 8px; border: 1px solid #000; text-align: center;">تاريخ الجلسة الجديد</th>
-                                    <th style="padding: 8px; border: 1px solid #000; text-align: center;">سبب التأجيل</th>
+                                    <th style="padding: 8px; border: 1px solid #000; text-align: center;">منطوق الحكم / السبب</th>
                                     <th style="padding: 8px; border: 1px solid #000; text-align: center;">ملاحظات</th>
                                     <th style="padding: 8px; border: 1px solid #000; text-align: center;">تاريخ التسجيل</th>
                                 </tr>
@@ -11292,7 +11597,7 @@
                         <td style="padding: 6px; border: 1px solid #000; text-align: center;">${formatDate(session.date)}</td>
                         <td style="padding: 6px; border: 1px solid #000; text-align: center;">${sessionType}</td>
                         <td style="padding: 6px; border: 1px solid #000; text-align: center;">${session.newDate ? formatDate(session.newDate) : (session.judgmentDate ? formatDate(session.judgmentDate) : '-')}</td>
-                        <td style="padding: 6px; border: 1px solid #000; text-align: right;">${session.judgmentText ? session.judgmentText : (session.reason || '-')}</td>
+                        <td style="padding: 6px; border: 1px solid #000; text-align: right; white-space: pre-wrap;">${session.judgmentText || session.reason || '-'}</td>
                         <td style="padding: 6px; border: 1px solid #000; text-align: right;">${session.notes || '-'}</td>
                         <td style="padding: 6px; border: 1px solid #000; text-align: center;">${formatDate(session.recordedDate)}</td>
                     </tr>
@@ -11363,7 +11668,7 @@
                         <td>${formatDate(session.date)}</td>
                         <td>${sessionType}</td>
                         <td>${session.newDate ? formatDate(session.newDate) : (session.judgmentDate ? formatDate(session.judgmentDate) : '-')}</td>
-                        <td>${session.judgmentText ? session.judgmentText : (session.reason || '-')}</td>
+                        <td style="white-space: pre-wrap;">${session.judgmentText || session.reason || '-'}</td>
                         <td>${session.notes || '-'}</td>
                         <td>${formatDate(session.recordedDate)}</td>
                     </tr>
@@ -11410,7 +11715,7 @@
                             <th>تاريخ الجلسة</th>
                             <th>نوع الجلسة</th>
                             <th>تاريخ الجلسة الجديد</th>
-                            <th>سبب التأجيل</th>
+                            <th>منطوق الحكم / السبب</th>
                             <th>ملاحظات</th>
                             <th>تاريخ التسجيل</th>
                         </tr>
@@ -11471,14 +11776,19 @@
                 `;
                 
                 caseItem.sessionHistory.forEach((session, index) => {
-                    const sessionType = getSessionTypeLabel(session.type);
+                    let sessionType = '';
+                    if (session.type === 'postponement') sessionType = 'ترحيل';
+                    else if (session.type === 'initial') sessionType = 'مبدئية';
+                    else if (session.type === 'reserved') sessionType = 'محجوزة';
+                    else if (session.type === 'cancelled') sessionType = 'مشطوبة';
+                    else if (session.type === 'judgment') sessionType = 'حكم';
                     
                     sessionHistoryHTML += `
                         <tr>
                             <td style="padding: 6px; border: 1px solid #ddd; text-align: center;">${index + 1}</td>
                             <td style="padding: 6px; border: 1px solid #ddd; text-align: center;">${formatDate(session.date)}</td>
                             <td style="padding: 6px; border: 1px solid #ddd; text-align: center;">${sessionType}</td>
-                            <td style="padding: 6px; border: 1px solid #ddd; text-align: right;">${session.judgmentText ? session.judgmentText : (session.reason || '-')}</td>
+                            <td style="padding: 6px; border: 1px solid #ddd; text-align: right;">${session.reason || '-'}</td>
                         </tr>
                     `;
                 });
@@ -11566,6 +11876,9 @@
                         <button class="btn-info" onclick="showEnhancedSessionHistory('${caseItem.id}')">
                             <i class="fas fa-history"></i> سجل الجلسات الكامل
                         </button>
+                        <button class="btn-primary btn-case-letters" data-id="${caseItem.id}">
+                            <i class="fas fa-envelope-open-text"></i> خطابات وإخطارات
+                        </button>
                     </div>
                 </div>
             `;
@@ -11574,6 +11887,394 @@
             // تحميل قائمة المستندات للقضية (إن وُجدت)
             try { if (typeof refreshDocuments === 'function') refreshDocuments(caseItem.id); } catch(e) { console.error(e); }
         }
+
+        const LETTER_TEMPLATE_FIELDS = {
+            'حكم استجواب.docx': [
+                { key: 'interrogatedParty', label: 'اسم المطلوب استجوابه' },
+                { key: 'nextSessionDate', label: 'الجلسة المحددة للاستجواب', type: 'date' }
+            ],
+            'حكم إحالة للتحقيق.docx': [
+                { key: 'nextSessionDate', label: 'الجلسة المحددة للتحقيق', type: 'date' }
+            ],
+            'حكم خبير.docx': [
+                { key: 'depositDate', label: 'موعد سداد الأمانة', type: 'date' },
+                { key: 'expertReportDate', label: 'جلسة إيداع تقرير الخبير', type: 'date' }
+            ],
+            'حكم قطعي.docx': [
+                { key: 'rulingText', label: 'منطوق الحكم', type: 'textarea' }
+            ],
+            'إخطار.docx': [
+                { key: 'request1', label: 'المعلومة أو المستند المطلوب 1', type: 'textarea' },
+                { key: 'request2', label: 'المعلومة أو المستند المطلوب 2', type: 'textarea' },
+                { key: 'request3', label: 'المعلومة أو المستند المطلوب 3', type: 'textarea' }
+            ],
+            'استعجال.docx': [
+                { key: 'previousBookNumber1', label: 'رقم الكتاب السابق (1)' },
+                { key: 'previousBookDate1', label: 'تاريخ الكتاب السابق (1)', type: 'date' },
+                { key: 'previousBookNumber2', label: 'رقم الكتاب السابق (2)' },
+                { key: 'previousBookDate2', label: 'تاريخ الكتاب السابق (2)', type: 'date' },
+                { key: 'previousBookNumber3', label: 'رقم الكتاب السابق (3)' },
+                { key: 'previousBookDate3', label: 'تاريخ الكتاب السابق (3)', type: 'date' },
+                { key: 'request1', label: 'المطلوب استعجاله 1', type: 'textarea' },
+                { key: 'request2', label: 'المطلوب استعجاله 2', type: 'textarea' },
+                { key: 'request3', label: 'المطلوب استعجاله 3', type: 'textarea' }
+            ],
+            'شطب.docx': [
+                { key: 'strikeSessionDate', label: 'تاريخ جلسة الشطب', type: 'date' }
+            ],
+            'قسم النقض.docx': [
+                { key: 'appealNumber', label: 'رقم الطعن بالنقض' },
+                { key: 'appealYear', label: 'سنة الطعن بالنقض' },
+                { key: 'judgmentNumber', label: 'رقم الحكم المطعون عليه' },
+                { key: 'judgmentYear', label: 'سنة الحكم المطعون عليه' }
+            ]
+        };
+
+        const LETTER_TEMPLATE_LABELS = {
+            'حكم استجواب.docx': 'حكم استجواب',
+            'حكم إحالة للتحقيق.docx': 'حكم إحالة للتحقيق',
+            'حكم خبير.docx': 'حكم خبير',
+            'حكم قطعي.docx': 'حكم قطعي',
+            'إخطار.docx': 'إخطار',
+            'استعجال.docx': 'استعجال',
+            'شطب.docx': 'شطب',
+            'قسم النقض.docx': 'قسم النقض'
+        };
+
+        function lettersEscape(value) {
+            return String(value == null ? '' : value).replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char]));
+        }
+
+        function todayDateInputValue() {
+            const today = new Date();
+            return `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+        }
+
+        function getLetterTemplateLabel(templateName) {
+            return LETTER_TEMPLATE_LABELS[templateName] || templateName.replace(/\.docx$/i, '').replace(/\s*copy\s*/gi, ' ').replace(/\s+/g, ' ').trim();
+        }
+
+        function getLetterCaseFields(caseItem) {
+            const rawNumber = String(caseItem.number || caseItem.caseNumber || '').trim();
+            const parts = rawNumber.split('/');
+            return {
+                caseNumber: String(caseItem.number || (parts.length > 1 ? parts[0] : rawNumber) || '').trim(),
+                caseYear: String(caseItem.year || caseItem.caseYear || (parts.length > 1 ? parts.slice(1).join('/') : '') || '').trim(),
+                defendant: String(caseItem.defendant || caseItem.appellee || '').trim(),
+                // تاريخ آخر جلسة مثبتة فعليًا في سجل الجلسات (وليس تاريخ اليوم)
+                hearingDate: (function () { const last = letterGetLastSession(caseItem); return last ? (last.y + '-' + String(last.m).padStart(2, '0') + '-' + String(last.d).padStart(2, '0')) : (caseItem.sessionDate || caseItem.reserveDate || caseItem.cancelDate || ''); })(),
+                caseType: String(caseItem.caseType || caseItem.lawsuitType || '').trim(),
+                plaintiff: String(caseItem.plaintiff || caseItem.appellant || '').trim()
+            };
+        }
+
+        function getLetterFieldDefinitions(templateName, caseItem) {
+            const caseFields = getLetterCaseFields(caseItem);
+            const common = [
+                { key: 'plaintiff', label: 'اسم المدعي', value: caseFields.plaintiff },
+                { key: 'caseNumber', label: 'رقم الدعوى', value: caseFields.caseNumber },
+                { key: 'caseYear', label: 'سنة الدعوى', value: caseFields.caseYear },
+                { key: 'caseType', label: 'نوع الدعوى (يُكتب بعد السنة، مثل: مدني كلي)', value: caseFields.caseType },
+                { key: 'defendant', label: 'الخصم المقابل بعد عبارة «ضد»', value: caseFields.defendant },
+                { key: 'hearingDate', label: 'تاريخ الجلسة', type: 'date', value: caseFields.hearingDate },
+                { key: 'recipient', label: 'السيد الأستاذ / الجهة الموجه إليها', value: '' },
+                { key: 'letterDate', label: 'تاريخ تحرير الخطاب', type: 'date', value: todayDateInputValue() }
+            ];
+            const specific = LETTER_TEMPLATE_FIELDS[templateName] || [];
+            return common.concat(specific.map(field => ({
+                ...field,
+                value: field.key === 'rulingText' ? String(caseItem.judgmentText || '') :
+                    field.key === 'strikeSessionDate' ? String(caseItem.cancelDate || caseItem.sessionDate || '') :
+                    field.key === 'appealNumber' ? String(caseItem.appealNumber || '') :
+                    field.key === 'appealYear' ? String(caseItem.appealYear || '') :
+                    field.key === 'judgmentNumber' ? String(caseItem.judgmentNumber || '') :
+                    field.key === 'judgmentYear' ? String(caseItem.judgmentYear || '') : ''
+            })));
+        }
+
+        function setLettersPanel(panelId) {
+            ['letters-library-panel', 'letters-editor-panel', 'letters-preview-panel'].forEach(id => {
+                document.getElementById(id).hidden = id !== panelId;
+            });
+        }
+
+        function renderLetterTemplateList() {
+            const search = (document.getElementById('letters-template-search').value || '').trim().toLocaleLowerCase('ar');
+            const list = document.getElementById('letters-template-list');
+            list.replaceChildren();
+            const filtered = activeLetterTemplates.filter(item => `${item.displayName} ${getLetterTemplateLabel(item.fileName)}`.toLocaleLowerCase('ar').includes(search));
+            if (!filtered.length) {
+                list.innerHTML = '<p class="letters-note">لا توجد نماذج مطابقة للبحث.</p>';
+                return;
+            }
+
+            const select = document.createElement('select');
+            select.className = 'letters-template-select';
+            select.setAttribute('aria-label', 'اختر نموذج الخطاب');
+            const placeholder = document.createElement('option');
+            placeholder.value = '';
+            placeholder.textContent = 'اختر نوع الخطاب';
+            placeholder.disabled = true;
+            placeholder.selected = !activeLetterTemplate;
+            select.appendChild(placeholder);
+            filtered.forEach(item => {
+                const option = document.createElement('option');
+                option.value = item.fileName;
+                option.textContent = getLetterTemplateLabel(item.fileName);
+                select.appendChild(option);
+            });
+            if (activeLetterTemplate && filtered.some(item => item.fileName === activeLetterTemplate)) {
+                select.value = activeLetterTemplate;
+            }
+            list.appendChild(select);
+        }
+
+        function renderLetterFields(templateName) {
+            const container = document.getElementById('letters-fields');
+            container.replaceChildren();
+            getLetterFieldDefinitions(templateName, activeLetterCaseData).forEach(field => {
+                const wrapper = document.createElement('div');
+                wrapper.className = 'letters-field';
+                const label = document.createElement('label');
+                const id = `letter-field-${field.key}`;
+                label.htmlFor = id;
+                label.textContent = field.label;
+                const input = field.type === 'textarea' ? document.createElement('textarea') : document.createElement('input');
+                input.id = id;
+                input.dataset.letterField = field.key;
+                input.type = field.type === 'date' ? 'date' : 'text';
+                input.value = field.value || '';
+                wrapper.append(label, input);
+                container.appendChild(wrapper);
+            });
+            if (templateName === 'استعجال.docx') {
+                const hint = document.createElement('div');
+                hint.className = 'letters-note';
+                hint.style.gridColumn = '1 / -1';
+                hint.textContent = 'أدخل كتابًا واحدًا أو اثنين أو ثلاثة من الكتب السابقة: تتغير الصياغة تلقائيًا (لكتابنا / لكتابينا / لكتبنا) وتُرتَّب الأرقام والتواريخ من الأقدم إلى الأحدث. اترك الباقي فارغًا.';
+                container.appendChild(hint);
+            }
+        }
+
+        async function openLettersForCase(caseItem, caseIdOverride) {
+            if (typeof caseItem === 'string') caseItem = findCaseAnywhereById(caseItem);
+            if (!caseItem) {
+                showAlert('تعذر العثور على بيانات القضية لفتح الخطابات', 'warning');
+                return;
+            }
+            activeLetterCaseId = String(caseIdOverride || caseItem.caseId || caseItem.id || '');
+            if (!activeLetterCaseId) {
+                showAlert('لا يوجد معرّف ثابت لهذه القضية، لذلك تعذر فتح الخطابات لها', 'danger');
+                return;
+            }
+            activeLetterCaseData = { ...caseItem, id: activeLetterCaseId, caseId: activeLetterCaseId };
+            activeLetterTemplate = '';
+            const identity = getLetterCaseFields(activeLetterCaseData);
+            document.getElementById('letters-case-context').textContent = `القضية: ${identity.caseNumber || 'رقم غير مسجل'} / ${identity.caseYear || 'سنة غير مسجلة'} | ${identity.plaintiff || 'مدعٍ غير مسجل'} ضد ${identity.defendant || 'خصم غير مسجل'}`;
+            lettersReturnToDetails = document.getElementById('case-details-modal').style.display === 'flex';
+            document.getElementById('letters-back-to-case').hidden = !lettersReturnToDetails;
+            document.getElementById('letters-template-search').value = '';
+            activeLetterDocument = null;
+            setLettersPanel('letters-library-panel');
+            document.getElementById('letters-library-message').hidden = true;
+            document.getElementById('letters-modal').style.display = 'flex';
+
+            const result = await LettersBackend.listLetterTemplates();
+            activeLetterTemplates = result && result.success ? result.templates : [];
+            renderLetterTemplateList();
+            if (!activeLetterTemplates.length) {
+                document.getElementById('letters-library-message').textContent = (result && result.error) || 'لم يتم العثور على ملفات DOCX أصلية في مجلد النماذج.';
+                document.getElementById('letters-library-message').hidden = false;
+            }
+        }
+
+        function openLettersForJudgment(caseId, type) {
+            const source = type === 'favorable' ? favorableJudgments : againstJudgments;
+            const judgment = source.find(item => item.caseId === caseId);
+            if (!judgment) {
+                showAlert('تعذر العثور على الحكم المرتبط بالقضية', 'warning');
+                return;
+            }
+            const original = findCaseAnywhereById(caseId);
+            const combined = String(judgment.caseNumber || '');
+            const parts = combined.split('/');
+            const reference = original || {
+                id: caseId,
+                number: parts.length > 1 ? parts[0] : '',
+                year: parts.length > 1 ? parts.slice(1).join('/') : '',
+                plaintiff: judgment.plaintiff || '',
+                defendant: judgment.defendant || '',
+                subject: judgment.subject || '',
+                department: judgment.department || '',
+                sessionDate: judgment.sessionDate || '',
+                judgmentText: judgment.text || ''
+            };
+            openLettersForCase(reference, caseId);
+        }
+
+        function openLettersForUnderFiling(kind, recordId) {
+            const record = (kind === 'appeal' ? underFilingAppeals : underFilingCases).find(item => item.id === recordId);
+            if (!record) {
+                showAlert('تعذر العثور على سجل تحت الرفع', 'warning');
+                return;
+            }
+            const caseData = kind === 'appeal'
+                ? { ...record, id: record.id, caseId: record.id, plaintiff: record.appellant || '', defendant: record.appellee || '' }
+                : { ...record, id: record.id, caseId: record.id };
+            openLettersForCase(caseData, record.id);
+        }
+
+        function chooseLetterTemplate(templateName) {
+            activeLetterTemplate = templateName;
+            activeLetterDocument = null;
+            document.getElementById('letters-selected-template').textContent = getLetterTemplateLabel(templateName);
+            renderLetterFields(templateName);
+            const caseFields = getLetterCaseFields(activeLetterCaseData);
+            const filenameParts = [caseFields.plaintiff, caseFields.caseNumber, caseFields.caseYear, getLetterTemplateLabel(templateName)].filter(Boolean);
+            document.getElementById('letters-output-name').value = filenameParts.join('_');
+            setLettersPanel('letters-editor-panel');
+        }
+
+        function collectLetterFields() {
+            const fields = {};
+            document.querySelectorAll('#letters-fields [data-letter-field]').forEach(input => {
+                fields[input.dataset.letterField] = input.value.trim();
+            });
+            return fields;
+        }
+
+        function letterPreviewBytes(base64) {
+            const binary = atob(base64);
+            const bytes = new Uint8Array(binary.length);
+            for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+            return bytes.buffer;
+        }
+
+        async function displayLetterPreview(base64) {
+            const container = document.getElementById('letter-preview-document');
+            container.replaceChildren();
+            if (!window.docx || typeof window.docx.renderAsync !== 'function') {
+                throw new Error('مكتبة معاينة Word غير متاحة محليًا. يمكن فتح الملف في Word بدلًا من ذلك.');
+            }
+            await window.docx.renderAsync(letterPreviewBytes(base64), container, null, { breakPages: true, renderHeaders: true, renderFooters: true });
+        }
+
+        function setLetterPreviewWarning(unmatchedFields) {
+            const warning = document.getElementById('letters-preview-warning');
+            const labels = new Map(getLetterFieldDefinitions(activeLetterDocument.templateName, activeLetterCaseData).map(field => [field.key, field.label]));
+            const unresolved = (unmatchedFields || []).map(key => labels.get(key) || key);
+            warning.hidden = unresolved.length === 0;
+            warning.textContent = unresolved.length
+                ? `تعذر وضع هذه البيانات تلقائيًا في موضع موثوق داخل القالب: ${unresolved.join('، ')}. بقي النموذج الأصلي كما هو؛ أكمل هذه البيانات في Word قبل الاعتماد.`
+                : '';
+        }
+
+        async function createLetterDraftFromForm() {
+            if (!activeLetterTemplate || !activeLetterCaseId) return;
+            const button = document.getElementById('letters-create-draft');
+            if (button) button.disabled = true;
+            try {
+                const fieldValues = collectLetterFields();
+                fieldValues.letterDate = todayDateInputValue();
+                const letterDateInput = document.querySelector('#letters-fields [data-letter-field="letterDate"]');
+                if (letterDateInput) letterDateInput.value = fieldValues.letterDate;
+                const result = await LettersBackend.createLetterDraft({
+                    caseId: activeLetterCaseId,
+                    caseData: activeLetterCaseData,
+                    templateName: activeLetterTemplate,
+                    fieldValues,
+                    filename: document.getElementById('letters-output-name').value
+                });
+                if (!result || !result.success) throw new Error((result && result.error) || 'تعذر إنشاء المستند');
+                activeLetterDocument = {
+                    draftId: result.draftId,
+                    name: result.name,
+                    templateName: result.templateName,
+                    status: 'مسودة',
+                    createdAt: result.createdAt,
+                    dataBase64: result.dataBase64
+                };
+                document.getElementById('letters-preview-title').textContent = result.name;
+                document.getElementById('letters-refresh-preview').disabled = !activeLetterDocument.draftId;
+                document.getElementById('letters-refresh-preview').style.display = activeLetterDocument.draftId ? '' : 'none';
+                setLetterPreviewWarning(result.unmatchedFields);
+                setLettersPanel('letters-preview-panel');
+                try {
+                    await displayLetterPreview(result.dataBase64);
+                } catch (previewErr) {
+                    console.warn('preview error:', previewErr);
+                }
+            } catch (error) {
+                showAlert(error.message || 'تعذر إنشاء مسودة الخطاب', 'danger');
+            } finally {
+                if (button) button.disabled = false;
+            }
+        }
+
+        // "حفظ الخطاب على الجهاز" هو الحفظ الوحيد للخطاب: لا يُسجَّل شيء داخل البرنامج أو ملفات القضية
+        async function saveLetterToDevice() {
+            if (!activeLetterDocument || !activeLetterDocument.dataBase64) return;
+            const result = await LettersBackend.saveGeneratedLetter({ draftId: activeLetterDocument.draftId, dataBase64: activeLetterDocument.dataBase64, name: activeLetterDocument.name });
+            if (result && result.success) showAlert(result.downloaded ? 'تم تنزيل الخطاب على جهازك' : 'تم حفظ الخطاب على الجهاز', 'success');
+            else if (result && result.error !== 'cancelled') showAlert((result && result.error) || 'تعذر حفظ الخطاب', 'danger');
+        }
+
+        async function openCurrentLetterInWord() {
+            if (!activeLetterDocument) return;
+            const result = await LettersBackend.openGeneratedLetter({ draftId: activeLetterDocument.draftId, dataBase64: activeLetterDocument.dataBase64, name: activeLetterDocument.name });
+            if (result && result.success && result.downloaded) showAlert('تم تنزيل الخطاب. افتحه ببرنامج Word لتعديله ثم احفظه.', 'info');
+            else if (!result || !result.success) showAlert((result && result.error) || 'تعذر فتح الخطاب في Word', 'warning');
+        }
+
+        async function refreshCurrentLetterPreview() {
+            if (!activeLetterDocument || !activeLetterDocument.draftId) return;
+            const result = await LettersBackend.readGeneratedLetter({ draftId: activeLetterDocument.draftId });
+            if (!result || !result.success) {
+                showAlert((result && result.error) || 'تعذرت قراءة التعديلات من Word', 'danger');
+                return;
+            }
+            activeLetterDocument.dataBase64 = result.dataBase64;
+            try {
+                await displayLetterPreview(result.dataBase64);
+                showAlert('تم تحديث معاينة الخطاب بالتعديلات الحالية', 'success');
+            } catch (error) {
+                showAlert(error.message || 'تعذر تحديث المعاينة', 'warning');
+            }
+        }
+
+        function printCurrentLetterPreview() {
+            window.print();
+        }
+
+        function setupLetterWorkspace() {
+            document.getElementById('letters-template-search').addEventListener('input', renderLetterTemplateList);
+            document.getElementById('letters-template-list').addEventListener('change', event => {
+                const select = event.target.closest('select.letters-template-select');
+                if (select && select.value) chooseLetterTemplate(select.value);
+            });
+            document.getElementById('letters-back-to-case').addEventListener('click', () => {
+                document.getElementById('letters-modal').style.display = 'none';
+                if (lettersReturnToDetails) document.getElementById('case-details-modal').style.display = 'flex';
+            });
+            document.getElementById('letters-editor-back').addEventListener('click', () => {
+                activeLetterTemplate = '';
+                activeLetterDocument = null;
+                renderLetterTemplateList();
+                setLettersPanel('letters-library-panel');
+            });
+            document.getElementById('letters-preview-back').addEventListener('click', () => {
+                activeLetterTemplate = '';
+                activeLetterDocument = null;
+                renderLetterTemplateList();
+                setLettersPanel('letters-library-panel');
+            });
+            document.getElementById('letters-create-draft').addEventListener('click', createLetterDraftFromForm);
+            document.getElementById('letters-open-word').addEventListener('click', openCurrentLetterInWord);
+            document.getElementById('letters-refresh-preview').addEventListener('click', refreshCurrentLetterPreview);
+            document.getElementById('letters-print').addEventListener('click', printCurrentLetterPreview);
+            document.getElementById('letters-save-to-device').addEventListener('click', saveLetterToDevice);
+        }
+        setupLetterWorkspace();
 
         // ========== Document management functions ==========
         async function uploadDocument(caseId) {
@@ -13313,38 +14014,10 @@
             let casesToPrint = cases;
             
             if (startDate && endDate) {
-                // جمع جميع القوائم لأننا نريد أن نعرض كل القضايا التي كان لها جلسة في الفترة المحددة
-                const allCandidates = []
-                    .concat(cases || [])
-                    .concat(reservedCases || [])
-                    .concat(cancelledCases || [])
-                    .concat(suspendedCases || [])
-                    .concat(archivedCases || [])
-                    .concat((favorableJudgments || []).map(j => ({...j, caseNumber: j.caseNumber, caseYear: j.caseNumber ? j.caseNumber.split('/')[1] : ''})))
-                    .concat((againstJudgments || []).map(j => ({...j, caseNumber: j.caseNumber, caseYear: j.caseNumber ? j.caseNumber.split('/')[1] : ''})));
-
-                const s = new Date(startDate);
-                const e = new Date(endDate);
-
-                casesToPrint = allCandidates.filter(c => {
-                    // تحقق من سجل الجلسات أولاً
-                    if (Array.isArray(c.sessionHistory) && c.sessionHistory.length) {
-                        return c.sessionHistory.some(h => {
-                            if (!h || !h.date) return false;
-                            const d = new Date(h.date);
-                            return d >= s && d <= e;
-                        });
-                    }
-
-                    // تحقق من الحقول المحتملة للتاريخ (تشمل الأحكام أيضاً)
-                    const possibleDates = [c.sessionDate, c.date, c.reserveDate, c.cancelDate, c.suspendDate, c.archiveDate];
-                    for (const ds of possibleDates) {
-                        if (!ds) continue;
-                        const d = new Date(ds);
-                        if (d >= s && d <= e) return true;
-                    }
-
-                    return false;
+                const allCandidates = getAllCaseRecordsForPrint();
+                casesToPrint = allCandidates.filter(caseItem => {
+                    const firstSessionDate = getDateKey(getCaseFirstSessionDate(caseItem));
+                    return firstSessionDate && firstSessionDate >= startDate && firstSessionDate <= endDate;
                 });
             }
             
@@ -13733,37 +14406,10 @@
                 }
                 
                 // جمع جميع القوائم من جميع الفئات (بما فيها الأحكام) حتى تحتفظ القضية بجميع بياناتها في كل مراحلها
-                const allCandidates = []
-                    .concat(cases || [])
-                    .concat(reservedCases || [])
-                    .concat(cancelledCases || [])
-                    .concat(suspendedCases || [])
-                    .concat(archivedCases || [])
-                    .concat((favorableJudgments || []).map(j => ({...j, caseNumber: j.caseNumber, caseYear: j.caseNumber ? j.caseNumber.split('/')[1] : ''})))
-                    .concat((againstJudgments || []).map(j => ({...j, caseNumber: j.caseNumber, caseYear: j.caseNumber ? j.caseNumber.split('/')[1] : ''})));
-
-                const s = new Date(startDate);
-                const e = new Date(endDate);
-
-                let casesToExport = allCandidates.filter(c => {
-                    // تحقق من سجل الجلسات أولاً
-                    if (Array.isArray(c.sessionHistory) && c.sessionHistory.length) {
-                        return c.sessionHistory.some(h => {
-                            if (!h || !h.date) return false;
-                            const d = new Date(h.date);
-                            return d >= s && d <= e;
-                        });
-                    }
-
-                    // تحقق من الحقول المحتملة للتاريخ (تشمل الأحكام أيضاً)
-                    const possibleDates = [c.sessionDate, c.date, c.reserveDate, c.cancelDate, c.suspendDate, c.archiveDate];
-                    for (const ds of possibleDates) {
-                        if (!ds) continue;
-                        const d = new Date(ds);
-                        if (d >= s && d <= e) return true;
-                    }
-
-                    return false;
+                const allCandidates = getAllCaseRecordsForPrint();
+                const casesToExport = allCandidates.filter(caseItem => {
+                    const firstSessionDate = getDateKey(getCaseFirstSessionDate(caseItem));
+                    return firstSessionDate && firstSessionDate >= startDate && firstSessionDate <= endDate;
                 });
                 
                 const department = printDateRangeDepartmentSelect ? printDateRangeDepartmentSelect.value : '';
@@ -14018,6 +14664,39 @@
         });
         
         // ========== دالة محسنة لإنشاء تقرير طباعة الأحكام ==========
+        function getAllJudgmentsForPrint() {
+            const activeJudgments = [
+                ...(favorableJudgments || []).map(judgment => ({ ...judgment, judgmentType: 'favorable', typeLabel: 'أحكام الصالح', sourceJudgmentId: judgment.id })),
+                ...(againstJudgments || []).map(judgment => ({ ...judgment, judgmentType: 'against', typeLabel: 'أحكام الضد', sourceJudgmentId: judgment.id }))
+            ];
+            const archivedJudgments = (archivedCases || [])
+                .filter(item => item.judgmentType === 'favorable' || item.judgmentType === 'against')
+                .map(item => {
+                    const historyEntry = (item.sessionHistory || []).find(session =>
+                        (item.archivedJudgmentId && session.judgmentId === item.archivedJudgmentId) ||
+                        (session.type === 'judgment' && session.judgmentType === item.judgmentType &&
+                            (session.judgmentText || '') === (item.judgmentText || '') &&
+                            (!item.judgmentDate || session.judgmentDate === item.judgmentDate))
+                    );
+                    const caseNumber = [item.caseNumber, item.caseYear].filter(Boolean).join('/');
+                    return {
+                        ...item,
+                        caseNumber,
+                        sessionDate: item.judgmentSessionDate || (historyEntry && historyEntry.date) || item.sessionDate || item.judgmentDate || '',
+                        date: item.judgmentDate || item.date || '',
+                        text: item.judgmentText || item.text || '',
+                        sourceJudgmentId: item.archivedJudgmentId || ''
+                    };
+                });
+            const seen = new Set();
+            return [...activeJudgments, ...archivedJudgments].filter(judgment => {
+                const key = String(judgment.sourceJudgmentId || `${judgment.judgmentType}|${judgment.caseId || judgment.caseNumber || ''}|${judgment.sessionDate || ''}|${judgment.date || ''}|${judgment.text || ''}`);
+                if (seen.has(key)) return false;
+                seen.add(key);
+                return true;
+            });
+        }
+
         function generateJudgmentsPrintReport() {
             console.log('تم استدعاء دالة generateJudgmentsPrintReport');
             
@@ -14027,11 +14706,8 @@
             
             console.log(`تم تحميل ${favorableJudgments.length} أحكام صالح و ${againstJudgments.length} أحكام ضد`);
             
-            // جمع جميع الأحكام من الصالح والضد
-            let allJudgments = [
-                ...favorableJudgments.map(j => ({...j, judgmentType: 'favorable', typeLabel: 'أحكام الصالح'})),
-                ...againstJudgments.map(j => ({...j, judgmentType: 'against', typeLabel: 'أحكام الضد'}))
-            ];
+            // جمع الأحكام النشطة والمؤرشفة معًا لتظل تقارير الفترات مكتملة
+            let allJudgments = getAllJudgmentsForPrint();
             
             allJudgments = applyJudgmentsPrintFilters(allJudgments);
 
@@ -14807,6 +15483,8 @@
                 archivedCases = [];
                 suspendedCases = [];
                 notifications = [];
+                underFilingCases = [];
+                underFilingAppeals = [];
                 
                 localStorage.removeItem('cases');
                 localStorage.removeItem('favorableJudgments');
@@ -14816,6 +15494,8 @@
                 localStorage.removeItem('suspendedCases');
                 localStorage.removeItem('archivedCases');
                 localStorage.removeItem('notifications');
+                localStorage.removeItem('underFilingCases');
+                localStorage.removeItem('underFilingAppeals');
                 localStorage.removeItem('lastBackup');
 
                 if (window.electronAPI && window.electronAPI.saveData) {
@@ -14829,6 +15509,9 @@
                             suspendedCases: [],
                             archivedCases: [],
                             notifications: [],
+                            departments: [],
+                            underFilingCases: [],
+                            underFilingAppeals: [],
                             forceEmpty: true
                         });
                     } catch (e) {
@@ -14840,6 +15523,8 @@
                 renderJudgmentsTables();
                 renderReservedAndCancelledCases();
                 renderArchivedCasesTable();
+                renderUnderFilingCasesTable();
+                renderUnderFilingAppealsTable();
                 updateStats();
                 updateDashboard();
                 
@@ -15052,6 +15737,7 @@
                         <td class="actions no-print">
                             <button class="btn-info uf-edit-case-btn" data-id="${c.id}" style="padding:5px 8px;font-size:12px;"><i class="fas fa-edit"></i> فتح</button>
                             <button class="btn-purple uf-case-actions-btn" data-id="${c.id}" style="padding:5px 8px;font-size:12px;"><i class="fas fa-tasks"></i> الإجراءات</button>
+                            <button class="btn-primary uf-case-letters-btn" data-id="${c.id}" style="padding:5px 8px;font-size:12px;"><i class="fas fa-envelope-open-text"></i> خطابات وإخطارات</button>
                             <button class="btn-secondary uf-case-docs-btn" data-id="${c.id}" style="padding:5px 8px;font-size:12px;"><i class="fas fa-paperclip"></i> المستندات</button>
                             ${c.status !== 'filed'
                                 ? `<button class="btn-success uf-file-case-btn" data-id="${c.id}" style="padding:5px 8px;font-size:12px;"><i class="fas fa-check-circle"></i> تم رفع القضية</button>`
@@ -15119,6 +15805,7 @@
                         <td class="actions no-print">
                             <button class="btn-info uf-edit-appeal-btn" data-id="${a.id}" style="padding:5px 8px;font-size:12px;"><i class="fas fa-edit"></i> فتح</button>
                             <button class="btn-purple uf-appeal-actions-btn" data-id="${a.id}" style="padding:5px 8px;font-size:12px;"><i class="fas fa-tasks"></i> الإجراءات</button>
+                            <button class="btn-primary uf-appeal-letters-btn" data-id="${a.id}" style="padding:5px 8px;font-size:12px;"><i class="fas fa-envelope-open-text"></i> خطابات وإخطارات</button>
                             <button class="btn-secondary uf-appeal-docs-btn" data-id="${a.id}" style="padding:5px 8px;font-size:12px;"><i class="fas fa-paperclip"></i> المستندات</button>
                             ${a.status !== 'filed'
                                 ? `<button class="btn-success uf-file-appeal-btn" data-id="${a.id}" style="padding:5px 8px;font-size:12px;"><i class="fas fa-check-circle"></i> تم رفع الاستئناف</button>`
@@ -15646,20 +16333,59 @@
         }
 
         // ---------- طباعة قضايا/استئنافات تحت الرفع ----------
-        function printUnderFilingCases() {
-            const searchInput = document.getElementById('uf-case-search');
-            const statusFilter = document.getElementById('uf-case-status-filter');
+        function getUfRegistrationDate(record) {
+            if (!record || !record.createdAt) return '';
+            const date = new Date(record.createdAt);
+            if (isNaN(date.getTime())) return '';
+            return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+        }
+
+        function getFilteredUnderFilingRecords(kind) {
+            const isAppeal = kind === 'appeal';
+            const startDate = document.getElementById(isAppeal ? 'uf-appeals-start-date' : 'uf-cases-start-date').value;
+            const endDate = document.getElementById(isAppeal ? 'uf-appeals-end-date' : 'uf-cases-end-date').value;
+            if (startDate && endDate && startDate > endDate) {
+                showAlert('تاريخ البداية يجب أن يكون قبل تاريخ النهاية', 'warning');
+                return null;
+            }
+
+            const records = (isAppeal ? underFilingAppeals : underFilingCases).slice();
+            const searchInput = document.getElementById(isAppeal ? 'uf-appeal-search' : 'uf-case-search');
+            const statusFilter = document.getElementById(isAppeal ? 'uf-appeal-status-filter' : 'uf-case-status-filter');
             const searchTerm = searchInput ? searchInput.value.trim().toLowerCase() : '';
             const statusValue = statusFilter ? statusFilter.value : '';
+            let filtered = records;
 
-            let filtered = underFilingCases.slice();
-            if (statusValue) filtered = filtered.filter(c => (c.status || 'pending') === statusValue);
-            if (searchTerm) {
-                filtered = filtered.filter(c => {
-                    const haystack = `${c.circulationNumber || ''} ${c.plaintiff || ''} ${c.defendant || ''} ${c.subject || ''}`.toLowerCase();
-                    return haystack.includes(searchTerm);
+            if (startDate || endDate) {
+                filtered = filtered.filter(record => {
+                    const registeredDate = getUfRegistrationDate(record);
+                    return registeredDate && (!startDate || registeredDate >= startDate) && (!endDate || registeredDate <= endDate);
                 });
             }
+            if (statusValue) filtered = filtered.filter(record => (record.status || 'pending') === statusValue);
+            if (searchTerm) {
+                filtered = filtered.filter(record => {
+                    const parties = isAppeal
+                        ? `${record.circulationNumber || ''} ${record.appellant || ''} ${record.appellee || ''}`
+                        : `${record.circulationNumber || ''} ${record.plaintiff || ''} ${record.defendant || ''} ${record.subject || ''}`;
+                    return parties.toLowerCase().includes(searchTerm);
+                });
+            }
+            return filtered;
+        }
+
+        function getUfRegistrationRangeLabel(kind) {
+            const isAppeal = kind === 'appeal';
+            const startDate = document.getElementById(isAppeal ? 'uf-appeals-start-date' : 'uf-cases-start-date').value;
+            const endDate = document.getElementById(isAppeal ? 'uf-appeals-end-date' : 'uf-cases-end-date').value;
+            if (!startDate && !endDate) return '';
+            return `${startDate ? formatDate(startDate) : 'بلا بداية'} إلى ${endDate ? formatDate(endDate) : 'بلا نهاية'}`;
+        }
+
+        // ---------- طباعة قضايا/استئنافات تحت الرفع ----------
+        function printUnderFilingCases() {
+            const filtered = getFilteredUnderFilingRecords('case');
+            if (filtered === null) return;
 
             if (filtered.length === 0) {
                 showAlert('لا توجد قضايا لطباعتها', 'warning');
@@ -15704,6 +16430,7 @@
                     <div class="header">
                         <h2>هيئة قضايا الدولة</h2>
                         <h3>كشف القضايا تحت الرفع</h3>
+                        <p>فترة التسجيل: ${getUfRegistrationRangeLabel('case') || 'كل التواريخ'}</p>
                         <p>تاريخ التقرير: ${formatDate(new Date().toISOString().split('T')[0])} | عدد القضايا: ${filtered.length}</p>
                     </div>
                     <table>
@@ -15727,19 +16454,8 @@
         }
 
         function printUnderFilingAppeals() {
-            const searchInput = document.getElementById('uf-appeal-search');
-            const statusFilter = document.getElementById('uf-appeal-status-filter');
-            const searchTerm = searchInput ? searchInput.value.trim().toLowerCase() : '';
-            const statusValue = statusFilter ? statusFilter.value : '';
-
-            let filtered = underFilingAppeals.slice();
-            if (statusValue) filtered = filtered.filter(a => (a.status || 'pending') === statusValue);
-            if (searchTerm) {
-                filtered = filtered.filter(a => {
-                    const haystack = `${a.circulationNumber || ''} ${a.appellant || ''} ${a.appellee || ''}`.toLowerCase();
-                    return haystack.includes(searchTerm);
-                });
-            }
+            const filtered = getFilteredUnderFilingRecords('appeal');
+            if (filtered === null) return;
 
             if (filtered.length === 0) {
                 showAlert('لا توجد استئنافات لطباعتها', 'warning');
@@ -15786,6 +16502,7 @@
                     <div class="header">
                         <h2>هيئة قضايا الدولة</h2>
                         <h3>كشف الاستئنافات تحت الرفع</h3>
+                        <p>فترة التسجيل: ${getUfRegistrationRangeLabel('appeal') || 'كل التواريخ'}</p>
                         <p>تاريخ التقرير: ${formatDate(new Date().toISOString().split('T')[0])} | عدد الاستئنافات: ${filtered.length}</p>
                     </div>
                     <table>
@@ -15811,19 +16528,8 @@
 
         // ---------- تصدير قضايا/استئنافات تحت الرفع إلى Word ----------
         function exportUnderFilingCasesToWord() {
-            const searchInput = document.getElementById('uf-case-search');
-            const statusFilter = document.getElementById('uf-case-status-filter');
-            const searchTerm = searchInput ? searchInput.value.trim().toLowerCase() : '';
-            const statusValue = statusFilter ? statusFilter.value : '';
-
-            let filtered = underFilingCases.slice();
-            if (statusValue) filtered = filtered.filter(c => (c.status || 'pending') === statusValue);
-            if (searchTerm) {
-                filtered = filtered.filter(c => {
-                    const haystack = `${c.circulationNumber || ''} ${c.plaintiff || ''} ${c.defendant || ''} ${c.subject || ''}`.toLowerCase();
-                    return haystack.includes(searchTerm);
-                });
-            }
+            const filtered = getFilteredUnderFilingRecords('case');
+            if (filtered === null) return;
 
             if (filtered.length === 0) {
                 showAlert('لا توجد قضايا للتصدير', 'warning');
@@ -15854,6 +16560,7 @@
                     <h1>هيئة قضايا الدولة</h1>
                     <h2>نظام إدارة القضايا</h2>
                     <h3>كشف القضايا تحت الرفع</h3>
+                    <p>فترة التسجيل: ${getUfRegistrationRangeLabel('case') || 'كل التواريخ'}</p>
                     <p>عدد القضايا: ${filtered.length}</p>
                     <p>تاريخ التصدير: ${formatDate(new Date().toISOString().split('T')[0])}</p>
                 </div>
@@ -15873,19 +16580,8 @@
         }
 
         function exportUnderFilingAppealsToWord() {
-            const searchInput = document.getElementById('uf-appeal-search');
-            const statusFilter = document.getElementById('uf-appeal-status-filter');
-            const searchTerm = searchInput ? searchInput.value.trim().toLowerCase() : '';
-            const statusValue = statusFilter ? statusFilter.value : '';
-
-            let filtered = underFilingAppeals.slice();
-            if (statusValue) filtered = filtered.filter(a => (a.status || 'pending') === statusValue);
-            if (searchTerm) {
-                filtered = filtered.filter(a => {
-                    const haystack = `${a.circulationNumber || ''} ${a.appellant || ''} ${a.appellee || ''}`.toLowerCase();
-                    return haystack.includes(searchTerm);
-                });
-            }
+            const filtered = getFilteredUnderFilingRecords('appeal');
+            if (filtered === null) return;
 
             if (filtered.length === 0) {
                 showAlert('لا توجد استئنافات للتصدير', 'warning');
@@ -15918,6 +16614,7 @@
                     <h1>هيئة قضايا الدولة</h1>
                     <h2>نظام إدارة القضايا</h2>
                     <h3>كشف الاستئنافات تحت الرفع</h3>
+                    <p>فترة التسجيل: ${getUfRegistrationRangeLabel('appeal') || 'كل التواريخ'}</p>
                     <p>عدد الاستئنافات: ${filtered.length}</p>
                     <p>تاريخ التصدير: ${formatDate(new Date().toISOString().split('T')[0])}</p>
                 </div>
@@ -16002,7 +16699,8 @@
                 if (!btn) return;
                 const id = btn.getAttribute('data-id');
                 if (!id) return;
-                if (btn.classList.contains('uf-edit-case-btn')) openUfCaseModal(id);
+                if (btn.classList.contains('uf-case-letters-btn')) openLettersForUnderFiling('case', id);
+                else if (btn.classList.contains('uf-edit-case-btn')) openUfCaseModal(id);
                 else if (btn.classList.contains('uf-case-actions-btn')) openUfActionsModal('case', id);
                 else if (btn.classList.contains('uf-case-docs-btn')) openUfDocumentsModal('case', id);
                 else if (btn.classList.contains('uf-file-case-btn')) openUfFileCaseModal(id);
@@ -16017,7 +16715,8 @@
                 if (!btn) return;
                 const id = btn.getAttribute('data-id');
                 if (!id) return;
-                if (btn.classList.contains('uf-edit-appeal-btn')) openUfAppealModal(id);
+                if (btn.classList.contains('uf-appeal-letters-btn')) openLettersForUnderFiling('appeal', id);
+                else if (btn.classList.contains('uf-edit-appeal-btn')) openUfAppealModal(id);
                 else if (btn.classList.contains('uf-appeal-actions-btn')) openUfActionsModal('appeal', id);
                 else if (btn.classList.contains('uf-appeal-docs-btn')) openUfDocumentsModal('appeal', id);
                 else if (btn.classList.contains('uf-file-appeal-btn')) openUfFileAppealModal(id);
@@ -16040,6 +16739,474 @@
                 console.warn('refreshAllViews failed', e);
             }
         }
+
+        // ====================================================================
+        // محرك الخطابات (قوالب Word) — يعمل خلف نافذة "خطابات وإخطارات" (letters-modal)
+        // --------------------------------------------------------------------
+        // - القوالب الأصلية للقراءة فقط في app/templates ولا تُعدَّل أبدًا؛ كل خطاب نسخة جديدة.
+        // - تُملأ ترويسة القالب (قضية / ضد / رقم لسنة + نوع الدعوى / جلسة) وبيانات متن الخطاب من النموذج.
+        // - يُحفظ الخطاب ويُربط بالقضية عبر نظام المستندات الحالي (electronAPI.saveFile/listFiles/readFile/...)
+        //   فيعمل نفس الكود على سطح المكتب (ملف حقيقي على القرص) وعلى الويب/الموبايل (Firebase).
+        // ====================================================================
+        const LETTER_TEMPLATES = {
+            "إخطار": "إخطار.docx",
+            "استعجال": "استعجال.docx",
+            "شطب": "شطب.docx",
+            "حكم قطعي": "حكم قطعي.docx",
+            "حكم خبير": "حكم خبير.docx",
+            "حكم استجواب": "حكم استجواب.docx",
+            "حكم إحالة للتحقيق": "حكم إحالة للتحقيق.docx",
+            "قسم النقض": "قسم النقض.docx"
+        };
+        const LETTER_FILE_TO_TYPE = {};
+        Object.keys(LETTER_TEMPLATES).forEach(type => { LETTER_FILE_TO_TYPE[LETTER_TEMPLATES[type]] = type; });
+        const LETTER_MAX_BYTES_WEB = 25 * 1024 * 1024;      // حد الويب/الموبايل (الخطاب في الذاكرة فقط)
+        const LETTER_MAX_BYTES_DESKTOP = 50 * 1024 * 1024;  // حد سطح المكتب
+        const LETTER_W_NS = 'http://schemas.openxmlformats.org/wordprocessingml/2006/main';
+        const LETTER_XML_NS = 'http://www.w3.org/XML/1998/namespace';
+
+        function letterIsDesktop() {
+            return !!(window.electronAPI && typeof window.electronAPI.readTemplate === 'function');
+        }
+
+        // ---------- التواريخ (تاريخ آخر جلسة من سجل الجلسات فقط — لا يُستخدم تاريخ اليوم أبدًا) ----------
+        function letterParseDate(v) {
+            if (!v) return null;
+            const str = String(v).trim();
+            let m = str.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
+            let y, mo, d;
+            if (m) { y = +m[1]; mo = +m[2]; d = +m[3]; }
+            else {
+                m = str.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/);
+                if (!m) return null;
+                d = +m[1]; mo = +m[2]; y = +m[3];
+            }
+            if (!y || mo < 1 || mo > 12 || d < 1 || d > 31) return null;
+            return { y, m: mo, d, key: y * 10000 + mo * 100 + d };
+        }
+        function letterGetLastSession(rec) {
+            const cands = [];
+            if (rec) {
+                cands.push(letterParseDate(rec.sessionDate));
+                (Array.isArray(rec.sessionHistory) ? rec.sessionHistory : []).forEach(h => {
+                    if (!h) return;
+                    cands.push(letterParseDate(h.date));
+                    cands.push(letterParseDate(h.newDate));
+                });
+            }
+            let best = null;
+            cands.forEach(c => { if (c && (!best || c.key > best.key)) best = c; });
+            return best;
+        }
+        function letterFormatDate(p) {
+            if (!p) return '';
+            const z = n => (n < 10 ? '0' : '') + n;
+            return z(p.d) + ' / ' + z(p.m) + ' / ' + p.y;
+        }
+        function letterIsoToDisplay(v) { return letterFormatDate(letterParseDate(v)); }
+
+        // ---------- بيانات القضية (الدالة المركزية) ----------
+        function letterResolveRecord(caseId) {
+            const c = (typeof findCaseById === 'function') ? findCaseById(caseId) : null;
+            if (c) return { record: c, isCase: true };
+            const byCaseId = j => j && j.caseId === caseId;
+            const byId = j => j && j.id === caseId;
+            const j = favorableJudgments.find(byCaseId) || againstJudgments.find(byCaseId) ||
+                      favorableJudgments.find(byId) || againstJudgments.find(byId);
+            if (!j) return null;
+            let number = '', year = '';
+            if (j.caseNumber && String(j.caseNumber).includes('/')) {
+                const parts = String(j.caseNumber).split('/');
+                number = (parts[0] || '').trim(); year = (parts[1] || '').trim();
+            } else {
+                number = j.caseNumber || j.number || ''; year = j.caseYear || j.year || '';
+            }
+            return { isCase: false, record: {
+                id: caseId, number, year, plaintiff: j.plaintiff || '', defendant: j.defendant || '',
+                sessionDate: j.sessionDate || '', sessionHistory: j.sessionHistory || [], caseType: j.caseType || ''
+            } };
+        }
+        // ملحوظة: برنامج القضايا لا يسجل "نوع الدعوى" (مدني كلي/مستأنف...) ضمن بيانات القضية؛ يُقرأ caseType إن وُجد،
+        // ويكتبه المستخدم في نموذج الخطاب فيُحفظ في القضية ويُعبأ تلقائيًا في خطاباتها التالية.
+        function getCaseTemplateData(caseId) {
+            const r = letterResolveRecord(caseId);
+            if (!r) return null;
+            const c = r.record;
+            const last = letterGetLastSession(c);
+            return {
+                caseId,
+                plaintiff: String(c.plaintiff || c.plaintiffName || c.party1 || '').trim(),
+                defendant: String(c.defendant || c.defendantName || c.party2 || '').trim(),
+                caseNumber: String(c.number || c.caseNumber || '').trim(),
+                caseYear: String(c.year || c.caseYear || '').trim(),
+                caseType: String(c.caseType || c.lawsuitType || '').trim(),
+                lastSessionDate: letterFormatDate(last),
+                lastSessionISO: last ? (last.y + '-' + String(last.m).padStart(2, '0') + '-' + String(last.d).padStart(2, '0')) : '',
+                _isCase: r.isCase
+            };
+        }
+        // ---------- تعديل XML القالب ----------
+        function letterTextNodes(p) {
+            const arr = [];
+            Array.from(p.childNodes).forEach(r => {
+                if (r.localName === 'r' && r.namespaceURI === LETTER_W_NS) {
+                    Array.from(r.childNodes).forEach(c => { if (c.localName === 't') arr.push(c); });
+                }
+            });
+            return arr;
+        }
+        function letterDirectText(p) { return letterTextNodes(p).map(n => n.textContent).join(''); }
+        function letterInTextBox(p) {
+            for (let n = p.parentNode; n; n = n.parentNode) if (n.localName === 'txbxContent') return true;
+            return false;
+        }
+        function letterMakeRun(doc, rPrSource, text) {
+            const run = doc.createElementNS(LETTER_W_NS, 'w:r');
+            if (rPrSource) run.appendChild(rPrSource.cloneNode(true));
+            String(text).split(/\r?\n/).forEach((line, i) => {
+                if (i > 0) run.appendChild(doc.createElementNS(LETTER_W_NS, 'w:br'));
+                const t = doc.createElementNS(LETTER_W_NS, 'w:t');
+                t.setAttributeNS(LETTER_XML_NS, 'xml:space', 'preserve');
+                t.textContent = line;
+                run.appendChild(t);
+            });
+            return run;
+        }
+        // يستبدل نص الفقرة بنص واحد بنفس تنسيق (خط/حجم/RTL) أول جزء نصي فيها
+        function letterSetParagraphText(doc, p, text) {
+            const runs = Array.from(p.childNodes).filter(n => n.localName === 'r' && n.namespaceURI === LETTER_W_NS);
+            const first = runs.find(r => Array.from(r.childNodes).some(c => c.localName === 't')) || runs[0];
+            const rPr = first ? Array.from(first.childNodes).find(c => c.localName === 'rPr') : null;
+            runs.forEach(r => p.removeChild(r));
+            p.appendChild(letterMakeRun(doc, rPr, text));
+        }
+        // استبدال مجال [start,end) من نص الفقرة (موزّع على عدة Runs) بنص جديد مع الحفاظ على تنسيق الجزء الذي يبدأ عنده
+        function letterSetRange(p, start, end, text) {
+            let pos = 0, placed = false;
+            letterTextNodes(p).forEach(n => {
+                const s = n.textContent, ns = pos, ne = pos + s.length;
+                pos = ne;
+                if (ne <= start || ns >= end) return;
+                const a = Math.max(start, ns) - ns, b = Math.min(end, ne) - ns;
+                n.textContent = s.slice(0, a) + (placed ? '' : text) + s.slice(b);
+                n.setAttributeNS(LETTER_XML_NS, 'xml:space', 'preserve');
+                placed = true;
+            });
+            return placed;
+        }
+        function letterAppendText(p, text) {
+            const nodes = letterTextNodes(p);
+            if (!nodes.length) return false;
+            const last = nodes[nodes.length - 1];
+            last.textContent = last.textContent + text;
+            last.setAttributeNS(LETTER_XML_NS, 'xml:space', 'preserve');
+            return true;
+        }
+        // يطبّق Regex له مجموعات (Groups) تمثل الخانات الفارغة، ويكتب القيمة المقابلة في كل مجموعة
+        function letterApplySlots(p, re, values) {
+            const text = letterDirectText(p);
+            const m = re.exec(text);
+            if (!m || !m.indices) return false;
+            for (let g = values.length; g >= 1; g--) {
+                if (values[g - 1] == null || values[g - 1] === '') continue;
+                const range = m.indices[g];
+                if (range) letterSetRange(p, range[0], range[1], values[g - 1]);
+            }
+            return true;
+        }
+
+        const LETTER_DATE_SLOT = '(\\s*\\/\\s*\\/\\s*)';
+        function letterDateSlot(v) { const s = letterIsoToDisplay(v); return s ? ' ' + s + ' ' : ''; }
+        function letterBlankSlot(v) { const s = String(v == null ? '' : v).trim(); return s ? ' ' + s + ' ' : ''; }
+
+        // تعبئة ترويسة القالب (صندوق النص: قضية / ضد / رقم لسنة / جلسة) — نسختا Choice وFallback معًا
+        function letterFillHeaderLabels(doc, d) {
+            const norm = s => String(s).replace(/[\u0640\u200e\u200f\u00a0]/g, '').replace(/\s+/g, ' ').trim();
+            const rules = [
+                { key: 'plaintiff', re: /^قضية[\s\/]*$/, text: d.plaintiff ? 'قضية / ' + d.plaintiff : null },
+                { key: 'defendant', re: /^ضد[\s\/]*$/, text: d.defendant ? 'ضـــد / ' + d.defendant : null },
+                { key: 'caseNumber', re: /^رقم[\s\/]*لسنة[\s\/]*$/, text: (d.caseNumber && d.caseYear) ? ('رقم / ' + d.caseNumber + ' لسنة ' + d.caseYear + (d.caseType ? ' ' + d.caseType : '')) : null },
+                { key: 'hearingDate', re: /^جلسة[\s\/]*$/, text: d.lastSessionDate ? 'جلسة / ' + d.lastSessionDate : null }
+            ];
+            const done = {};
+            Array.from(doc.getElementsByTagNameNS(LETTER_W_NS, 'p')).forEach(p => {
+                if (!letterInTextBox(p)) return;
+                const t = norm(letterDirectText(p));
+                if (!t) return;
+                const rule = rules.find(r => r.re.test(t));
+                if (rule && rule.text) { letterSetParagraphText(doc, p, rule.text); done[rule.key] = true; }
+            });
+            return done;
+        }
+
+        // ---------- خطاب الاستعجال: الكتب السابقة (حتى ثلاثة) بصياغة عربية تتغير حسب العدد ----------
+        // كتاب واحد:  لكتابنا رقم (ر1) بتاريخ (ت1)
+        // كتابان:     لكتابينا رقمي (ر1) بتاريخ (ت1) ورقم (ر2) بتاريخ (ت2)
+        // ثلاثة:      لكتبنا أرقام (ر1) بتاريخ (ت1) ورقم (ر2) بتاريخ (ت2) ورقم (ر3) بتاريخ (ت3)
+        // الترتيب دائمًا من الأقدم إلى الأحدث حسب التاريخ، وكل رقم يبقى مع تاريخه.
+        function letterUrgentBooksPhrase(f) {
+            const entries = [];
+            for (let i = 1; i <= 3; i++) {
+                const num = String(f['previousBookNumber' + i] || '').trim();
+                const dt = letterParseDate(String(f['previousBookDate' + i] || '').trim());
+                if (num || dt) entries.push({ i, num, dt });
+            }
+            if (!entries.length) return null;
+            entries.sort((a, b) => {
+                if (a.dt && b.dt) return (a.dt.key - b.dt.key) || (a.i - b.i);
+                if (a.dt) return -1;
+                if (b.dt) return 1;
+                return a.i - b.i;
+            });
+            const n = entries.length;
+            const head = n === 1 ? 'لكتابنا رقم' : (n === 2 ? 'لكتابينا رقمي' : 'لكتبنا أرقام');
+            const blank = '      '; // الجزء الناقص يُترك فراغًا ليكتبه المستخدم بيده في Word
+            const pair = (e, k) => (k === 0 ? head : 'ورقم') + ' ' + (e.num || blank) + ' بتاريخ ' + (e.dt ? letterFormatDate(e.dt) : blank);
+            return { text: entries.map(pair).join(' ') + ' ', keys: entries.map(e => ['previousBookNumber' + e.i, 'previousBookDate' + e.i]).reduce((a, b) => a.concat(b), []) };
+        }
+        function letterFillUrgentBooks(p, f) {
+            const phrase = letterUrgentBooksPhrase(f);
+            if (!phrase) return null;
+            const m = /لكتابنا\s*رقم\s+بتاريخ\s+(?=نأمل)/d.exec(letterDirectText(p));
+            if (!m || !m.indices) return null;
+            return letterSetRange(p, m.indices[0][0], m.indices[0][1], phrase.text) ? phrase.keys : null;
+        }
+
+        // تعبئة متن الخطاب (خارج الترويسة) حسب القالب. يرجع مفاتيح الحقول التي أُدخلت فعلًا.
+        function letterFillBody(doc, templateFile, f) {
+            const used = {};
+            const paras = Array.from(doc.getElementsByTagNameNS(LETTER_W_NS, 'p')).filter(p => !letterInTextBox(p));
+            const type = LETTER_FILE_TO_TYPE[templateFile] || '';
+            const hearing = letterDateSlot(f.hearingDate);
+            const mark = (keys, ok) => { if (ok) (Array.isArray(keys) ? keys : [keys]).forEach(k => { used[k] = true; }); };
+            let rulingAnchor = null;
+            paras.forEach(p => {
+                const text = letterDirectText(p);
+                if (!text.trim()) return;
+                // المرسل إليه
+                if (/^\s*السيد\s*الأستاذ\s*\/\s*$/.test(text)) {
+                    if (f.recipient) mark('recipient', letterAppendText(p, f.recipient));
+                    return;
+                }
+                // تاريخ التحرير
+                if (/^\s*تحريرا\s*في\s*\/\s*\/\s*$/.test(text)) {
+                    const v = letterDateSlot(f.letterDate);
+                    if (v) mark('letterDate', letterApplySlots(p, new RegExp('تحريرا\\s*في' + LETTER_DATE_SLOT, 'd'), [v]));
+                    return;
+                }
+                // بنود المطلوب (إخطار / استعجال)
+                const item = text.match(/^\s*([123])\s*[-–]\s*$/);
+                if (item && (type === 'إخطار' || type === 'استعجال')) {
+                    const val = f['request' + item[1]];
+                    if (val) mark('request' + item[1], letterAppendText(p, ' ' + val));
+                    return;
+                }
+                if (/بخصوص\s*الدعوى/.test(text) || /^\s*حكمت\s*المحكمة/.test(text) || /^\s*ليودع/.test(text)) {
+                    if (type === 'استعجال') {
+                        const filled = letterFillUrgentBooks(p, f);
+                        if (filled) mark(filled, true);
+                    } else if (type === 'قسم النقض') {
+                        mark(['appealNumber', 'appealYear', 'judgmentNumber', 'judgmentYear'], letterApplySlots(p, /النقض\s*رقم(\s+)لسنة(\s+)ق\s*طعنا\s*علي\s*الحكم\s*رقم(\s+)لسنة(\s+)مدني/d,
+                            [letterBlankSlot(f.appealNumber), letterBlankSlot(f.appealYear), letterBlankSlot(f.judgmentNumber), letterBlankSlot(f.judgmentYear)]));
+                    } else if (type === 'شطب') {
+                        const v = letterDateSlot(f.strikeSessionDate || f.hearingDate);
+                        if (v) { const ok = letterApplySlots(p, new RegExp('بجلسة' + LETTER_DATE_SLOT, 'd'), [v]); mark(f.strikeSessionDate ? 'strikeSessionDate' : 'hearingDate', ok); }
+                    } else if (/بجلسة\s*\/\s*\/\s/.test(text)) {
+                        if (hearing) mark('hearingDate', letterApplySlots(p, new RegExp('بجلسة' + LETTER_DATE_SLOT, 'd'), [hearing]));
+                    }
+                    if (type === 'حكم قطعي' && /حكمت\s*المحكمة/.test(text)) rulingAnchor = p;
+                    if (type === 'حكم خبير' && /حكمت\s*المحكمة/.test(text)) {
+                        mark(['depositDate', 'expertReportDate'], letterApplySlots(p, new RegExp('وحددت' + LETTER_DATE_SLOT + 'لسداد\\s*الأمانة\\s*وجلسة' + LETTER_DATE_SLOT, 'd'), [letterDateSlot(f.depositDate), letterDateSlot(f.expertReportDate)]));
+                    }
+                    if (type === 'حكم استجواب' && /حكمت\s*المحكمة/.test(text)) {
+                        mark(['interrogatedParty', 'nextSessionDate'], letterApplySlots(p, new RegExp('باستجواب(\\s+)لجلسة' + LETTER_DATE_SLOT, 'd'), [letterBlankSlot(f.interrogatedParty), letterDateSlot(f.nextSessionDate)]));
+                    }
+                    if (type === 'حكم إحالة للتحقيق' && /حكمت\s*المحكمة/.test(text)) {
+                        mark('nextSessionDate', letterApplySlots(p, new RegExp('للتحقيق\\s*لجلسة' + LETTER_DATE_SLOT, 'd'), [letterDateSlot(f.nextSessionDate)]));
+                    }
+                    return;
+                }
+            });
+            // منطوق الحكم (حكم قطعي): أول فقرة فارغة بعد عبارة "حكمت المحكمة"
+            if (type === 'حكم قطعي' && f.rulingText) {
+                let target = rulingAnchor ? rulingAnchor.nextSibling : null;
+                while (target && !(target.localName === 'p' && target.namespaceURI === LETTER_W_NS && !letterDirectText(target).trim())) target = target.nextSibling;
+                if (target) {
+                    const pPr = Array.from(target.childNodes).find(c => c.localName === 'pPr');
+                    const mark_rPr = pPr ? Array.from(pPr.childNodes).find(c => c.localName === 'rPr') : null;
+                    target.appendChild(letterMakeRun(doc, mark_rPr, f.rulingText));
+                    used.rulingText = true;
+                }
+            }
+            return used;
+        }
+        function letterPlaceholderMap(f) {
+            return { PLAINTIFF: f.plaintiff, DEFENDANT: f.defendant, CASE_NUMBER: f.caseNumber, CASE_YEAR: f.caseYear, CASE_TYPE: f.caseType, LAST_SESSION_DATE: letterIsoToDisplay(f.hearingDate) };
+        }
+        // يستبدل {{PLAINTIFF}} ... إلخ داخل أي فقرة (حتى لو قسّمها Word على عدة أجزاء)
+        function replaceTemplatePlaceholders(doc, f) {
+            const map = letterPlaceholderMap(f);
+            let changed = false;
+            Array.from(doc.getElementsByTagNameNS(LETTER_W_NS, 'p')).forEach(p => {
+                const full = letterDirectText(p);
+                if (full.indexOf('{{') === -1) return;
+                const replaced = full.replace(/\{\{\s*([A-Z_]+)\s*\}\}/g, (m, k) => (k in map ? (map[k] || '') : m));
+                if (replaced === full) return;
+                const ts = letterTextNodes(p);
+                ts.forEach((t, i) => { t.textContent = i === 0 ? replaced : ''; });
+                if (ts[0]) ts[0].setAttributeNS(LETTER_XML_NS, 'xml:space', 'preserve');
+                changed = true;
+            });
+            return changed;
+        }
+        function letterFillXml(xml, templateFile, f, isMain) {
+            const doc = new DOMParser().parseFromString(xml, 'application/xml');
+            if (doc.getElementsByTagName('parsererror').length) throw new Error('XML_PARSE');
+            let header = {}, body = {};
+            if (isMain) {
+                header = letterFillHeaderLabels(doc, {
+                    plaintiff: f.plaintiff, defendant: f.defendant, caseNumber: f.caseNumber, caseYear: f.caseYear,
+                    caseType: f.caseType, lastSessionDate: letterIsoToDisplay(f.hearingDate)
+                });
+                body = letterFillBody(doc, templateFile, f);
+            }
+            const ph = replaceTemplatePlaceholders(doc, f);
+            let out = new XMLSerializer().serializeToString(doc);
+            if (out.indexOf('<?xml') !== 0) out = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n' + out;
+            return { xml: out, header, body, placeholders: ph };
+        }
+
+        async function letterLoadTemplateBytes(fileName) {
+            if (letterIsDesktop()) {
+                const r = await window.electronAPI.readTemplate({ name: fileName });
+                if (!r || !r.success) throw new Error(r && r.error === 'template-not-found' ? 'TEMPLATE_NOT_FOUND' : ((r && r.error) || 'TEMPLATE_READ'));
+                const bin = atob(r.dataBase64);
+                const bytes = new Uint8Array(bin.length);
+                for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+                return bytes;
+            }
+            const resp = await fetch('./templates/' + encodeURIComponent(fileName), { cache: 'no-cache' });
+            if (!resp.ok) throw new Error('TEMPLATE_NOT_FOUND');
+            const bytes = new Uint8Array(await resp.arrayBuffer());
+            // الاستضافة قد تُرجع index.html بدل 404 للملف المفقود → نتحقق من توقيع ملف docx (PK)
+            if (bytes.length < 4 || bytes[0] !== 0x50 || bytes[1] !== 0x4B) throw new Error('TEMPLATE_NOT_FOUND');
+            return bytes;
+        }
+        function letterErrorMessage(e, label) {
+            const code = e && e.message;
+            if (code === 'TEMPLATE_NOT_FOUND') return 'ملف قالب "' + label + '" غير موجود. ضعه في مجلد app/templates باسم: ' + (LETTER_TEMPLATES[label] || '');
+            if (code === 'TEMPLATE_READ') return 'تعذر قراءة ملف القالب "' + label + '".';
+            if (code === 'JSZIP_MISSING') return 'مكتبة إنشاء ملفات Word لم تُحمَّل. تأكد من وجود app/vendor/jszip.min.js أو من الاتصال بالإنترنت.';
+            if (code === 'XML_PARSE' || code === 'BAD_TEMPLATE') return 'ملف القالب "' + label + '" تالف أو ليس ملف Word صالحًا.';
+            if (code === 'TOO_LARGE') return 'حجم الخطاب كبير جدًا.';
+            return 'تعذر إنشاء الخطاب: ' + (code || 'خطأ غير معروف');
+        }
+        function letterSafeName(name) {
+            return String(name || '').replace(/[\\\/:*?"<>|\u0000-\u001f]/g, '_').replace(/\s+/g, ' ').replace(/[. ]+$/, '').trim().slice(0, 120);
+        }
+
+        // ---------- إنشاء الخطاب (نسخة جديدة دائمًا من القالب) وحفظه وربطه بالقضية ----------
+        async function letterCreateDraft({ caseId, caseData, templateName, fieldValues, filename }) {
+            const label = LETTER_FILE_TO_TYPE[templateName];
+            if (!label) return { success: false, error: 'نموذج الخطاب غير معروف' };
+            try {
+                const f = Object.assign({}, fieldValues || {});
+                const missing = [];
+                if (!f.plaintiff) missing.push('اسم المدعي');
+                if (!f.defendant) missing.push('اسم المدعى عليه');
+                if (!f.caseNumber) missing.push('رقم الدعوى');
+                if (!f.caseYear) missing.push('سنة الدعوى');
+                if (missing.length) showAlert('بيانات ناقصة تُركت فارغة في الخطاب: ' + missing.join('، '), 'warning');
+                if (!f.hearingDate) showAlert('لا توجد جلسة مسجلة لهذه القضية، تُرك حقل الجلسة فارغًا في الخطاب', 'warning');
+
+                if (typeof JSZip === 'undefined') throw new Error('JSZIP_MISSING');
+                const bytes = await letterLoadTemplateBytes(templateName);
+                let zip;
+                try { zip = await JSZip.loadAsync(bytes); } catch (e) { throw new Error('BAD_TEMPLATE'); }
+                const parts = Object.keys(zip.files).filter(n => /^word\/(document|header\d*|footer\d*)\.xml$/.test(n));
+                if (parts.indexOf('word/document.xml') === -1) throw new Error('BAD_TEMPLATE');
+                const placed = {};
+                for (const name of parts) {
+                    const xml = await zip.file(name).async('string');
+                    const res = letterFillXml(xml, templateName, f, name === 'word/document.xml');
+                    if (name === 'word/document.xml') { Object.assign(placed, res.header, res.body); }
+                    zip.file(name, res.xml);
+                }
+                // الحقول التي أدخلها المستخدم ولم يوجد لها موضع موثوق داخل القالب
+                const unmatchedFields = [];
+                Object.keys(f).forEach(k => {
+                    if (!String(f[k] || '').trim()) return;
+                    if (k === 'letterDate' || ((k === 'caseType' || k === 'caseYear') && placed.caseNumber)) return;
+                    if (placed[k]) return;
+                    if (k === 'hearingDate' && (placed.hearingDate || placed.strikeSessionDate)) return;
+                    unmatchedFields.push(k);
+                });
+                const dataBase64 = await zip.generateAsync({ type: 'base64', compression: 'DEFLATE' });
+                if (Math.floor(dataBase64.length * 0.75) > (letterIsDesktop() ? LETTER_MAX_BYTES_DESKTOP : LETTER_MAX_BYTES_WEB)) throw new Error('TOO_LARGE');
+
+                const title = letterSafeName(filename) || label;
+                // لا يُحفظ الخطاب داخل البرنامج: مسودة مؤقتة فقط (ملف مؤقت على سطح المكتب، أو في ذاكرة الصفحة على الويب/الموبايل)
+                let draftId = null, name = title + '.docx';
+                if (letterIsDesktop()) {
+                    const w = await window.electronAPI.letterDraftWrite({ dataBase64, filename: title });
+                    if (!w || !w.success) return { success: false, error: 'تعذر إنشاء المسودة المؤقتة' + (w && w.error ? ': ' + w.error : '') };
+                    draftId = w.draftId; name = w.name || name;
+                }
+
+                // نوع الدعوى يُحفظ في بيانات القضية فقط (وليس الخطاب) ليُعبأ تلقائيًا في الخطابات التالية
+                if (f.caseType) {
+                    const rec = (typeof findCaseById === 'function') ? findCaseById(caseId) : null;
+                    if (rec && rec.caseType !== f.caseType) {
+                        rec.caseType = f.caseType;
+                        try { if (typeof saveDataToAPI === 'function') saveDataToAPI(); } catch (e) { console.warn(e); }
+                    }
+                }
+                return { success: true, draftId, name, templateName, createdAt: Date.now(), dataBase64, unmatchedFields };
+            } catch (e) {
+                console.error('letterCreateDraft', e);
+                return { success: false, error: letterErrorMessage(e, label) };
+            }
+        }
+
+        // ---------- المسودات المؤقتة (لا حفظ داخل البرنامج) ----------
+        function letterDownloadBlob(dataBase64, fileName) {
+            const bin = atob(dataBase64);
+            const bytes = new Uint8Array(bin.length);
+            for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+            const blob = new Blob([bytes], { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url; a.download = fileName;
+            document.body.appendChild(a); a.click(); a.remove();
+            setTimeout(() => URL.revokeObjectURL(url), 8000);
+        }
+        // واجهة موحّدة تستخدمها نافذة الخطابات
+        const LettersBackend = {
+            async listLetterTemplates() {
+                return { success: true, templates: Object.keys(LETTER_FILE_TO_TYPE).map(fileName => ({ fileName, displayName: LETTER_FILE_TO_TYPE[fileName] })) };
+            },
+            createLetterDraft: letterCreateDraft,
+            // فتح المسودة في Word: سطح المكتب يفتح الملف المؤقت مباشرة، والويب/الموبايل ينزّل نسخة ليفتحها المستخدم
+            async openGeneratedLetter({ draftId, dataBase64, name }) {
+                if (draftId && letterIsDesktop()) return window.electronAPI.letterDraftOpen({ draftId });
+                if (!dataBase64) return { success: false, error: 'لا توجد مسودة مفتوحة' };
+                letterDownloadBlob(dataBase64, name || 'خطاب.docx');
+                return { success: true, downloaded: true };
+            },
+            // قراءة آخر نسخة بعد التعديل في Word (سطح المكتب فقط)
+            async readGeneratedLetter({ draftId }) {
+                if (!draftId || !letterIsDesktop()) return { success: false, error: 'تحديث المعاينة بعد التعديل متاح في نسخة سطح المكتب فقط' };
+                return window.electronAPI.letterDraftRead({ draftId });
+            },
+            // "حفظ الخطاب على الجهاز": هو الحفظ الوحيد — نافذة حفظ باسم على سطح المكتب، وتنزيل ملف على الويب/الموبايل
+            async saveGeneratedLetter({ draftId, dataBase64, name }) {
+                if (draftId && letterIsDesktop()) return window.electronAPI.letterDraftSaveAs({ draftId, dataBase64, filename: name });
+                if (!dataBase64) return { success: false, error: 'لا توجد مسودة للحفظ' };
+                letterDownloadBlob(dataBase64, name || 'خطاب.docx');
+                return { success: true, downloaded: true };
+            }
+        };
+
 
         // ========== المزامنة التلقائية بين الأجهزة (عند تشغيل السيرفر المحلي) ==========
         // كل عدة ثوانٍ، وأيضًا عند رجوع المستخدم لتبويب/تطبيق الموبايل، نعيد تحميل

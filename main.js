@@ -879,7 +879,8 @@ ipcMain.handle('saveFile', async (event, { caseId, filename, dataBase64, docType
         });
         writeIndex(index);
 
-        return { success: true };
+        // نرجّع معرّف الملف واسمه (إضافة غير مُخلّة بالسلوك القديم) ليتمكن الكود من فتح الملف مباشرة بعد إنشائه
+        return { success: true, id, name: displayName };
     } catch (e) {
         console.error('saveFile error:', e);
         return { success: false, error: e.message };
@@ -1054,6 +1055,116 @@ ipcMain.handle('exportHtmlToPdf', async (event, { html, defaultFileName }) => {
         if (tempHtmlPath) { try { fs.unlinkSync(tempHtmlPath); } catch (e) {} }
     }
 });
+
+// قراءة قالب Word من مجلد app/templates (قراءة فقط — القالب الأصلي لا يُعدَّل أبدًا؛
+// كل خطاب يُنشأ كنسخة جديدة من القالب داخل index.html)
+ipcMain.handle('readTemplate', async (event, { name } = {}) => {
+    try {
+        const safe = path.basename(String(name || ''));
+        if (!safe || !/\.docx$/i.test(safe)) return { success: false, error: 'اسم قالب غير صالح' };
+        const full = path.join(__dirname, 'app', 'templates', safe);
+        if (!fs.existsSync(full)) return { success: false, error: 'template-not-found' };
+        const buf = fs.readFileSync(full);
+        return { success: true, dataBase64: buf.toString('base64'), name: safe };
+    } catch (e) {
+        console.error('readTemplate error:', e);
+        return { success: false, error: e.message };
+    }
+});
+
+// ---------------------------------------------------------------
+// مسودات الخطابات (مؤقتة): لا تُسجَّل في البرنامج ولا في ملفات القضية.
+// تُكتب في مجلد مؤقت ليفتحها المستخدم في Word ويعدّلها، ولا تُحفظ نهائيًا
+// إلا عندما يختار المستخدم "حفظ الخطاب على الجهاز" (نافذة حفظ باسم).
+// ---------------------------------------------------------------
+const LETTER_DRAFTS_DIR = path.join(app.getPath('temp'), 'case-manager-letter-drafts');
+const letterDrafts = new Map(); // draftId -> المسار الكامل لملف المسودة
+
+function cleanLetterDrafts(maxAgeMs) {
+    try {
+        if (!fs.existsSync(LETTER_DRAFTS_DIR)) return;
+        const now = Date.now();
+        fs.readdirSync(LETTER_DRAFTS_DIR).forEach(name => {
+            const dir = path.join(LETTER_DRAFTS_DIR, name);
+            try {
+                const st = fs.statSync(dir);
+                if (maxAgeMs === 0 || now - st.mtimeMs > maxAgeMs) fs.rmSync(dir, { recursive: true, force: true });
+            } catch (e) { /* ملف مفتوح في Word حاليًا: نتجاهله وسيُحذف لاحقًا */ }
+        });
+    } catch (e) { /* تجاهل */ }
+}
+function letterDraftPath(draftId) {
+    const id = String(draftId || '');
+    if (!/^[A-Za-z0-9_-]+$/.test(id)) return null;
+    const known = letterDrafts.get(id);
+    return known && fs.existsSync(known) ? known : null;
+}
+
+ipcMain.handle('letterDraftWrite', async (event, { dataBase64, filename } = {}) => {
+    try {
+        if (!dataBase64) return { success: false, error: 'لا توجد بيانات للمسودة' };
+        const id = `${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+        const dir = path.join(LETTER_DRAFTS_DIR, id);
+        fs.mkdirSync(dir, { recursive: true });
+        const base = sanitizeName(String(filename || 'خطاب').replace(/\.docx$/i, '')) || 'خطاب';
+        const full = path.join(dir, `${base}.docx`);
+        fs.writeFileSync(full, Buffer.from(dataBase64, 'base64'));
+        letterDrafts.set(id, full);
+        return { success: true, draftId: id, name: path.basename(full) };
+    } catch (e) {
+        console.error('letterDraftWrite error:', e);
+        return { success: false, error: e.message };
+    }
+});
+
+ipcMain.handle('letterDraftOpen', async (event, { draftId } = {}) => {
+    try {
+        const full = letterDraftPath(draftId);
+        if (!full) return { success: false, error: 'المسودة غير موجودة (ربما أُغلق البرنامج). أنشئ الخطاب من جديد.' };
+        const result = await shell.openPath(full);
+        if (result) return { success: false, error: result };
+        return { success: true };
+    } catch (e) {
+        console.error('letterDraftOpen error:', e);
+        return { success: false, error: e.message };
+    }
+});
+
+// قراءة آخر نسخة من المسودة بعد تعديلها وحفظها في Word (لتحديث المعاينة)
+ipcMain.handle('letterDraftRead', async (event, { draftId } = {}) => {
+    try {
+        const full = letterDraftPath(draftId);
+        if (!full) return { success: false, error: 'المسودة غير موجودة' };
+        return { success: true, dataBase64: fs.readFileSync(full).toString('base64'), name: path.basename(full) };
+    } catch (e) {
+        console.error('letterDraftRead error:', e);
+        return { success: false, error: e.message };
+    }
+});
+
+// "حفظ الخطاب على الجهاز": نافذة حفظ باسم يختار منها المستخدم المكان والاسم، وتُنسخ آخر نسخة معدّلة من المسودة
+ipcMain.handle('letterDraftSaveAs', async (event, { draftId, dataBase64, filename } = {}) => {
+    try {
+        const draft = letterDraftPath(draftId);
+        const base = sanitizeName(String(filename || (draft ? path.basename(draft) : 'خطاب')).replace(/\.docx$/i, '')) || 'خطاب';
+        const { canceled, filePath } = await dialog.showSaveDialog(mainWindow, {
+            title: 'حفظ الخطاب على الجهاز',
+            defaultPath: path.join(app.getPath('documents'), `${base}.docx`),
+            filters: [{ name: 'مستند Word', extensions: ['docx'] }]
+        });
+        if (canceled || !filePath) return { success: false, error: 'cancelled' };
+        if (draft) fs.copyFileSync(draft, filePath);
+        else if (dataBase64) fs.writeFileSync(filePath, Buffer.from(dataBase64, 'base64'));
+        else return { success: false, error: 'المسودة غير موجودة' };
+        return { success: true, filePath };
+    } catch (e) {
+        console.error('letterDraftSaveAs error:', e);
+        return { success: false, error: e.message };
+    }
+});
+
+app.on('before-quit', () => cleanLetterDrafts(0));
+app.whenReady().then(() => cleanLetterDrafts(24 * 60 * 60 * 1000));
 
 ipcMain.handle('chooseStorageFolder', async () => {
     try {
