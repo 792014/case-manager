@@ -1611,6 +1611,20 @@
             resize: vertical;
         }
         
+        /* ===== رول الجلسة: اختيار الدوائر وترتيبها ===== */
+        .roll-dept-picker { background:#f6f8fc; border:1px solid #dbe3f0; border-radius:8px; padding:12px 14px; margin:12px 0 16px; }
+        .roll-dept-hint { color:#6b7280; font-size:12px; display:block; margin-top:2px; }
+        .roll-dept-row { display:flex; align-items:center; gap:10px; padding:7px 10px; border:1px solid #e2e8f0; border-radius:6px; background:#fff; margin-top:6px; flex-wrap:wrap; }
+        .roll-dept-row.is-unchecked { opacity:.6; }
+        .roll-dept-row label { display:flex; align-items:center; gap:8px; flex:1; min-width:150px; cursor:pointer; margin:0; }
+        .roll-dept-row input[type=checkbox], .roll-dept-tools input[type=checkbox] { width:18px !important; height:18px; min-width:18px; flex:none; margin:0; padding:0; }
+        .roll-dept-order { font-size:12px; font-weight:700; color:#5b21b6; min-width:70px; text-align:center; }
+        .roll-dept-move button { padding:3px 9px; font-size:13px; margin-inline-start:4px; }
+        .roll-dept-tools { display:flex; gap:8px; flex-wrap:wrap; margin-top:10px; align-items:center; }
+        .roll-dept-tools label { display:flex; align-items:center; gap:6px; cursor:pointer; margin:0; font-size:13px; width:auto; }
+        .roll-group { margin-top:18px; overflow-x:auto; }
+        .roll-group-title { background:#eef6fb; border:1px solid #cfe0ea; border-radius:6px; padding:8px 12px; margin:0 0 8px; font-size:16px; color:#1a5f7a; }
+        .roll-group-count { color:#6b7280; font-size:12px; font-weight:normal; }
         .roll-order-controls {
             display: flex;
             gap: 10px;
@@ -3286,31 +3300,32 @@
                 <input type="date" id="session-date-roll">
                 <button id="generate-roll"><i class="fas fa-sync-alt"></i> إنشاء الرول</button>
             </div>
-            
+
+            <!-- اختيار الدوائر وترتيب ظهورها (عند وجود قضايا في أكثر من دائرة في نفس اليوم) -->
+            <div id="roll-dept-picker" class="roll-dept-picker no-print" style="display: none;">
+                <div>
+                    <strong><i class="fas fa-building-columns"></i> الدوائر في هذا اليوم</strong>
+                    <small class="roll-dept-hint">اختر دائرة أو أكثر. تظهر الدوائر المختارة بالترتيب الموضح (استخدم الأسهم لتغيير أيها تكون أولًا وأيها ثانيًا)، ولكل دائرة رول مستقل وترقيمها الخاص.</small>
+                </div>
+                <div id="roll-dept-list"></div>
+                <div class="roll-dept-tools">
+                    <button type="button" id="roll-dept-all" class="btn-info"><i class="fas fa-check-double"></i> تحديد الكل</button>
+                    <button type="button" id="roll-dept-none" class="btn-info"><i class="fas fa-times"></i> إلغاء التحديد</button>
+                    <label><input type="checkbox" id="roll-split-pages"> كل دائرة في صفحة مستقلة عند الطباعة والتصدير</label>
+                </div>
+            </div>
+
             <div id="roll-content" class="print-section" style="display: none;">
                 <div class="roll-header">
                     <h3>رول جلسة - هيئة قضايا الدولة</h3>
                     <p id="roll-date"></p>
+                    <p id="roll-departments-line"></p>
                 </div>
                 <div class="roll-order-controls no-print">
                     <button id="sort-roll" class="btn-info"><i class="fas fa-sort-amount-up"></i> ترتيب حسب رقم الرول</button>
-                    <span>يتم ترتيب القضايا تصاعدياً حسب رقم الرول</span>
+                    <span>يتم ترتيب قضايا كل دائرة تصاعدياً حسب رقم الرول (لكل دائرة ترقيم مستقل)</span>
                 </div>
-                <table class="print-table sequential-table">
-                    <thead>
-                        <tr>
-                            <th style="width: 10%">الرول</th>
-                            <th style="width: 15%">رقم الدعوي</th>
-                            <th style="width: 20%">المدعي</th>
-                            <th style="width: 20%">المدعي عليه</th>
-                            <th style="width: 20%">الطلبات</th>
-                            <th style="width: 15%">القرار</th>
-                        </tr>
-                    </thead>
-                    <tbody id="roll-table-body">
-                        <!-- سيتم ملؤها بالبيانات -->
-                    </tbody>
-                </table>
+                <div id="roll-groups"></div>
                 <div class="print-actions no-print" style="margin-top: 20px;">
                     <button id="print-roll" class="btn-print"><i class="fas fa-print"></i> طباعة الرول</button>
                     <button id="share-roll-whatsapp" class="btn-whatsapp"><i class="fab fa-whatsapp"></i> مشاركة عبر WhatsApp</button>
@@ -5184,7 +5199,7 @@
         const sessionDateRoll = document.getElementById('session-date-roll');
         const generateRollBtn = document.getElementById('generate-roll');
         const rollContent = document.getElementById('roll-content');
-        const rollTableBody = document.getElementById('roll-table-body');
+        const rollGroupsContainer = document.getElementById('roll-groups');
         const rollDate = document.getElementById('roll-date');
         const printRollBtn = document.getElementById('print-roll');
         const shareRollWhatsAppBtn = document.getElementById('share-roll-whatsapp');
@@ -5415,7 +5430,8 @@
         let activeLetterTemplate = null;
         let activeLetterDocument = null;
         let lettersReturnToDetails = false;
-        let rollData = [];
+        let rollGroups = [];            // [{department, items:[{id, rollNumber, caseNumber, ...}]}] — لكل دائرة رول مستقل
+        let rollGeneratedDate = '';     // تاريخ الرول المعروض حاليًا
         
         // تعيين بيانات النسخ الاحتياطي
         lastBackupElement.textContent = localStorage.getItem('lastBackup') || 'لم يتم إنشاء نسخ احتياطي بعد';
@@ -6316,55 +6332,31 @@
 
         // ========== دالة لتصدير رول الجلسة إلى Word ==========
         function exportRollToWord() {
-            const selectedDate = sessionDateRoll.value;
-            if (!selectedDate || rollData.length === 0) {
+            const selectedDate = rollGeneratedDate || sessionDateRoll.value;
+            if (!selectedDate || !rollGroups.length) {
                 showAlert('الرجاء إنشاء الرول أولاً', 'warning');
                 return;
             }
-            
-            const sortedRollData = [...rollData].sort((a, b) => a.rollNumber - b.rollNumber);
-            
-            let tableRows = '';
-            sortedRollData.forEach((item) => {
-                tableRows += `
-                    <tr>
-                        <td>${item.rollNumber}</td>
-                        <td>${item.caseNumber}/${item.caseYear}</td>
-                        <td>${item.plaintiff}</td>
-                        <td>${item.defendant}</td>
-                        <td>${item.notes || ''}</td>
-                        <td>${item.decision || ''}</td>
-                    </tr>
-                `;
-            });
-            
+            rollSaveEdits();
+            const groups = rollSortedGroups();
+            const total = groups.reduce((n, g) => n + g.items.length, 0);
+            const split = !!(document.getElementById('roll-split-pages') && document.getElementById('roll-split-pages').checked);
+
             const content = `
                 <div class="header">
                     <h1>هيئة قضايا الدولة</h1>
                     <h2>نظام إدارة القضايا</h2>
                     <h3>رول الجلسة</h3>
                     <p>تاريخ الجلسة: ${formatDate(selectedDate)}</p>
-                    <p>عدد القضايا: ${sortedRollData.length}</p>
+                    ${rollDepartmentsLine(groups) ? `<p>${rollEsc(rollDepartmentsLine(groups))}</p>` : ''}
+                    <p>عدد القضايا: ${total}</p>
                     <p>تاريخ التصدير: ${formatDate(new Date().toISOString().split('T')[0])}</p>
                 </div>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>الرول</th>
-                            <th>رقم الدعوي</th>
-                            <th>المدعي</th>
-                            <th>المدعى عليه</th>
-                            <th>الطلبات</th>
-                            <th>القرار</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${tableRows}
-                    </tbody>
-                </table>
+                ${rollDocGroupsHTML(groups, split)}
             `;
-            
-            const filename = `رول_جلسة_${selectedDate}`;
+
+            const deptPart = groups.length === 1 && groups[0].department ? '_' + groups[0].department.replace(/[\\\/:*?"<>|]/g, ' ').trim() : (groups.length > 1 ? '_' + groups.length + '_دوائر' : '');
+            const filename = `رول_جلسة_${selectedDate}${deptPart}`;
             exportToWord(content, filename);
             showAlert('تم تصدير الرول إلى ملف Word', 'success');
         }
@@ -9164,6 +9156,8 @@
                     refreshAllDepartmentSelects();
                 } else if (targetSection === 'add-case') {
                     refreshAllDepartmentSelects();
+                } else if (targetSection === 'session-roll') {
+                    rollRefreshDepartmentPicker(true);
                 }
             });
         });
@@ -15068,26 +15062,102 @@
             saveDataToAPI();
         }
         
-        // ========== إنشاء رول الجلسة ==========
-        generateRollBtn.addEventListener('click', () => {
-            const selectedDate = sessionDateRoll.value;
-            if (!selectedDate) {
-                showAlert('الرجاء اختيار تاريخ الجلسة', 'warning');
+        // ========== رول الجلسة: الدوائر المتعددة (كل دائرة برول مستقل في نفس الصفحة) ==========
+        const ROLL_ORDINALS = ['أولًا', 'ثانيًا', 'ثالثًا', 'رابعًا', 'خامسًا', 'سادسًا', 'سابعًا', 'ثامنًا', 'تاسعًا', 'عاشرًا'];
+        let rollPickerItems = [];   // [{name, count, checked}] بالترتيب الظاهر للمستخدم
+        let rollPickerDate = '';
+
+        function rollEsc(v) {
+            return String(v == null ? '' : v).replace(/[&<>"']/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
+        }
+        function rollDeptOf(caseItem) { return normalizeDeptName(caseItem && caseItem.department); }
+        function rollDeptLabel(name) { return name || 'بدون دائرة'; }
+        function rollCountLabel(n) { return n === 1 ? 'قضية واحدة' : (n === 2 ? 'قضيتان' : (n >= 3 && n <= 10 ? n + ' قضايا' : n + ' قضية')); }
+        function rollDepartmentsLine(groups) {
+            if (!groups.length) return '';
+            if (groups.length === 1 && !groups[0].department) return '';
+            return (groups.length > 1 ? 'الدوائر: ' : 'الدائرة: ') + groups.map(g => rollDeptLabel(g.department)).join(' ، ');
+        }
+        function rollLoadSavedOrder() {
+            try { const v = JSON.parse(localStorage.getItem('rollDeptOrder') || '[]'); return Array.isArray(v) ? v : []; } catch (e) { return []; }
+        }
+        function rollSaveOrder() {
+            // نتذكر ترتيب الدوائر المفضل للمرات القادمة (دون أن يؤثر على بيانات القضايا)
+            const current = rollPickerItems.map(i => i.name).filter(Boolean);
+            const merged = current.concat(rollLoadSavedOrder().filter(n => current.indexOf(n) === -1));
+            try { localStorage.setItem('rollDeptOrder', JSON.stringify(merged)); } catch (e) { /* تجاهل */ }
+        }
+
+        // يبني قائمة الدوائر التي لها قضايا في التاريخ المختار (مع الحفاظ على اختيار المستخدم لنفس التاريخ)
+        function rollRefreshDepartmentPicker(keepChecked) {
+            const picker = document.getElementById('roll-dept-picker');
+            const list = document.getElementById('roll-dept-list');
+            if (!picker || !list) return;
+            const date = sessionDateRoll.value;
+            if (!date) { picker.style.display = 'none'; rollPickerItems = []; rollPickerDate = ''; return; }
+
+            const previous = (keepChecked && rollPickerDate === date) ? rollPickerItems : [];
+            const counts = new Map();
+            cases.filter(c => c.sessionDate === date).forEach(c => {
+                const n = rollDeptOf(c);
+                counts.set(n, (counts.get(n) || 0) + 1);
+            });
+            const saved = rollLoadSavedOrder();
+            const registered = departments.map(d => normalizeDeptName(d.name));
+            const rank = n => {
+                if (n === '') return [3, 0];
+                const si = saved.indexOf(n); if (si >= 0) return [0, si];
+                const ri = registered.indexOf(n); if (ri >= 0) return [1, ri];
+                return [2, 0];
+            };
+            let names = Array.from(counts.keys());
+            if (previous.length) {
+                // نفس التاريخ: نحافظ على ترتيب المستخدم الحالي ونضيف أي دائرة جديدة في آخره
+                const kept = previous.map(i => i.name).filter(n => counts.has(n));
+                names = kept.concat(names.filter(n => kept.indexOf(n) === -1));
+            } else {
+                names.sort((x, y) => { const a = rank(x), b = rank(y); return (a[0] - b[0]) || (a[1] - b[1]) || x.localeCompare(y, 'ar'); });
+            }
+            rollPickerItems = names.map(n => {
+                const old = previous.find(i => i.name === n);
+                return { name: n, count: counts.get(n), checked: old ? old.checked : true };
+            });
+            rollPickerDate = date;
+            picker.style.display = 'block';
+            rollRenderPicker();
+        }
+
+        function rollRenderPicker() {
+            const list = document.getElementById('roll-dept-list');
+            if (!list) return;
+            if (!rollPickerItems.length) {
+                list.innerHTML = '<p style="color:#6b7280; margin:8px 0 0;">لا توجد قضايا في هذا التاريخ.</p>';
                 return;
             }
-            
-            currentRollCases = cases.filter(c => c.sessionDate === selectedDate);
-            
-            if (currentRollCases.length === 0) {
-                showAlert('لا توجد قضايا في هذا التاريخ', 'warning');
-                rollContent.style.display = 'none';
-                return;
-            }
-            
-            rollDate.textContent = `تاريخ الجلسة: ${formatDate(selectedDate)}`;
-            rollTableBody.innerHTML = '';
-            
-            rollData = currentRollCases.map((caseItem, index) => ({
+            let order = 0;
+            list.innerHTML = rollPickerItems.map((it, i) => {
+                const pos = it.checked ? (ROLL_ORDINALS[order] || String(order + 1)) : '';
+                if (it.checked) order++;
+                return `<div class="roll-dept-row ${it.checked ? '' : 'is-unchecked'}" data-i="${i}">
+                    <label><input type="checkbox" class="roll-dept-check" ${it.checked ? 'checked' : ''}>
+                        <span><b>${rollEsc(rollDeptLabel(it.name))}</b> <small>(${rollCountLabel(it.count)})</small></span></label>
+                    <span class="roll-dept-order">${pos ? 'تظهر ' + pos : 'غير مختارة'}</span>
+                    <span class="roll-dept-move">
+                        <button type="button" class="btn-info roll-dept-up" title="تقديم (تظهر قبل)" ${i === 0 ? 'disabled' : ''}>▲</button>
+                        <button type="button" class="btn-info roll-dept-down" title="تأخير (تظهر بعد)" ${i === rollPickerItems.length - 1 ? 'disabled' : ''}>▼</button>
+                    </span>
+                </div>`;
+            }).join('');
+        }
+
+        // عند تغيير الاختيار/الترتيب والرول معروض لنفس التاريخ: نعيد بناءه مع الحفاظ على الأرقام والملاحظات والقرارات المكتوبة
+        function rollApplyPickerChange() {
+            rollRenderPicker();
+            if (rollGroups.length && rollGeneratedDate === sessionDateRoll.value) rollGenerate(true);
+        }
+
+        function rollMakeItem(caseItem, index) {
+            return {
                 id: caseItem.id,
                 rollNumber: index + 1,
                 caseNumber: caseItem.number,
@@ -15096,77 +15166,200 @@
                 defendant: caseItem.defendant,
                 notes: caseItem.notes || '',
                 decision: ''
+            };
+        }
+
+        // preserve=true: نحتفظ بما كُتب على القضايا الموجودة بالفعل في الرول المعروض
+        function rollGenerate(preserve) {
+            const selectedDate = sessionDateRoll.value;
+            if (!selectedDate) {
+                showAlert('الرجاء اختيار تاريخ الجلسة', 'warning');
+                return;
+            }
+            if (preserve) rollSaveEdits();
+            rollRefreshDepartmentPicker(true);
+
+            const dayCases = cases.filter(c => c.sessionDate === selectedDate);
+            if (dayCases.length === 0) {
+                showAlert('لا توجد قضايا في هذا التاريخ', 'warning');
+                rollContent.style.display = 'none';
+                rollGroups = [];
+                return;
+            }
+            const chosen = rollPickerItems.filter(i => i.checked);
+            if (!chosen.length) {
+                showAlert('اختر دائرة واحدة على الأقل لإظهار قضاياها', 'warning');
+                rollContent.style.display = 'none';
+                rollGroups = [];
+                return;
+            }
+
+            const oldItems = new Map();
+            if (preserve && rollGeneratedDate === selectedDate) rollGroups.forEach(g => g.items.forEach(it => oldItems.set(String(it.id), it)));
+
+            rollGroups = chosen.map(it => ({
+                department: it.name,
+                items: dayCases.filter(c => rollDeptOf(c) === it.name).map((c, idx) => {
+                    const fresh = rollMakeItem(c, idx);
+                    const old = oldItems.get(String(c.id));
+                    return old ? Object.assign(fresh, { rollNumber: old.rollNumber, notes: old.notes, decision: old.decision }) : fresh;
+                })
             }));
-            
-            rollData.forEach((item, index) => {
-                const row = document.createElement('tr');
-                row.setAttribute('data-case-id', item.id);
-                row.innerHTML = `
-                    <td><input type="number" class="roll-number-input" value="${item.rollNumber}" min="1" max="999" data-index="${index}"></td>
-                    <td>${item.caseNumber}/${item.caseYear}</td>
-                    <td>${item.plaintiff}</td>
-                    <td>${item.defendant}</td>
-                    <td contenteditable="true">${item.notes}</td>
-                    <td contenteditable="true">${item.decision}</td>
-                `;
-                rollTableBody.appendChild(row);
-            });
-            
+            rollGeneratedDate = selectedDate;
+            rollRenderGroups();
+        }
+
+        function rollRenderGroups() {
+            const total = rollGroups.reduce((n, g) => n + g.items.length, 0);
+            rollDate.textContent = `تاريخ الجلسة: ${formatDate(rollGeneratedDate)}`;
+            const line = document.getElementById('roll-departments-line');
+            if (line) line.textContent = rollDepartmentsLine(rollGroups);
+            const showTitles = !(rollGroups.length === 1 && !rollGroups[0].department);
+            rollGroupsContainer.innerHTML = rollGroups.map((g, gi) => `
+                <div class="roll-group" data-group="${gi}">
+                    ${showTitles ? `<h4 class="roll-group-title"><i class="fas fa-building-columns"></i> ${rollEsc(rollDeptLabel(g.department))} <span class="roll-group-count">(${rollCountLabel(g.items.length)})</span></h4>` : ''}
+                    <table class="print-table sequential-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 10%">الرول</th>
+                                <th style="width: 15%">رقم الدعوي</th>
+                                <th style="width: 20%">المدعي</th>
+                                <th style="width: 20%">المدعي عليه</th>
+                                <th style="width: 20%">الطلبات</th>
+                                <th style="width: 15%">القرار</th>
+                            </tr>
+                        </thead>
+                        <tbody class="roll-group-body" data-group="${gi}">
+                            ${g.items.map((item, index) => `
+                            <tr data-case-id="${rollEsc(item.id)}">
+                                <td><input type="number" class="roll-number-input" value="${rollEsc(item.rollNumber)}" min="1" max="999" data-group="${gi}" data-index="${index}"></td>
+                                <td>${rollEsc(item.caseNumber)}/${rollEsc(item.caseYear)}</td>
+                                <td>${rollEsc(item.plaintiff)}</td>
+                                <td>${rollEsc(item.defendant)}</td>
+                                <td contenteditable="true">${rollEsc(item.notes)}</td>
+                                <td contenteditable="true">${rollEsc(item.decision)}</td>
+                            </tr>`).join('')}
+                        </tbody>
+                    </table>
+                </div>`).join('');
             rollContent.style.display = 'block';
-            
-            document.querySelectorAll('.roll-number-input').forEach(input => {
-                input.addEventListener('change', function() {
-                    const index = parseInt(this.getAttribute('data-index'));
-                    rollData[index].rollNumber = parseInt(this.value) || 1;
+            if (!total) rollContent.style.display = 'none';
+        }
+
+        // قراءة الأرقام والملاحظات والقرارات المكتوبة على الشاشة إلى الذاكرة
+        function rollSaveEdits() {
+            rollGroupsContainer.querySelectorAll('tbody.roll-group-body').forEach(body => {
+                const group = rollGroups[parseInt(body.getAttribute('data-group'))];
+                if (!group) return;
+                Array.from(body.querySelectorAll('tr')).forEach((row, index) => {
+                    const item = group.items[index];
+                    if (!item) return;
+                    const input = row.querySelector('.roll-number-input');
+                    const cells = row.querySelectorAll('td');
+                    item.rollNumber = parseInt(input && input.value) || 1;
+                    item.notes = cells[4] ? cells[4].textContent : '';
+                    item.decision = cells[5] ? cells[5].textContent : '';
                 });
             });
+        }
+        function saveRollData() { rollSaveEdits(); }   // اسم قديم محفوظ للتوافق
+
+        // نسخة مرتبة: الدوائر بترتيبها المختار، وقضايا كل دائرة تصاعديًا حسب رقم الرول الخاص بها
+        function rollSortedGroups() {
+            return rollGroups.map(g => ({ department: g.department, items: [...g.items].sort((a, b) => a.rollNumber - b.rollNumber) }));
+        }
+
+        // جداول الدوائر لأغراض الطباعة وWord: عنوان لكل دائرة ثم جدولها المستقل
+        function rollDocGroupsHTML(groups, splitPages) {
+            const showTitles = !(groups.length === 1 && !groups[0].department);
+            return groups.map((g, gi) => {
+                const rows = g.items.map(item => `
+                    <tr>
+                        <td>${rollEsc(item.rollNumber)}</td>
+                        <td>${rollEsc(item.caseNumber)}/${rollEsc(item.caseYear)}</td>
+                        <td>${rollEsc(item.plaintiff)}</td>
+                        <td>${rollEsc(item.defendant)}</td>
+                        <td>${rollEsc(item.notes || '')}</td>
+                        <td>${rollEsc(item.decision || '')}</td>
+                    </tr>`).join('');
+                const brk = (splitPages && gi > 0) ? ' style="page-break-before: always;"' : '';
+                return `<div class="dept-block"${brk}>
+                    ${showTitles ? `<h3 class="dept-title">${rollEsc(rollDeptLabel(g.department))} (${rollCountLabel(g.items.length)})</h3>` : ''}
+                    <table>
+                        <thead>
+                            <tr><th>الرول</th><th>رقم الدعوي</th><th>المدعي</th><th>المدعى عليه</th><th>الطلبات</th><th>القرار</th></tr>
+                        </thead>
+                        <tbody>${rows}</tbody>
+                    </table>
+                </div>`;
+            }).join('');
+        }
+
+        // ---------- الأحداث ----------
+        generateRollBtn.addEventListener('click', () => rollGenerate(false));
+
+        sessionDateRoll.addEventListener('change', () => {
+            // تغيير التاريخ: الرول المعروض لم يعد يخص التاريخ الجديد
+            rollGroups = [];
+            rollGeneratedDate = '';
+            rollContent.style.display = 'none';
+            rollRefreshDepartmentPicker(false);
         });
-        
-        // ========== ترتيب الرول حسب رقم الرول تصاعدياً ==========
+
+        document.getElementById('roll-dept-list').addEventListener('click', event => {
+            const row = event.target.closest('.roll-dept-row');
+            if (!row) return;
+            const i = parseInt(row.getAttribute('data-i'));
+            if (event.target.closest('.roll-dept-up') && i > 0) {
+                [rollPickerItems[i - 1], rollPickerItems[i]] = [rollPickerItems[i], rollPickerItems[i - 1]];
+                rollSaveOrder(); rollApplyPickerChange();
+            } else if (event.target.closest('.roll-dept-down') && i < rollPickerItems.length - 1) {
+                [rollPickerItems[i + 1], rollPickerItems[i]] = [rollPickerItems[i], rollPickerItems[i + 1]];
+                rollSaveOrder(); rollApplyPickerChange();
+            }
+        });
+        document.getElementById('roll-dept-list').addEventListener('change', event => {
+            const check = event.target.closest('.roll-dept-check');
+            if (!check) return;
+            const i = parseInt(check.closest('.roll-dept-row').getAttribute('data-i'));
+            if (rollPickerItems[i]) rollPickerItems[i].checked = check.checked;
+            rollApplyPickerChange();
+        });
+        document.getElementById('roll-dept-all').addEventListener('click', () => { rollPickerItems.forEach(i => { i.checked = true; }); rollApplyPickerChange(); });
+        document.getElementById('roll-dept-none').addEventListener('click', () => { rollPickerItems.forEach(i => { i.checked = false; }); rollApplyPickerChange(); });
+
+        rollGroupsContainer.addEventListener('change', event => {
+            const input = event.target.closest('.roll-number-input');
+            if (!input) return;
+            const group = rollGroups[parseInt(input.getAttribute('data-group'))];
+            const item = group && group.items[parseInt(input.getAttribute('data-index'))];
+            if (item) item.rollNumber = parseInt(input.value) || 1;
+        });
+
+        // ========== ترتيب كل رول حسب رقم الرول تصاعدياً ==========
         sortRollBtn.addEventListener('click', () => {
-            if (rollData.length === 0) {
+            if (!rollGroups.length) {
                 showAlert('لا توجد بيانات للرول', 'warning');
                 return;
             }
-            
-            rollData.sort((a, b) => a.rollNumber - b.rollNumber);
-            
-            rollTableBody.innerHTML = '';
-            rollData.forEach((item, index) => {
-                const row = document.createElement('tr');
-                row.setAttribute('data-case-id', item.id);
-                row.innerHTML = `
-                    <td><input type="number" class="roll-number-input" value="${item.rollNumber}" min="1" max="999" data-index="${index}"></td>
-                    <td>${item.caseNumber}/${item.caseYear}</td>
-                    <td>${item.plaintiff}</td>
-                    <td>${item.defendant}</td>
-                    <td contenteditable="true">${item.notes}</td>
-                    <td contenteditable="true">${item.decision}</td>
-                `;
-                rollTableBody.appendChild(row);
-            });
-            
-            document.querySelectorAll('.roll-number-input').forEach(input => {
-                input.addEventListener('change', function() {
-                    const index = parseInt(this.getAttribute('data-index'));
-                    rollData[index].rollNumber = parseInt(this.value) || 1;
-                });
-            });
-            
-            showAlert('تم ترتيب القضايا حسب رقم الرول تصاعدياً', 'success');
+            rollSaveEdits();   // حتى لا تضيع الملاحظات والقرارات المكتوبة قبل إعادة الرسم
+            rollGroups.forEach(g => g.items.sort((a, b) => a.rollNumber - b.rollNumber));
+            rollRenderGroups();
+            showAlert('تم ترتيب قضايا كل دائرة حسب رقم الرول تصاعدياً', 'success');
         });
-        
+
         // ========== طباعة الرول ==========
         printRollBtn.addEventListener('click', () => {
-            if (rollData.length === 0) {
+            if (!rollGroups.length) {
                 showAlert('الرجاء إنشاء الرول أولاً', 'warning');
                 return;
             }
-            
-            saveRollData();
-            
-            const sortedRollData = [...rollData].sort((a, b) => a.rollNumber - b.rollNumber);
-            
+            rollSaveEdits();
+            const groups = rollSortedGroups();
+            const total = groups.reduce((n, g) => n + g.items.length, 0);
+            const split = !!(document.getElementById('roll-split-pages') && document.getElementById('roll-split-pages').checked);
+            const deptLine = rollDepartmentsLine(groups);
+
             let printContent = `
                 <!DOCTYPE html>
                 <html lang="ar" dir="rtl">
@@ -15181,101 +15374,35 @@
                             margin-bottom: 2.5cm;
                             margin-left: 1cm;
                             margin-right: 1cm;
-                            
+
                             @bottom-center {
                                 content: "صفحة " counter(page) " من " counter(pages) " | مطور البرنامج: المستشار محمود العوابدي - هيئة قضايا الدولة";
                                 font-size: 9px;
                                 color: #666;
                             }
                         }
-                        
-                        body {
-                            font-family: 'Arial', sans-serif;
-                            margin: 0;
-                            padding: 20px;
-                            direction: rtl;
-                            counter-reset: pageNum;
-                        }
-                        
-                        .print-header {
-                            text-align: center;
-                            margin-bottom: 30px;
-                            border-bottom: 2px solid #000;
-                            padding-bottom: 15px;
-                            page-break-after: avoid;
-                        }
-                        
-                        .print-header h1 {
-                            font-size: 24px;
-                            margin: 0;
-                            color: #1a5f7a;
-                        }
-                        
-                        .print-header h2 {
-                            font-size: 18px;
-                            margin: 10px 0;
-                            color: #159895;
-                        }
-                        
-                        .print-header p {
-                            font-size: 14px;
-                            margin: 5px 0;
-                            color: #666;
-                        }
-                        
-                        table {
-                            width: 100%;
-                            border-collapse: collapse;
-                            margin-top: 20px;
-                            font-size: 11px;
-                            page-break-inside: auto;
-                        }
-                        
-                        th, td {
-                            border: 1px solid #000;
-                            padding: 6px;
-                            text-align: center;
-                            vertical-align: middle;
-                        }
-                        
-                        th {
-                            background-color: #f2f2f2;
-                            font-weight: bold;
-                            color: #000;
-                        }
-                        
-                        tr {
-                            page-break-inside: avoid;
-                            page-break-after: auto;
-                        }
-                        
-                        td:first-child {
-                            width: 10%;
-                        }
-                        
-                        td:nth-child(2) {
-                            width: 15%;
-                        }
-                        
-                        td:nth-child(3) {
-                            width: 20%;
-                            text-align: right;
-                        }
-                        
-                        td:nth-child(4) {
-                            width: 20%;
-                            text-align: right;
-                        }
-                        
-                        td:nth-child(5) {
-                            width: 20%;
-                            text-align: right;
-                        }
-                        
-                        td:nth-child(6) {
-                            width: 15%;
-                            text-align: right;
-                        }
+
+                        body { font-family: 'Arial', sans-serif; margin: 0; padding: 20px; direction: rtl; }
+
+                        .print-header { text-align: center; margin-bottom: 20px; border-bottom: 2px solid #000; padding-bottom: 15px; page-break-after: avoid; }
+                        .print-header h1 { font-size: 24px; margin: 0; color: #1a5f7a; }
+                        .print-header h2 { font-size: 18px; margin: 10px 0; color: #159895; }
+                        .print-header p { font-size: 14px; margin: 5px 0; color: #666; }
+
+                        .dept-block { margin-top: 22px; }
+                        .dept-title { text-align: center; font-size: 15px; margin: 0 0 6px; padding: 7px; background-color: #e8f1f5; border: 1px solid #000; color: #1a5f7a; page-break-after: avoid; }
+
+                        table { width: 100%; border-collapse: collapse; margin-top: 0; font-size: 11px; page-break-inside: auto; }
+                        thead { display: table-header-group; }
+                        th, td { border: 1px solid #000; padding: 6px; text-align: center; vertical-align: middle; }
+                        th { background-color: #f2f2f2; font-weight: bold; color: #000; }
+                        tr { page-break-inside: avoid; page-break-after: auto; }
+                        td:first-child { width: 10%; }
+                        td:nth-child(2) { width: 15%; }
+                        td:nth-child(3) { width: 20%; text-align: right; }
+                        td:nth-child(4) { width: 20%; text-align: right; }
+                        td:nth-child(5) { width: 20%; text-align: right; }
+                        td:nth-child(6) { width: 15%; text-align: right; }
                     </style>
                 </head>
                 <body>
@@ -15283,46 +15410,18 @@
                         <h1>هيئة قضايا الدولة</h1>
                         <h2>نظام إدارة القضايا</h2>
                         <h3>رول الجلسة</h3>
-                        <p>تاريخ الجلسة: ${formatDate(sessionDateRoll.value)}</p>
-                        <p>عدد القضايا: ${sortedRollData.length}</p>
+                        <p>تاريخ الجلسة: ${formatDate(rollGeneratedDate || sessionDateRoll.value)}</p>
+                        ${deptLine ? `<p>${rollEsc(deptLine)}</p>` : ''}
+                        <p>عدد القضايا: ${total}</p>
                     </div>
-                    
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>الرول</th>
-                                <th>رقم الدعوي</th>
-                                <th>المدعي</th>
-                                <th>المدعى عليه</th>
-                                <th>الطلبات</th>
-                                <th>القرار</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-            `;
-            
-            sortedRollData.forEach((item) => {
-                printContent += `
-                    <tr>
-                        <td>${item.rollNumber}</td>
-                        <td>${item.caseNumber}/${item.caseYear}</td>
-                        <td>${item.plaintiff}</td>
-                        <td>${item.defendant}</td>
-                        <td>${item.notes || ''}</td>
-                        <td>${item.decision || ''}</td>
-                    </tr>
-                `;
-            });
-            
-            printContent += `
-                        </tbody>
-                    </table>
-                    
+
+                    ${rollDocGroupsHTML(groups, split)}
+
                     <script>
                         window.onload = function() {
                             window.print();
                         };
-                        
+
                         window.onafterprint = function() {
                             window.close();
                         };
@@ -15330,58 +15429,44 @@
                 </body>
                 </html>
             `;
-            
+
             const printWindow = window.open('', '_blank');
             printWindow.document.write(printContent);
             printWindow.document.close();
         });
-        
-        // ========== حفظ بيانات الرول ==========
-        function saveRollData() {
-            const rows = rollTableBody.querySelectorAll('tr');
-            rows.forEach((row, index) => {
-                const caseId = row.getAttribute('data-case-id');
-                const rollNumberInput = row.querySelector('.roll-number-input');
-                const notesCell = row.querySelector('td:nth-child(5)');
-                const decisionCell = row.querySelector('td:nth-child(6)');
-                
-                if (rollData[index]) {
-                    rollData[index].rollNumber = parseInt(rollNumberInput.value) || 1;
-                    rollData[index].notes = notesCell.textContent || '';
-                    rollData[index].decision = decisionCell.textContent || '';
-                }
-            });
-        }
-        
+
         // ========== مشاركة الرول عبر WhatsApp ==========
         shareRollWhatsAppBtn.addEventListener('click', () => {
-            saveRollData();
-            
-            const selectedDate = sessionDateRoll.value;
-            if (selectedDate && rollData.length > 0) {
-                const sortedRollData = [...rollData].sort((a, b) => a.rollNumber - b.rollNumber);
-                
-                let text = `📄 *رول الجلسة*\n\n` +
-                           `📅 *تاريخ الجلسة:* ${formatDate(selectedDate)}\n\n` +
-                           `📋 *عدد القضايا:* ${sortedRollData.length}\n\n`;
-                
-                sortedRollData.forEach((item) => {
+            if (!rollGroups.length) {
+                showAlert('الرجاء إنشاء الرول أولاً', 'warning');
+                return;
+            }
+            rollSaveEdits();
+            const groups = rollSortedGroups();
+            const total = groups.reduce((n, g) => n + g.items.length, 0);
+            const showTitles = !(groups.length === 1 && !groups[0].department);
+
+            let text = `📄 *رول الجلسة*\n\n` +
+                       `📅 *تاريخ الجلسة:* ${formatDate(rollGeneratedDate || sessionDateRoll.value)}\n\n` +
+                       `📋 *عدد القضايا:* ${total}\n\n`;
+
+            groups.forEach(g => {
+                if (showTitles) text += `🏛️ *${rollDeptLabel(g.department)}* (${rollCountLabel(g.items.length)})\n\n`;
+                g.items.forEach(item => {
                     text += `*${item.rollNumber}.* ${item.caseNumber}/${item.caseYear}\n` +
                             `   👤 ${item.plaintiff}\n` +
                             `   👥 ${item.defendant}\n` +
                             `   📝 ${item.notes || ''}\n` +
                             `   ⚖️ ${item.decision || ''}\n\n`;
                 });
-                
-                text += `---\n` +
-                        `نظام إدارة القضايا - هيئة قضايا الدولة`;
-                
-                shareViaWhatsApp(text);
-            } else {
-                showAlert('الرجاء إنشاء الرول أولاً', 'warning');
-            }
+            });
+
+            text += `---\n` +
+                    `نظام إدارة القضايا - هيئة قضايا الدولة`;
+
+            shareViaWhatsApp(text);
         });
-        
+
         // ========== تفعيل زر إنشاء تقرير طباعة الأحكام ==========
         generateJudgmentsPrintBtn.addEventListener('click', generateJudgmentsPrintReport);
         
@@ -17296,6 +17381,7 @@
             const today = new Date().toISOString().split('T')[0];
             document.getElementById('session-date').value = today;
             sessionDateRoll.value = today;
+            rollRefreshDepartmentPicker(false);
             if (printStartDate) printStartDate.value = today;
             if (printEndDate) printEndDate.value = today;
             document.getElementById('new-session-date').value = today;
