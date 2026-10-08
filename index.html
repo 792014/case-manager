@@ -2717,6 +2717,10 @@
                             <option value="">-- اختر الدائرة --</option>
                         </select>
                     </div>
+                    <div class="form-group" style="flex: 1; min-width: 260px;">
+                        <label for="archive-active-department-reason">سبب الأرشفة</label>
+                        <input type="text" id="archive-active-department-reason" placeholder="أدخل سبب الأرشفة...">
+                    </div>
                     <button type="button" id="archive-active-department-btn" class="btn-archive"><i class="fas fa-archive"></i> أرشفة جميع قضايا الدائرة</button>
                 </div>
             </div>
@@ -3231,6 +3235,7 @@
                             <th>المدعى عليه</th>
                             <th>نوع الحكم</th>
                             <th>تاريخ الأرشفة</th>
+                            <th>سبب الأرشفة</th>
                             <th class="no-print">الإجراءات</th>
                         </tr>
                     </thead>
@@ -8550,8 +8555,16 @@
                         showAlert('لا توجد قضايا متداولة في هذه الدائرة', 'warning');
                         return;
                     }
-                    if (!confirm(`سيتم نقل ${selectedCases.length} قضية من دائرة «${department}» إلى الأرشيف. هل تريد المتابعة؟`)) return;
-                    const archivedCount = archiveActiveCasesBatch(selectedCases, `أرشفة جماعية لدائرة ${department}`);
+                    const reasonInput = document.getElementById('archive-active-department-reason');
+                    const reason = (reasonInput?.value || '').trim();
+                    if (!reason) {
+                        showAlert('أدخل سبب الأرشفة أولاً', 'warning');
+                        reasonInput?.focus();
+                        return;
+                    }
+                    if (!confirm(`سيتم نقل ${selectedCases.length} قضية من دائرة «${department}» إلى الأرشيف.\nسبب الأرشفة: ${reason}\nهل تريد المتابعة؟`)) return;
+                    const archivedCount = archiveActiveCasesBatch(selectedCases, reason);
+                    if (reasonInput) reasonInput.value = '';
                     showAlert(`تمت أرشفة ${archivedCount} قضية من دائرة ${department}`, 'success');
                 }
 
@@ -10225,7 +10238,7 @@
             
             groupByDepartmentForDisplay(casesData).forEach(entry => {
                 if (entry.isHeader) {
-                    archivedBody.appendChild(buildDepartmentHeaderRow(8, entry.department, entry.count));
+                    archivedBody.appendChild(buildDepartmentHeaderRow(9, entry.department, entry.count));
                     return;
                 }
                 const caseItem = entry.item;
@@ -10243,6 +10256,7 @@
                     <td>${caseItem.defendant}</td>
                     <td>${judgmentBadge}</td>
                     <td>${formatDate(caseItem.archiveDate)}</td>
+                    <td>${String(caseItem.archiveReason || '-').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</td>
                     <td class="actions">
                         <button class="btn-info btn-view-archived-case" data-id="${caseItem.id}"><i class="fas fa-eye"></i> عرض</button>
                         <button class="btn-warning btn-edit-archived-case" data-id="${caseItem.id}"><i class="fas fa-edit"></i> تعديل</button>
@@ -11916,6 +11930,20 @@
             'شطب.docx': [
                 { key: 'strikeSessionDate', label: 'تاريخ جلسة الشطب', type: 'date' }
             ],
+            'حكم إعادة للمرافعة.docx': [
+                { key: 'nextSessionDate', label: 'الجلسة المحددة لإعادة المرافعة', type: 'date' }
+            ],
+            'حكم وقف تعليقي.docx': [
+                { key: 'suspendedCaseNumber', label: 'رقم الدعوى المعلَّق الفصل فيها' },
+                { key: 'suspendedCaseYear', label: 'سنة الدعوى المعلَّق الفصل فيها' }
+            ],
+            'حكم وقف جزائي.docx': [],
+            'تجديد من الشطب.docx': [
+                { key: 'nextSessionDate', label: 'الجلسة المحددة بعد التجديد من الشطب', type: 'date' }
+            ],
+            'تعجيل من الوقف.docx': [
+                { key: 'nextSessionDate', label: 'الجلسة المحددة بعد التعجيل من الوقف', type: 'date' }
+            ],
             'قسم النقض.docx': [
                 { key: 'appealNumber', label: 'رقم الطعن بالنقض' },
                 { key: 'appealYear', label: 'سنة الطعن بالنقض' },
@@ -11932,7 +11960,12 @@
             'إخطار.docx': 'إخطار',
             'استعجال.docx': 'استعجال',
             'شطب.docx': 'شطب',
-            'قسم النقض.docx': 'قسم النقض'
+            'قسم النقض.docx': 'قسم النقض',
+            'حكم إعادة للمرافعة.docx': 'حكم إعادة للمرافعة',
+            'حكم وقف تعليقي.docx': 'حكم وقف تعليقي',
+            'حكم وقف جزائي.docx': 'حكم وقف جزائي',
+            'تجديد من الشطب.docx': 'تجديد من الشطب',
+            'تعجيل من الوقف.docx': 'تعجيل من الوقف'
         };
 
         function lettersEscape(value) {
@@ -16841,7 +16874,12 @@
             "حكم خبير": "حكم خبير.docx",
             "حكم استجواب": "حكم استجواب.docx",
             "حكم إحالة للتحقيق": "حكم إحالة للتحقيق.docx",
-            "قسم النقض": "قسم النقض.docx"
+            "قسم النقض": "قسم النقض.docx",
+            "حكم إعادة للمرافعة": "حكم إعادة للمرافعة.docx",
+            "حكم وقف تعليقي": "حكم وقف تعليقي.docx",
+            "حكم وقف جزائي": "حكم وقف جزائي.docx",
+            "تجديد من الشطب": "تجديد من الشطب.docx",
+            "تعجيل من الوقف": "تعجيل من الوقف.docx"
         };
         const LETTER_FILE_TO_TYPE = {};
         Object.keys(LETTER_TEMPLATES).forEach(type => { LETTER_FILE_TO_TYPE[LETTER_TEMPLATES[type]] = type; });
@@ -17086,7 +17124,7 @@
                     if (val) mark('request' + item[1], letterAppendText(p, ' ' + val));
                     return;
                 }
-                if (/بخصوص\s*الدعوى/.test(text) || /^\s*حكمت\s*المحكمة/.test(text) || /^\s*ليودع/.test(text)) {
+                if (/بخصوص\s*الدعوى/.test(text) || /^\s*حكمت\s*المحكمة/.test(text) || /^\s*ليودع/.test(text) || /^\s*نحيطكم/.test(text)) {
                     if (type === 'استعجال') {
                         const filled = letterFillUrgentBooks(p, f);
                         if (filled) mark(filled, true);
@@ -17105,6 +17143,19 @@
                     }
                     if (type === 'حكم استجواب' && /حكمت\s*المحكمة/.test(text)) {
                         mark(['interrogatedParty', 'nextSessionDate'], letterApplySlots(p, new RegExp('باستجواب(\\s+)لجلسة' + LETTER_DATE_SLOT, 'd'), [letterBlankSlot(f.interrogatedParty), letterDateSlot(f.nextSessionDate)]));
+                    }
+                    if (type === 'حكم إعادة للمرافعة' && /حكمت\s*المحكمة/.test(text)) {
+                        mark('nextSessionDate', letterApplySlots(p, new RegExp('للمرافعة\\s*لجلسة' + LETTER_DATE_SLOT, 'd'), [letterDateSlot(f.nextSessionDate)]));
+                    }
+                    if (type === 'حكم وقف تعليقي' && /حكمت\s*المحكمة/.test(text)) {
+                        mark(['suspendedCaseNumber', 'suspendedCaseYear'], letterApplySlots(p, /الدعوي\s*رقم(\s+)لسنة(\s+)بحكم\s*نهائي/d,
+                            [letterBlankSlot(f.suspendedCaseNumber), letterBlankSlot(f.suspendedCaseYear)]));
+                    }
+                    if (type === 'تجديد من الشطب' && /نحيطكم/.test(text)) {
+                        mark('nextSessionDate', letterApplySlots(p, new RegExp('الشطب\\s*لجلسة' + LETTER_DATE_SLOT, 'd'), [letterDateSlot(f.nextSessionDate)]));
+                    }
+                    if (type === 'تعجيل من الوقف' && /نحيطكم/.test(text)) {
+                        mark('nextSessionDate', letterApplySlots(p, new RegExp('الوقف\\s*لجلسة' + LETTER_DATE_SLOT, 'd'), [letterDateSlot(f.nextSessionDate)]));
                     }
                     if (type === 'حكم إحالة للتحقيق' && /حكمت\s*المحكمة/.test(text)) {
                         mark('nextSessionDate', letterApplySlots(p, new RegExp('للتحقيق\\s*لجلسة' + LETTER_DATE_SLOT, 'd'), [letterDateSlot(f.nextSessionDate)]));
