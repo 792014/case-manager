@@ -312,22 +312,26 @@
         @keyframes slideUpFade { from { transform: translateY(8px); opacity: 0 } to { transform: translateY(0); opacity: 1 } }
         
         .logo {
-            width: 110px !important;
-            height: 110px !important;
+            width: 160px !important;
+            height: 160px !important;
+            flex: 0 0 auto;
             background: #ffffff;
-            border-radius: 16px;
+            border-radius: 20px;
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 6px 18px rgba(11,61,145,0.18);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.28), 0 0 0 3px rgba(241,196,15,0.9);
             border: 1px solid rgba(11,61,145,0.2);
-            padding: 5px;
+            padding: 4px;
         }
 
         .logo-img {
             width: 100%;
             height: 100%;
             object-fit: contain;
+            image-rendering: -webkit-optimize-contrast;
+            image-rendering: high-quality;
+            filter: contrast(1.08) saturate(1.1);
         }
 
         .logo i {
@@ -449,6 +453,64 @@
             border-top: 1px solid rgba(255,255,255,0.1);
         }
         
+
+        /* ===== إخفاء/إظهار بطاقات الدوائر ===== */
+        .dt-hide-btn { position:absolute; left:10px; top:10px; z-index:3; width:30px; height:30px; border-radius:50%; border:1px solid rgba(255,255,255,.4); background:rgba(0,0,0,.18); color:#fff; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:13px; padding:0; transition:background .15s, transform .15s; }
+        .dt-hide-btn:hover { background:rgba(0,0,0,.45); transform:scale(1.08); }
+        .dt-hidden-toggle { border:1px dashed #94a3b8; background:#f4f6f8; color:#475569; border-radius:18px; padding:6px 14px; cursor:pointer; font-family:inherit; font-size:13px; display:inline-flex; align-items:center; gap:7px; }
+        .dt-hidden-toggle:hover { background:#e7ecf2; }
+        .dt-hidden-toggle b { background:#475569; color:#fff; border-radius:10px; padding:0 8px; font-size:12px; }
+        .dt-hidden-list { margin:0 0 14px; padding:10px 12px; background:#fff; border:1px dashed #cbd5e1; border-radius:12px; display:flex; flex-wrap:wrap; gap:8px; }
+        .dt-hidden-list[hidden] { display:none; }
+        .dt-hidden-item { display:inline-flex; align-items:center; gap:8px; background:#f1f5f9; border:1px solid #dbe3ee; border-radius:20px; padding:4px 6px 4px 12px; font-size:13px; color:#334155; }
+        .dt-restore { border:0; background:#16a34a; color:#fff; border-radius:14px; padding:3px 12px; cursor:pointer; font-family:inherit; font-size:12px; }
+        .dt-restore:hover { background:#15803d; }
+        @media print { .dt-hide-btn, .dt-hidden-toggle, .dt-hidden-list { display:none !important; } }
+
+        /* ===== بطاقة المطور في الترويسة — تصميم أنيق ===== */
+        header .developer-info-header {
+            flex: 0 0 auto; width: max-content; min-width: 292px; max-width: 100%; margin-right: 8px; padding: 12px 16px 11px !important; min-height: 0; border-radius: 16px; gap: 9px;
+            background:
+                radial-gradient(120% 140% at 100% 0%, rgba(241,196,15,.20) 0%, rgba(241,196,15,0) 46%),
+                linear-gradient(145deg, #0d2f4f 0%, #0f4c6b 55%, #12708a 100%);
+            border: 1px solid rgba(255,255,255,.16);
+            box-shadow: 0 10px 26px rgba(6,28,48,.35), inset 0 1px 0 rgba(255,255,255,.18);
+            color: #fff; text-align: right;
+        }
+        header .developer-info-header::before {
+            width: 100%; height: 3px; top: 0; right: 0; left: 0;
+            background: linear-gradient(90deg, rgba(241,196,15,0), #f1c40f 30%, #ffe27a 50%, #f1c40f 70%, rgba(241,196,15,0));
+        }
+        header .developer-info-header::after { background: linear-gradient(115deg, rgba(255,255,255,.10) 0%, rgba(255,255,255,0) 42%); pointer-events: none; }
+        header .developer-info-header:hover { transform: translateY(-2px); box-shadow: 0 14px 32px rgba(6,28,48,.45), inset 0 1px 0 rgba(255,255,255,.22); }
+        .developer-info-header .dev-ribbon {
+            align-self: flex-start; display: inline-flex; align-items: center; gap: 6px; position: relative; z-index: 2;
+            padding: 3px 11px; border-radius: 20px; font-size: 11.5px; font-weight: 700; letter-spacing: .2px;
+            color: #ffe27a; background: rgba(241,196,15,.12); border: 1px solid rgba(241,196,15,.45);
+        }
+        .developer-info-header .dev-ribbon i { font-size: 11px; }
+        .developer-info-header .dev-main { display: flex; align-items: center; gap: 12px; position: relative; z-index: 2; }
+        .developer-info-header .dev-avatar {
+            flex: 0 0 auto; width: 46px; height: 46px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            font-size: 20px; color: #0d2f4f; background: linear-gradient(145deg, #ffe27a, #f1c40f);
+            box-shadow: 0 0 0 3px rgba(255,255,255,.18), 0 6px 14px rgba(0,0,0,.28);
+        }
+        .developer-info-header .dev-id { min-width: 0; }
+        .developer-info-header .dev-name { white-space: nowrap; font-size: 17px; font-weight: 800; line-height: 1.35; color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,.3); }
+        .developer-info-header .dev-org { margin-top: 2px; font-size: 12.5px; font-weight: 600; color: #bfe3ee; display: flex; align-items: center; gap: 6px; }
+        .developer-info-header .dev-org i { color: #f1c40f; font-size: 12px; }
+        .developer-info-header .dev-tagline {
+            position: relative; z-index: 2; display: flex; align-items: center; justify-content: center; gap: 8px;
+            padding: 6px 10px; border-radius: 10px; font-size: 12.5px; font-weight: 700; color: #fff;
+            background: linear-gradient(90deg, rgba(255,255,255,.06), rgba(255,255,255,.16), rgba(255,255,255,.06));
+            border: 1px solid rgba(255,255,255,.14);
+        }
+        .developer-info-header .dev-tagline i { color: #f1c40f; font-size: 12px; }
+        .developer-info-header .dev-rights {
+            position: relative; z-index: 2; text-align: center; font-size: 10.5px; color: rgba(255,255,255,.7);
+            padding-top: 7px; border-top: 1px dashed rgba(255,255,255,.22); display: flex; align-items: center; justify-content: center; gap: 5px;
+        }
+
         /* فوتر المطور في لوحة التحكم */
         .developer-footer {
             background: linear-gradient(135deg, rgba(26, 95, 122, 0.9), rgba(21, 152, 149, 0.9));
@@ -520,6 +582,32 @@
             gap: 6px;
         }
         
+
+        /* ===== شريط المطور السفلي (مشترك في كل الصفحات) — تصميم أنيق ===== */
+        .global-developer-footer {
+            background: linear-gradient(90deg, #0b2a47 0%, #0f4c6b 50%, #0b2a47 100%) !important;
+            border-top: 0 !important; padding: 0 !important; box-shadow: 0 -6px 20px rgba(6,28,48,.28) !important; position: fixed;
+        }
+        .global-developer-footer::before {
+            content: ""; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+            background: linear-gradient(90deg, transparent, #f1c40f 25%, #ffe27a 50%, #f1c40f 75%, transparent);
+        }
+        .global-developer-footer .gdf-inner { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 6px 14px; padding: 8px 14px 9px; color: #fff; font-size: 12.5px; }
+        .global-developer-footer .gdf-who { display: inline-flex; align-items: center; gap: 8px; }
+        .global-developer-footer .gdf-mark { width: 24px; height: 24px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; color: #0b2a47; background: linear-gradient(145deg, #ffe27a, #f1c40f); box-shadow: 0 0 0 2px rgba(255,255,255,.16); }
+        .global-developer-footer .gdf-label { font-size: 11px; font-weight: 600; color: #9fd0e0; letter-spacing: .2px; }
+        .global-developer-footer .gdf-name { font-size: 14px !important; font-weight: 800 !important; color: #ffe27a !important; text-shadow: 0 1px 2px rgba(0,0,0,.35); padding: 0 !important; }
+        .global-developer-footer .gdf-org { font-size: 12.5px !important; font-weight: 600; color: #fff !important; }
+        .global-developer-footer .gdf-chip { font-size: 11.5px !important; font-weight: 700; color: #ffe27a !important; background: rgba(241,196,15,.12); border: 1px solid rgba(241,196,15,.4); border-radius: 12px; padding: 2px 12px !important; }
+        .global-developer-footer .gdf-rights { font-size: 11px !important; color: rgba(255,255,255,.72) !important; }
+        .global-developer-footer .gdf-dot { width: 5px; height: 5px; transform: rotate(45deg); background: #f1c40f; opacity: .85; }
+        .global-developer-footer .gdf-inner span { white-space: nowrap; }
+        @media (max-width: 700px) {
+            .global-developer-footer .gdf-inner { font-size: 11px; gap: 4px 8px; padding: 6px 8px 7px; }
+            .global-developer-footer .gdf-label, .global-developer-footer .gdf-hide-sm, .global-developer-footer .gdf-rights { display: none; }
+            .global-developer-footer .gdf-name { font-size: 12px !important; }
+        }
+
         /* تقليل مساحة التبويبات العلوية */
         nav {
             background: linear-gradient(to right, var(--secondary-color), var(--accent-color));
@@ -2068,8 +2156,8 @@
             }
             
             .logo {
-                width: 88px !important;
-                height: 88px !important;
+                width: 125px !important;
+                height: 125px !important;
             }
             
             .logo i {
@@ -2138,8 +2226,8 @@
             }
             
             .logo {
-                width: 70px !important;
-                height: 70px !important;
+                width: 100px !important;
+                height: 100px !important;
             }
             
             .logo i {
@@ -2436,7 +2524,9 @@
         body.side-collapsed nav#side-nav a.active::before { right: 0; }
 
         /* أزرار التمرير العائمة كانت على اليمين، تنتقل لليسار حتى لا تتداخل مع القائمة */
-        .global-scroll-controls { right: auto !important; left: 18px; }
+        /* أزرار التمرير على الجانب الأيمن، بجوار القائمة الجانبية مباشرة (تتحرك معها عند طيّها) */
+        .global-scroll-controls { left: auto !important; right: calc(var(--side-w) + 14px) !important; transition: right .25s ease; }
+        body.side-collapsed .global-scroll-controls { right: calc(var(--side-w-collapsed) + 14px) !important; }
         #desktop-view-toggle { right: auto !important; left: 14px !important; }
         .global-developer-footer { right: calc(var(--side-w) + 14px) !important; transition: right .25s ease; }
         body.side-collapsed .global-developer-footer { right: calc(var(--side-w-collapsed) + 14px) !important; }
@@ -2510,12 +2600,17 @@
     <div class="container">
         <header>
             <!-- مربع المطور على اليسار - تم تصغيره -->
-            <div class="developer-info-header">
-                <h3><i class="fas fa-code"></i>مطور البرنامج</h3>
-                <p class="highlight">المستشار محمود العوابدي</p>
-                <p class="programmer-title">هيئة قضايا الدولة</p>
-                <p>أحد رواد العدالة الرقمية</p>
-                <p class="rights">جميع الحقوق محفوظة للمطور 2025</p>
+            <div class="developer-info-header" role="complementary" aria-label="بيانات المطور">
+                <div class="dev-ribbon"><i class="fas fa-code"></i><span>مطوّر البرنامج</span></div>
+                <div class="dev-main">
+                    <div class="dev-avatar" aria-hidden="true"><svg viewBox="0 0 24 24" width="26" height="26" fill="#0d2f4f"><circle cx="12" cy="7.5" r="4"/><path d="M4 21c0-4.4 3.6-7.5 8-7.5s8 3.1 8 7.5z"/><path d="M12 14l-1.6 2.2L12 20l1.6-3.8z" fill="#f1c40f"/></svg></div>
+                    <div class="dev-id">
+                        <div class="dev-name">المستشار محمود العوابدي</div>
+                        <div class="dev-org"><i class="fas fa-landmark"></i> هيئة قضايا الدولة</div>
+                    </div>
+                </div>
+                <div class="dev-tagline"><i class="fas fa-gem"></i> أحد رواد العدالة الرقمية</div>
+                <div class="dev-rights"><i class="far fa-copyright"></i> جميع الحقوق محفوظة للمطور 2025</div>
             </div>
             
             <!-- الشعار في المنتصف -->
@@ -2614,7 +2709,9 @@
             <div class="dt-section" id="dt-section">
                 <div class="dt-section-h">
                     <h3><i class="fas fa-building-columns" style="color:#1976d2"></i> الدوائر <small>— اضغط على أي رقم لعرض قضاياه بكل تفاصيلها (لا تتأثر بتصفية اللوحة)</small></h3>
+                <button type="button" class="dt-hidden-toggle" id="dt-hidden-toggle" hidden><i class="fas fa-eye-slash"></i> الدوائر المخفية <b id="dt-hidden-count">0</b></button>
                 </div>
+                <div class="dt-hidden-list" id="dt-hidden-list" hidden></div>
                 <div class="dt-grid" id="dt-grid"></div>
             </div>
 
@@ -2717,19 +2814,6 @@
                             <p>الأحكام</p>
                         </div>
                     </div>
-                </div>
-            </div>
-
-            <!-- فوتر المطور في لوحة التحكم -->
-            <div class="developer-footer">
-                <div class="developer-info">
-                    <span class="developer-name">مطور البرنامج: المستشار محمود العوابدي</span>
-                    <span class="separator">|</span>
-                    <span class="developer-org">هيئة قضايا الدولة</span>
-                    <span class="separator">|</span>
-                    <span class="developer-title">أحد رواد العدالة الرقمية</span>
-                    <span class="separator">|</span>
-                    <span class="developer-rights">جميع الحقوق محفوظة للمطور 2025</span>
                 </div>
             </div>
         </section>
@@ -20250,7 +20334,7 @@ let rollExcluded = [];          // [{department, item}] قضايا أُزيلت 
             const end7 = pdISO(in7);
             const entries = gsCollect().filter(e => DT_CATS.all.stages.indexOf(e.stage) !== -1);
             const regs = pdArr(departments).filter(d => d && d.name);
-            const list = regs.map(d => ({ key: dtDeptKey(d.name), name: d.name, day: d.conveningDay || '', registered: true }));
+            const list = regs.map(d => ({ key: dtDeptKey(d.name), name: d.name, day: d.conveningDay || '', registered: true, hidden: !!d.hidden, id: d.id }));
             const known = new Set(list.map(x => x.key));
             // قضايا بدائرة غير مسجلة أو بلا دائرة (حتى لا تختفي من الحساب)
             let orphan = false;
@@ -20285,12 +20369,26 @@ let rollExcluded = [];          // [{department, item}] قضايا أُزيلت 
                 dcRefreshModal();
                 return;
             }
-            grid.innerHTML = data.list.map((x, i) => {
+            const hiddenList = data.list.filter(x => x.hidden && x.registered);
+            const tg = document.getElementById('dt-hidden-toggle'), hl = document.getElementById('dt-hidden-list');
+            if (tg) { tg.hidden = !hiddenList.length; document.getElementById('dt-hidden-count').textContent = hiddenList.length; }
+            if (hl) {
+                hl.innerHTML = hiddenList.map(x => `<span class="dt-hidden-item"><i class="fas fa-building-columns"></i> ${pdEsc(x.name)} <button type="button" class="dt-restore" data-id="${pdEsc(x.id)}"><i class="fas fa-eye"></i> إظهار</button></span>`).join('');
+                if (!hiddenList.length) hl.hidden = true;
+            }
+            const shown = data.list.map((x, i) => ({ x, i })).filter(o => !(o.x.hidden && o.x.registered));
+            if (!shown.length) {
+                grid.innerHTML = '<div class="pd-muted" style="grid-column:1/-1;text-align:center;padding:18px;">كل الدوائر مخفية حاليًا — اضغط «الدوائر المخفية» لإظهار ما تريد.</div>';
+                dcRefreshModal();
+                return;
+            }
+            grid.innerHTML = shown.map(({ x, i }) => {
                 const o = data.byKey[x.key];
                 const pal = x.registered ? DT_PALETTES[i % DT_PALETTES.length] : ['#64748b', '#94a3b8'];
                 const keyAttr = pdEsc(x.key);
                 return `<div class="dt-tile" style="--a:${pal[0]};--b:${pal[1]}">
                     <div class="dt-head">
+                        ${x.registered ? `<button type="button" class="dt-hide-btn" data-id="${pdEsc(x.id)}" title="إخفاء هذه الدائرة من لوحة التحكم (يمكن إعادتها لاحقًا)"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/><path d="M3 3l18 18"/></svg></button>` : ''}
                         <div class="dt-name"><i class="fas fa-building-columns"></i> ${pdEsc(x.name)}</div>
                         ${x.day ? `<span class="dt-day"><i class="fas fa-calendar-day"></i> يوم الانعقاد: ${pdEsc(x.day)}</span>` : ''}
                     </div>
@@ -20431,7 +20529,20 @@ let rollExcluded = [];          // [{department, item}] قضايا أُزيلت 
             const form = document.getElementById('dept-archive-form');
             if (!grid || !form || form.dataset.bound) return;
             form.dataset.bound = '1';
+            const setDeptHidden = (id, flag) => {
+                const d = pdArr(departments).find(x => x && String(x.id) === String(id));
+                if (!d) return;
+                if (flag) d.hidden = true; else delete d.hidden;
+                try { saveDepartments(); } catch (e) {}
+                try { saveDataToAPI(); } catch (e) {}
+                dtRender();
+                showAlert(flag ? 'تم إخفاء الدائرة من لوحة التحكم — يمكنك إظهارها من «الدوائر المخفية»' : 'تمت إعادة إظهار الدائرة', 'success');
+            };
+            document.getElementById('dt-hidden-toggle').addEventListener('click', () => { const hl = document.getElementById('dt-hidden-list'); hl.hidden = !hl.hidden; });
+            document.getElementById('dt-hidden-list').addEventListener('click', ev => { const r = ev.target.closest('.dt-restore'); if (r) setDeptHidden(r.getAttribute('data-id'), false); });
             grid.addEventListener('click', ev => {
+                const hb = ev.target.closest('.dt-hide-btn');
+                if (hb) { setDeptHidden(hb.getAttribute('data-id'), true); return; }
                 const b = ev.target.closest('.dt-archive-btn');
                 if (!b || b.disabled) return;
                 dtaOpen(b.getAttribute('data-key'));
@@ -21058,15 +21169,19 @@ let rollExcluded = [];          // [{department, item}] قضايا أُزيلت 
     <!-- <script src="JUDGMENTS_ADVANCED_SYSTEM.js"></script> -->
     
     <!-- فوتر المطور في جميع الصفحات -->
-    <footer class="global-developer-footer">
-        <div class="developer-info">
-            <span class="developer-name">مطور البرنامج: المستشار محمود العوابدي</span>
-            <span class="separator">|</span>
-            <span class="developer-org">هيئة قضايا الدولة</span>
-            <span class="separator">|</span>
-            <span class="developer-title">أحد رواد العدالة الرقمية</span>
-            <span class="separator">|</span>
-            <span class="developer-rights">جميع الحقوق محفوظة للمطور 2025</span>
+    <footer class="global-developer-footer" role="contentinfo" aria-label="بيانات المطور">
+        <div class="gdf-inner">
+            <div class="gdf-who">
+                <span class="gdf-mark" aria-hidden="true"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 7l-5 5 5 5M16 7l5 5-5 5M14 4l-4 16"/></svg></span>
+                <span class="gdf-label">مطوّر البرنامج</span>
+                <span class="gdf-name developer-name">المستشار محمود العوابدي</span>
+            </div>
+            <span class="gdf-dot" aria-hidden="true"></span>
+            <span class="gdf-org developer-org">هيئة قضايا الدولة</span>
+            <span class="gdf-dot" aria-hidden="true"></span>
+            <span class="gdf-chip developer-title">أحد رواد العدالة الرقمية</span>
+            <span class="gdf-dot gdf-hide-sm" aria-hidden="true"></span>
+            <span class="gdf-rights developer-rights">© جميع الحقوق محفوظة للمطور 2025</span>
         </div>
     </footer>
 
