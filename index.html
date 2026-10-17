@@ -2238,6 +2238,42 @@
         /* ================= لوحة التحكم الاحترافية (pd-) ================= */
         #dashboard { background: linear-gradient(180deg, #f4f7fc 0%, #ffffff 260px); }
 
+        /* ===== تنبيه القضايا التي انتقضت جلستها دون إجراء ===== */
+        .ov-box { margin:0 0 18px; border-radius:16px; overflow:hidden; box-shadow:0 6px 20px rgba(190,30,45,.18); border:1px solid #f3b4ba; background:#fff; }
+        .ov-box.ov-ok { box-shadow:0 4px 14px rgba(22,163,74,.12); border-color:#bfe8cd; }
+        .ov-head { display:flex; align-items:center; gap:12px; padding:12px 16px; background:linear-gradient(135deg,#b91c1c,#ef4444); color:#fff; cursor:pointer; flex-wrap:wrap; }
+        .ov-ok .ov-head { background:linear-gradient(135deg,#15803d,#4ade80); cursor:default; }
+        .ov-ico { width:40px; height:40px; border-radius:50%; background:rgba(255,255,255,.22); display:flex; align-items:center; justify-content:center; font-size:19px; animation:ovShake 2.4s infinite; }
+        .ov-ok .ov-ico { animation:none; }
+        @keyframes ovShake { 0%,86%,100%{transform:rotate(0);} 90%{transform:rotate(-14deg);} 94%{transform:rotate(14deg);} 98%{transform:rotate(-8deg);} }
+        .ov-title { font-size:16.5px; font-weight:800; }
+        .ov-sub { font-size:12.5px; opacity:.92; }
+        .ov-count { margin-right:auto; background:#fff; color:#b91c1c; font-weight:800; font-size:20px; min-width:42px; text-align:center; padding:2px 12px; border-radius:20px; }
+        .ov-toggle { color:#fff; opacity:.9; }
+        .ov-body { padding:10px 14px 14px; max-height:420px; overflow:auto; }
+        .ov-body[hidden] { display:none; }
+        .ov-item { display:flex; align-items:center; gap:12px; padding:10px 12px; border:1px solid #f5d0d4; border-right:5px solid #ef4444; border-radius:10px; margin-top:8px; background:#fff8f8; flex-wrap:wrap; }
+        .ov-main { flex:1; min-width:220px; }
+        .ov-main strong { color:#1a3a5f; font-size:15px; }
+        .ov-main p { margin:3px 0 0; color:#4a5a70; font-size:13px; }
+        .ov-meta { display:flex; flex-direction:column; align-items:center; gap:4px; min-width:110px; font-size:12.5px; color:#6b7a90; }
+        .ov-late { background:#fee2e2; color:#b91c1c; font-weight:700; padding:2px 10px; border-radius:12px; font-size:12.5px; }
+        .ov-late.ov-heavy { background:#b91c1c; color:#fff; }
+        .ov-actions { display:flex; gap:6px; flex-wrap:wrap; }
+        .ov-actions button { padding:6px 12px; font-size:12.5px; }
+        .ov-more { display:block; width:100%; margin-top:10px; padding:8px; border:1px dashed #ef4444; background:#fff; color:#b91c1c; border-radius:10px; cursor:pointer; font-family:inherit; }
+        @media print { .ov-box { display:none !important; } }
+        /* ===== اختيار جلسات الحكم المتعددة (طباعة المحجوزة) ===== */
+        .rps-wrap { position:relative; }
+        .rps-btn { width:100%; display:flex; justify-content:space-between; align-items:center; gap:8px; padding:10px 12px; border:1px solid #cfd8e6; border-radius:8px; background:#fff; cursor:pointer; font-family:inherit; font-size:14px; color:#1f2d3d; text-align:right; }
+        .rps-btn:hover { border-color:#1976d2; }
+        .rps-panel { position:absolute; z-index:50; top:100%; right:0; left:0; margin-top:4px; background:#fff; border:1px solid #cfd8e6; border-radius:10px; box-shadow:0 10px 26px rgba(20,40,80,.18); max-height:280px; overflow:auto; padding:6px; }
+        .rps-panel[hidden] { display:none; }
+        .rps-item { display:flex; align-items:center; gap:8px; padding:7px 10px; border-radius:6px; cursor:pointer; margin:0; font-weight:normal; }
+        .rps-item:hover { background:#eef4fd; }
+        .rps-item input { width:auto; margin:0; }
+        .rps-all { border-bottom:1px solid #e3e9f3; border-radius:6px 6px 0 0; margin-bottom:4px; }
+        .rps-count { margin-right:auto; color:#6b7a90; font-size:12px; }
         /* ===== بطاقات الدوائر في لوحة التحكم ===== */
         .dt-section { margin:0 0 20px; }
         .dt-section-h { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px; margin:0 2px 12px; }
@@ -2703,6 +2739,20 @@
                 <div class="pd-kpi" data-go="under-filing" style="--c:#34495e"><div class="pd-kpi-ic"><i class="fas fa-cloud-upload-alt"></i></div><div class="pd-kpi-b"><h3 id="pd-kpi-uf">0</h3><p>تحت الرفع</p><small id="pd-sub-uf"></small></div></div>
                 <div class="pd-kpi" data-go="judgments" style="--c:#16a085"><div class="pd-kpi-ic"><i class="fas fa-percent"></i></div><div class="pd-kpi-b"><h3 id="pd-kpi-win">0%</h3><p>نسبة الأحكام لصالح</p><small>من إجمالي الأحكام</small></div></div>
                 <div class="pd-kpi" data-go="session-roll" style="--c:#2980b9"><div class="pd-kpi-ic"><i class="fas fa-calendar-week"></i></div><div class="pd-kpi-b"><h3 id="pd-kpi-week">0</h3><p>جلسات خلال 7 أيام</p><small id="pd-sub-week"></small></div></div>
+            </div>
+
+            <!-- تنبيه: قضايا انتقضت جلستها ولم يُتخذ فيها إجراء (ترحيل / حجز للحكم / شطب) -->
+            <div class="ov-box" id="ov-box" hidden>
+                <div class="ov-head" id="ov-head">
+                    <div class="ov-ico"><i class="fas fa-bell"></i></div>
+                    <div>
+                        <div class="ov-title" id="ov-title"></div>
+                        <div class="ov-sub" id="ov-sub"></div>
+                    </div>
+                    <span class="ov-count" id="ov-count">0</span>
+                    <i class="fas fa-chevron-down ov-toggle" id="ov-toggle"></i>
+                </div>
+                <div class="ov-body" id="ov-body"></div>
             </div>
 
             <!-- بطاقات الدوائر: كل دائرة مسجلة بإحصائياتها، والضغط على أي رقم يعرض قضاياه بالتفصيل -->
@@ -3526,11 +3576,13 @@
                                 <option value="">جميع الدوائر</option>
                             </select>
                         </div>
-                        <div class="form-group">
-                            <label for="reserved-print-session">جلسة الحكم</label>
-                            <select id="reserved-print-session">
-                                <option value="">جميع الجلسات</option>
-                            </select>
+                        <div class="form-group rps-wrap">
+                            <label>جلسة الحكم <small style="color:#777;">(يمكن اختيار أكثر من جلسة)</small></label>
+                            <button type="button" id="reserved-print-session-btn" class="rps-btn"><span id="reserved-print-session-label">جميع جلسات الحكم</span> <i class="fas fa-chevron-down"></i></button>
+                            <div id="reserved-print-session-panel" class="rps-panel" hidden>
+                                <label class="rps-item rps-all"><input type="checkbox" id="reserved-print-session-all" checked> <b>جميع جلسات الحكم</b></label>
+                                <div id="reserved-print-session-list"></div>
+                            </div>
                         </div>
                     </div>
                     <p id="reserved-print-summary" style="color: #666; font-size: 13px; margin: 5px 0 10px;"></p>
@@ -6597,11 +6649,13 @@ let rollExcluded = [];          // [{department, item}] قضايا أُزيلت 
             );
         }
 
+        // جلسات الحكم المختارة للطباعة/التصدير (مصفوفة تواريخ) — فارغة تعني «جميع الجلسات»
+        let reservedPrintSessions = [];
+
         function getFilteredReservedCases() {
             const reserveDate = getDateKey(searchReservedDate?.value || '');
             const department = normalizeDeptName(searchReservedDepartment?.value || '');
             const printDepartment = normalizeDeptName(document.getElementById('reserved-print-department')?.value || '');
-            const printSession = getDateKey(document.getElementById('reserved-print-session')?.value || '');
             let result = reservedCases;
             if (reserveDate) {
                 result = result.filter(c => getDateKey(c.reserveDate) === reserveDate);
@@ -6612,8 +6666,8 @@ let rollExcluded = [];          // [{department, item}] قضايا أُزيلت 
             if (printDepartment) {
                 result = result.filter(c => normalizeDeptName(c.department) === printDepartment);
             }
-            if (printSession) {
-                result = result.filter(c => getDateKey(c.reserveDate) === printSession);
+            if (reservedPrintSessions.length) {
+                result = result.filter(c => reservedPrintSessions.includes(getDateKey(c.reserveDate)));
             }
             return result;
         }
@@ -6622,8 +6676,8 @@ let rollExcluded = [];          // [{department, item}] قضايا أُزيلت 
         // قائمة الجلسات تعرض فقط تواريخ جلسات الحكم الموجودة فعلاً، وتتبع الدائرة المختارة.
         function refreshReservedPrintFilters() {
             const deptSelect = document.getElementById('reserved-print-department');
-            const sessionSelect = document.getElementById('reserved-print-session');
-            if (!deptSelect || !sessionSelect) return;
+            const sessionList = document.getElementById('reserved-print-session-list');
+            if (!deptSelect || !sessionList) return;
 
             const prevDept = normalizeDeptName(deptSelect.value || '');
             const deptNames = [...new Set([
@@ -6634,24 +6688,38 @@ let rollExcluded = [];          // [{department, item}] قضايا أُزيلت 
             deptNames.forEach(n => deptSelect.add(new Option(n, n)));
             deptSelect.value = deptNames.includes(prevDept) ? prevDept : '';
 
-            const prevSession = getDateKey(sessionSelect.value || '');
             const currentDept = normalizeDeptName(deptSelect.value || '');
-            const sessionDates = [...new Set((reservedCases || [])
+            const counts = {};
+            (reservedCases || [])
                 .filter(c => !currentDept || normalizeDeptName(c.department) === currentDept)
-                .map(c => getDateKey(c.reserveDate))
-                .filter(Boolean))].sort();
-            sessionSelect.replaceChildren(new Option('جميع الجلسات', ''));
-            sessionDates.forEach(d => sessionSelect.add(new Option(formatDate(d), d)));
-            sessionSelect.value = sessionDates.includes(prevSession) ? prevSession : '';
+                .forEach(c => { const k = getDateKey(c.reserveDate); if (k) counts[k] = (counts[k] || 0) + 1; });
+            const sessionDates = Object.keys(counts).sort();
+            // نُبقي فقط الجلسات التي ما زالت موجودة
+            reservedPrintSessions = reservedPrintSessions.filter(d => sessionDates.includes(d));
+            sessionList.innerHTML = sessionDates.map(d => `<label class="rps-item"><input type="checkbox" class="rps-check" value="${d}" ${reservedPrintSessions.includes(d) ? 'checked' : ''}> <span>${formatDate(d)}</span><span class="rps-count">${counts[d]} قضية</span></label>`).join('') ||
+                '<div style="padding:8px;color:#777;text-align:center;">لا توجد جلسات حكم</div>';
+            updateReservedSessionLabel();
+        }
+
+        function updateReservedSessionLabel() {
+            const label = document.getElementById('reserved-print-session-label');
+            const all = document.getElementById('reserved-print-session-all');
+            if (all) all.checked = reservedPrintSessions.length === 0;
+            if (!label) return;
+            if (!reservedPrintSessions.length) label.textContent = 'جميع جلسات الحكم';
+            else if (reservedPrintSessions.length === 1) label.textContent = 'جلسة ' + formatDate(reservedPrintSessions[0]);
+            else label.textContent = reservedPrintSessions.length + ' جلسات محددة';
         }
 
         function updateReservedPrintSummary() {
             const el = document.getElementById('reserved-print-summary');
             if (!el) return;
             const dept = normalizeDeptName(document.getElementById('reserved-print-department')?.value || '');
-            const session = getDateKey(document.getElementById('reserved-print-session')?.value || '');
             const count = getFilteredReservedCases().length;
-            el.textContent = `النطاق المحدد: ${dept ? 'الدائرة: ' + dept : 'جميع الدوائر'} — ${session ? 'جلسة الحكم ' + formatDate(session) : 'جميع جلسات الحكم'} (${count} قضية)`;
+            const sessText = !reservedPrintSessions.length ? 'جميع جلسات الحكم'
+                : (reservedPrintSessions.length === 1 ? 'جلسة الحكم ' + formatDate(reservedPrintSessions[0])
+                    : 'جلسات الحكم: ' + reservedPrintSessions.map(formatDate).join('، '));
+            el.textContent = `النطاق المحدد: ${dept ? 'الدائرة: ' + dept : 'جميع الدوائر'} — ${sessText} (${count} قضية)`;
         }
 
         function applyReservedPrintFilters() {
@@ -7857,6 +7925,7 @@ let rollExcluded = [];          // [{department, item}] قضايا أُزيلت 
                 pdSetText('pd-sub-uf', 'قضايا ' + pdNum(ufC.length) + ' | استئنافات ' + pdNum(ufA.length));
                 pdSetText('pd-sub-week', k.week.length ? 'أقرب جلسة: ' + k.week.slice().sort((a, b) => a.sessionDate.localeCompare(b.sessionDate))[0].sessionDate.split('-').reverse().join('/') : 'لا توجد جلسات');
                 try { dtRender(); } catch (err) { console.warn('dt render', err); }
+                try { ovRender(); } catch (err) { console.warn('ov render', err); }
                 try { leRender(); } catch (err) { console.warn('le render', err); }
                 pdSetText('pd-updated', 'آخر تحديث ' + new Date().toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' }));
 
@@ -11544,7 +11613,7 @@ let rollExcluded = [];          // [{department, item}] قضايا أُزيلت 
             if (!filteredReservedCases) {
                 refreshReservedPrintFilters();
                 // إن كان اختيار الدائرة/جلسة الحكم مفعلاً يبقى الجدول متسقاً مع ما سيُطبع
-                if (document.getElementById('reserved-print-department')?.value || document.getElementById('reserved-print-session')?.value) {
+                if (document.getElementById('reserved-print-department')?.value || reservedPrintSessions.length) {
                     reservedData = getFilteredReservedCases();
                 }
                 updateReservedPrintSummary();
@@ -11574,7 +11643,7 @@ let rollExcluded = [];          // [{department, item}] قضايا أُزيلت 
                         <button class="btn-purple btn-session-history" data-id="${caseItem.id}"><i class="fas fa-history"></i> سجل الجلسات</button>
                         <button class="btn-postpone btn-postpone-case" data-id="${caseItem.id}"><i class="fas fa-calendar-plus"></i> مد أجل الحكم</button>
                         <button class="btn-primary btn-case-letters" data-id="${caseItem.id}"><i class="fas fa-envelope-open-text"></i> خطابات</button>
-                        <button class="btn-judgment btn-judge-case" data-id="${caseItem.id}"><i class="fas fa-gavel"></i> الحكم</button>
+                        <button class="btn-judgment btn-judge-case" data-id="${caseItem.id}"><i class="fas fa-gavel"></i> حكم قطعي</button>
                         <button class="btn-interim-judgment btn-interim-judgment-case" data-id="${caseItem.id}"><i class="fas fa-balance-scale"></i> أحكام تمهيدية</button>
                         <button class="btn-warning btn-suspend-judgment" data-id="${caseItem.id}"><i class="fas fa-pause-circle"></i> وقف الدعوي</button>
                         <button class="btn-return btn-return-case" data-id="${caseItem.id}" data-type="reserved"><i class="fas fa-redo"></i> إعادة للمرافعة</button>
@@ -17229,7 +17298,7 @@ let rollExcluded = [];          // [{department, item}] قضايا أُزيلت 
             if (searchReservedDate) searchReservedDate.value = '';
             if (searchReservedDepartment) searchReservedDepartment.value = '';
             const rpd = document.getElementById('reserved-print-department'); if (rpd) rpd.value = '';
-            const rps = document.getElementById('reserved-print-session'); if (rps) rps.value = '';
+            reservedPrintSessions = [];
             renderReservedAndCancelledCases();
             showAlert('تم مسح معايير البحث في القضايا المحجوزة', 'info');
         });
@@ -20013,7 +20082,7 @@ let rollExcluded = [];          // [{department, item}] قضايا أُزيلت 
                     B('btn-purple btn-session-history', 'fas fa-history', 'سجل الجلسات', id),
                     B('btn-postpone btn-postpone-case', 'fas fa-calendar-plus', 'مد أجل الحكم', id),
                     B('btn-primary btn-case-letters', 'fas fa-envelope-open-text', 'خطابات', id),
-                    B('btn-judgment btn-judge-case', 'fas fa-gavel', 'الحكم', id),
+                    B('btn-judgment btn-judge-case', 'fas fa-gavel', 'حكم قطعي', id),
                     B('btn-interim-judgment btn-interim-judgment-case', 'fas fa-balance-scale', 'أحكام تمهيدية', id),
                     B('btn-warning btn-suspend-judgment', 'fas fa-pause-circle', 'وقف الدعوي', id),
                     B('btn-return btn-return-case', 'fas fa-redo', 'إعادة للمرافعة', id, 'reserved')].join('');
@@ -20436,6 +20505,74 @@ let rollExcluded = [];          // [{department, item}] قضايا أُزيلت 
         }
         if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', dtInit);
         else dtInit();
+
+        // ========== تنبيه القضايا التي انتقضت جلستها دون إجراء ==========
+        let ovState = { open: true, limit: 10 };
+        function ovDaysLate(dateStr) {
+            const a = new Date(dateStr + 'T12:00:00'), b = new Date(pdISO(new Date()) + 'T12:00:00');
+            return Math.max(1, Math.round((b - a) / 86400000));
+        }
+        function ovLateText(n) { return n === 1 ? 'متأخرة يوم' : (n === 2 ? 'متأخرة يومين' : (n <= 10 ? 'متأخرة ' + n + ' أيام' : 'متأخرة ' + n + ' يومًا')); }
+        function ovRender() {
+            const box = document.getElementById('ov-box');
+            if (!box) return;
+            const today = pdISO(new Date());
+            // القضايا المتداولة التي مرّ تاريخ جلستها ولم تُرحَّل ولم تُحجز للحكم ولم تُشطب (ما زالت في قائمة المتداولة بجلسة قديمة)
+            const moved = new Set([].concat(pdArr(reservedCases), pdArr(cancelledCases), pdArr(suspendedCases)).map(x => x && x.id));
+            const late = pdArr(cases).filter(c => c && c.sessionDate && String(c.sessionDate).slice(0, 10) < today && c.status !== 'completed' && !moved.has(c.id))
+                .sort((a, b) => String(a.sessionDate).localeCompare(String(b.sessionDate)) ||
+                    (parseInt(a.caseYear || a.year) || 0) - (parseInt(b.caseYear || b.year) || 0) ||
+                    (parseInt(a.caseNumber || a.number) || 0) - (parseInt(b.caseNumber || b.number) || 0));
+            box.hidden = false;
+            const body = document.getElementById('ov-body');
+            if (!late.length) {
+                box.classList.add('ov-ok');
+                document.getElementById('ov-title').textContent = 'لا توجد قضايا منتهية الجلسة دون إجراء';
+                document.getElementById('ov-sub').textContent = 'كل القضايا المتداولة جلساتها قادمة أو تم اتخاذ إجراء فيها';
+                document.getElementById('ov-count').textContent = '0';
+                document.getElementById('ov-count').style.color = '#15803d';
+                document.getElementById('ov-toggle').style.display = 'none';
+                body.hidden = true; body.innerHTML = '';
+                return;
+            }
+            box.classList.remove('ov-ok');
+            document.getElementById('ov-count').style.color = '';
+            document.getElementById('ov-toggle').style.display = '';
+            document.getElementById('ov-title').textContent = 'تنبيه: قضايا انتقضت جلستها ولم يُتخذ فيها إجراء';
+            document.getElementById('ov-sub').textContent = 'يلزم ترحيلها أو حجزها للحكم أو شطبها';
+            document.getElementById('ov-count').textContent = pdNum(late.length);
+            document.getElementById('ov-toggle').className = 'fas ov-toggle ' + (ovState.open ? 'fa-chevron-up' : 'fa-chevron-down');
+            body.hidden = !ovState.open;
+            const visible = late.slice(0, ovState.limit);
+            body.innerHTML = visible.map(c => {
+                const n = ovDaysLate(String(c.sessionDate).slice(0, 10));
+                return `<div class="ov-item">
+                    <div class="ov-main">
+                        <strong>${caseNumYearType(c)}</strong>
+                        <p>${pdEsc(c.plaintiff || '')} ضد ${pdEsc(c.defendant || '')}${c.department ? ' — ' + pdEsc(c.department) : ''}</p>
+                    </div>
+                    <div class="ov-meta">
+                        <span>جلسة ${formatDate(c.sessionDate)}</span>
+                        <span class="ov-late ${n > 7 ? 'ov-heavy' : ''}">${ovLateText(n)}</span>
+                    </div>
+                    <div class="ov-actions">
+                        <button type="button" class="btn-info btn-postpone-case" data-id="${pdEsc(c.id)}"><i class="fas fa-calendar-alt"></i> اتخاذ إجراء</button>
+                        <button type="button" class="btn-info btn-view-case" data-id="${pdEsc(c.id)}"><i class="fas fa-eye"></i> عرض</button>
+                    </div>
+                </div>`;
+            }).join('') + (late.length > visible.length ? `<button type="button" class="ov-more">عرض المزيد (${late.length - visible.length} قضية)</button>` : '');
+        }
+        (function ovInit() {
+            const run = () => {
+                const head = document.getElementById('ov-head');
+                const body = document.getElementById('ov-body');
+                if (!head || head.dataset.bound) return;
+                head.dataset.bound = '1';
+                head.addEventListener('click', () => { if (document.getElementById('ov-box').classList.contains('ov-ok')) return; ovState.open = !ovState.open; ovRender(); });
+                body.addEventListener('click', ev => { if (ev.target.closest('.ov-more')) { ovState.limit += 10; ovRender(); } });
+            };
+            if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', run); else run();
+        })();
 
 
         // ========== أرشفة جميع قضايا دائرة (من بطاقة الدائرة) ==========
@@ -21028,31 +21165,125 @@ let rollExcluded = [];          // [{department, item}] قضايا أُزيلت 
             const printReservedBtn = document.getElementById('print-reserved-cases');
             const exportReservedBtn = document.getElementById('export-reserved-word');
             const reservedPrintDept = document.getElementById('reserved-print-department');
-            const reservedPrintSession = document.getElementById('reserved-print-session');
             if (reservedPrintDept) reservedPrintDept.addEventListener('change', () => {
                 refreshReservedPrintFilters();   // تضييق قائمة الجلسات على الدائرة المختارة
                 applyReservedPrintFilters();
             });
-            if (reservedPrintSession) reservedPrintSession.addEventListener('change', applyReservedPrintFilters);
+            (function bindReservedSessionPicker() {
+                const btn = document.getElementById('reserved-print-session-btn');
+                const panel = document.getElementById('reserved-print-session-panel');
+                const list = document.getElementById('reserved-print-session-list');
+                const allBox = document.getElementById('reserved-print-session-all');
+                if (!btn || !panel || !list || !allBox) return;
+                btn.addEventListener('click', ev => { ev.stopPropagation(); panel.hidden = !panel.hidden; });
+                panel.addEventListener('click', ev => ev.stopPropagation());
+                document.addEventListener('click', () => { panel.hidden = true; });
+                allBox.addEventListener('change', () => {
+                    // «جميع الجلسات» تلغي أي اختيار محدد
+                    reservedPrintSessions = [];
+                    list.querySelectorAll('.rps-check').forEach(cb => { cb.checked = false; });
+                    updateReservedSessionLabel();
+                    applyReservedPrintFilters();
+                });
+                list.addEventListener('change', ev => {
+                    if (!ev.target.classList.contains('rps-check')) return;
+                    reservedPrintSessions = Array.from(list.querySelectorAll('.rps-check:checked')).map(cb => cb.value).sort();
+                    updateReservedSessionLabel();
+                    applyReservedPrintFilters();
+                });
+            })();
 
-            // القضايا المحجوزة: عمود "تاريخ الجلسة" في المطبوع/Word يعرض جلسة الحكم (تاريخ الحجز)
+            // ===== طباعة/تصدير القضايا المحجوزة =====
+            // الأعمدة (من اليمين): م | رقم الدعوى (الرقم/السنة + نوع الدعوى) | المدعي | المدعى عليه | جلسة الحكم | الدائرة (واسمها ويوم انعقادها) | ملاحظات
+            // الترتيب: الدوائر بالتتابع (أبجديًا)، وداخل كل دائرة تصاعديًا حسب جلسة الحكم دون فواصل
+            function reservedDeptCellHTML(c) {
+                const name = String(c.department || '').trim();
+                const reg = (departments || []).find(d => normalizeDeptName(d.name) === normalizeDeptName(name));
+                const day = reg && reg.conveningDay ? String(reg.conveningDay).trim() : '';
+                return escapeCaseTypeHtml(name || '-') + (day ? '<br>(' + escapeCaseTypeHtml(day) + ')' : '');
+            }
             function getReservedPrintPayload() {
                 const dept = normalizeDeptName(reservedPrintDept?.value || '');
-                const session = getDateKey(reservedPrintSession?.value || '');
-                let arr = getFilteredReservedCases().map(c => ({ ...normalizeCaseForExport(c), sessionDate: c.reserveDate || normalizeCaseForExport(c).sessionDate }));
-                if (!dept) arr = arr.slice().sort((a, b) => normalizeDeptName(a.department).localeCompare(normalizeDeptName(b.department), 'ar'));
-                const title = 'قضايا محجوزة للحكم' + (dept ? ' — الدائرة: ' + dept : ' — جميع الدوائر') + (session ? ' — جلسة الحكم: ' + formatDate(session) : '');
-                return { arr, dept, session, title };
+                const arr = getFilteredReservedCases().slice().sort((a, b) => {
+                    // قضايا كل دائرة متتالية، وداخل كل دائرة ترتيب تصاعدي حسب جلسة الحكم ثم السنة ثم الرقم
+                    const d = normalizeDeptName(a.department).localeCompare(normalizeDeptName(b.department), 'ar');
+                    if (d) return d;
+                    const da = getDateKey(a.reserveDate) || '9999', db = getDateKey(b.reserveDate) || '9999';
+                    if (da !== db) return da.localeCompare(db);
+                    return (parseInt(a.year || a.caseYear) || 0) - (parseInt(b.year || b.caseYear) || 0) ||
+                           (parseInt(a.number || a.caseNumber) || 0) - (parseInt(b.number || b.caseNumber) || 0);
+                });
+                const sess = reservedPrintSessions;
+                const title = 'قضايا محجوزة للحكم' + (dept ? ' — الدائرة: ' + dept : ' — جميع الدوائر') +
+                    (!sess.length ? ' — جميع جلسات الحكم' : (sess.length === 1 ? ' — جلسة الحكم: ' + formatDate(sess[0]) : ' — جلسات الحكم: ' + sess.map(formatDate).join('، ')));
+                return { arr, dept, title };
+            }
+            function reservedTableHTML(arr, forPrint) {
+                const rows = arr.map((c, i) => `<tr>
+                        <td>${i + 1}</td>
+                        <td>${caseNumYearType(c)}</td>
+                        <td>${escapeCaseTypeHtml(c.plaintiff || '')}</td>
+                        <td>${escapeCaseTypeHtml(c.defendant || '')}</td>
+                        <td>${c.reserveDate ? formatDate(c.reserveDate) : '-'}</td>
+                        <td>${reservedDeptCellHTML(c)}</td>
+                        <td>${escapeCaseTypeHtml(c.notes || '')}</td>
+                    </tr>`).join('');
+                return `<table>
+                    <thead><tr>
+                        <th>م</th><th>رقم الدعوى</th><th>المدعي</th><th>المدعى عليه</th><th>جلسة الحكم</th><th>الدائرة</th><th>ملاحظات</th>
+                    </tr></thead>
+                    <tbody>${rows}</tbody>
+                </table>`;
+            }
+            function printReservedCases(arr, title) {
+                const content = `<!DOCTYPE html>
+                    <html lang="ar" dir="rtl">
+                    <head>
+                        <meta charset="utf-8">
+                        <title>${escapeCaseTypeHtml(title)}</title>
+                        <style>
+                            body{font-family:Arial;direction:rtl}
+                            h2,p.sub{text-align:center;margin:6px 0}
+                            p.sub{color:#444;font-size:13px}
+                            table{border-collapse:collapse;width:100%;margin-top:12px}
+                            th,td{border:1px solid #000;padding:6px;text-align:center;vertical-align:middle}
+                            th{background:#f2f2f2}
+                            thead{display:table-header-group} tr{page-break-inside:avoid}
+                        </style>
+                    </head>
+                    <body>
+                        <h2>${escapeCaseTypeHtml(title)}</h2>
+                        <p class="sub">عدد القضايا: ${arr.length}</p>
+                        ${reservedTableHTML(arr, true)}
+                        <script>window.onload=function(){window.print();}<\/script>
+                    </body>
+                    </html>`;
+                const w = window.open('', '_blank');
+                w.document.write(content);
+                w.document.close();
+            }
+            function exportReservedCasesToWord(arr, title) {
+                const content = `
+                    <div class="header">
+                        <h1>هيئة قضايا الدولة</h1>
+                        <h2>نظام إدارة القضايا</h2>
+                        <h3>${escapeCaseTypeHtml(title)}</h3>
+                        <p>عدد القضايا: ${arr.length}</p>
+                        <p>تاريخ التصدير: ${formatDate(new Date().toISOString().split('T')[0])}</p>
+                    </div>
+                    ${reservedTableHTML(arr, false)}`;
+                exportToWord(content, `القضايا_المحجوزة_${new Date().toISOString().split('T')[0]}`);
+                showAlert('تم تصدير القضايا المحجوزة إلى ملف Word', 'success');
             }
             if (printReservedBtn) printReservedBtn.addEventListener('click', () => {
                 const { arr, title } = getReservedPrintPayload();
                 if (arr.length === 0) return showAlert('لا توجد قضايا محجوزة للطباعة', 'warning');
-                printCasesArray(true, arr, title);
+                printReservedCases(arr, title);
             });
             if (exportReservedBtn) exportReservedBtn.addEventListener('click', () => {
-                const { arr, dept, title } = getReservedPrintPayload();
+                const { arr, title } = getReservedPrintPayload();
                 if (arr.length === 0) return showAlert('لا توجد قضايا محجوزة للتصدير', 'warning');
-                exportCasesToWord(true, arr, dept, title);
+                exportReservedCasesToWord(arr, title);
             });
 
             // Print/export cancelled
