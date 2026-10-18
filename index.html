@@ -312,8 +312,8 @@
         @keyframes slideUpFade { from { transform: translateY(8px); opacity: 0 } to { transform: translateY(0); opacity: 1 } }
         
         .logo {
-            width: 160px !important;
-            height: 160px !important;
+            width: 200px !important;
+            height: 200px !important;
             flex: 0 0 auto;
             background: #ffffff;
             border-radius: 20px;
@@ -2156,8 +2156,8 @@
             }
             
             .logo {
-                width: 125px !important;
-                height: 125px !important;
+                width: 150px !important;
+                height: 150px !important;
             }
             
             .logo i {
@@ -2226,8 +2226,8 @@
             }
             
             .logo {
-                width: 100px !important;
-                height: 100px !important;
+                width: 120px !important;
+                height: 120px !important;
             }
             
             .logo i {
@@ -2238,21 +2238,55 @@
         /* ================= لوحة التحكم الاحترافية (pd-) ================= */
         #dashboard { background: linear-gradient(180deg, #f4f7fc 0%, #ffffff 260px); }
 
+
+        /* ===== زر التراجع العائم ===== */
+        .undo-fab { position:fixed; left:18px; bottom:70px; z-index:9000; display:flex; align-items:center; direction:rtl;
+            height:54px; padding:0 6px 0 0; border:0; border-radius:30px; cursor:pointer; font-family:inherit; color:#fff;
+            background:linear-gradient(135deg,#0b3d91,#1976d2 60%,#3b9bff); box-shadow:0 8px 22px rgba(11,61,145,.40), inset 0 1px 0 rgba(255,255,255,.25);
+            transition:transform .18s ease, box-shadow .18s ease, opacity .2s ease, filter .2s ease; }
+        .undo-fab:hover { transform:translateY(-3px); box-shadow:0 12px 28px rgba(11,61,145,.5), inset 0 1px 0 rgba(255,255,255,.25); }
+        .undo-fab:active { transform:scale(.94); }
+        .undo-fab-ico { width:54px; height:54px; display:flex; align-items:center; justify-content:center; font-size:21px; flex:0 0 54px; }
+        .undo-fab-ico i { transition:transform .35s ease; }
+        .undo-fab:hover .undo-fab-ico i { transform:rotate(-40deg); }
+        .undo-fab.undo-spin .undo-fab-ico i { animation:undoSpin .5s ease; }
+        @keyframes undoSpin { from{transform:rotate(0);} to{transform:rotate(-360deg);} }
+        .undo-fab-txt { max-width:0; overflow:hidden; white-space:nowrap; font-size:13.5px; font-weight:700; transition:max-width .28s ease, padding .28s ease; display:flex; flex-direction:column; line-height:1.35; text-align:right; }
+        .undo-fab-txt small { font-weight:500; opacity:.9; font-size:11.5px; overflow:hidden; text-overflow:ellipsis; max-width:260px; }
+        .undo-fab:hover .undo-fab-txt, .undo-fab:focus-visible .undo-fab-txt { max-width:290px; padding:0 4px 0 14px; }
+        .undo-fab-badge { position:absolute; top:-6px; right:-4px; min-width:22px; height:22px; padding:0 6px; border-radius:11px; background:#ef4444; color:#fff; font-size:12px; font-weight:800; display:flex; align-items:center; justify-content:center; border:2px solid #fff; box-shadow:0 2px 6px rgba(0,0,0,.25); }
+        .undo-fab.undo-empty { filter:grayscale(.85) brightness(1.05); opacity:.55; cursor:default; box-shadow:0 4px 12px rgba(0,0,0,.18); }
+        .undo-fab.undo-empty:hover { transform:none; }
+        .undo-fab.undo-empty .undo-fab-badge { display:none; }
+        @media (max-width:600px) { .undo-fab { left:12px; bottom:64px; height:48px; } .undo-fab-ico { width:48px; height:48px; flex-basis:48px; font-size:19px; } }
+        @media print { .undo-fab { display:none !important; } }
         /* ===== تنبيه القضايا التي انتقضت جلستها دون إجراء ===== */
-        .ov-box { margin:0 0 18px; border-radius:16px; overflow:hidden; box-shadow:0 6px 20px rgba(190,30,45,.18); border:1px solid #f3b4ba; background:#fff; }
+        .ov-box { margin:0 0 18px; border-radius:18px; overflow:hidden; box-shadow:0 10px 30px rgba(185,28,28,.16); border:1px solid #f3b4ba; background:#fff; }
         .ov-box.ov-ok { box-shadow:0 4px 14px rgba(22,163,74,.12); border-color:#bfe8cd; }
-        .ov-head { display:flex; align-items:center; gap:12px; padding:12px 16px; background:linear-gradient(135deg,#b91c1c,#ef4444); color:#fff; cursor:pointer; flex-wrap:wrap; }
+        .ov-head { display:flex; align-items:center; gap:14px; padding:14px 18px; background:linear-gradient(120deg,#7f1d1d 0%,#b91c1c 45%,#ef4444 100%); color:#fff; cursor:pointer; flex-wrap:wrap; position:relative; }
         .ov-ok .ov-head { background:linear-gradient(135deg,#15803d,#4ade80); cursor:default; }
-        .ov-ico { width:40px; height:40px; border-radius:50%; background:rgba(255,255,255,.22); display:flex; align-items:center; justify-content:center; font-size:19px; animation:ovShake 2.4s infinite; }
+        .ov-ico { width:46px; height:46px; border-radius:50%; background:rgba(255,255,255,.2); border:2px solid rgba(255,255,255,.45); display:flex; align-items:center; justify-content:center; font-size:21px; animation:ovShake 2.4s infinite; flex:0 0 auto; }
         .ov-ok .ov-ico { animation:none; }
         @keyframes ovShake { 0%,86%,100%{transform:rotate(0);} 90%{transform:rotate(-14deg);} 94%{transform:rotate(14deg);} 98%{transform:rotate(-8deg);} }
-        .ov-title { font-size:16.5px; font-weight:800; }
-        .ov-sub { font-size:12.5px; opacity:.92; }
-        .ov-count { margin-right:auto; background:#fff; color:#b91c1c; font-weight:800; font-size:20px; min-width:42px; text-align:center; padding:2px 12px; border-radius:20px; }
+        .ov-htext { flex:1 1 240px; }
+        .ov-title { font-size:17px; font-weight:800; }
+        .ov-sub { font-size:12.5px; opacity:.92; margin-top:2px; }
+        .ov-count { background:#fff; color:#b91c1c; font-weight:800; font-size:22px; min-width:46px; text-align:center; padding:2px 14px; border-radius:22px; box-shadow:0 2px 8px rgba(0,0,0,.2); }
         .ov-toggle { color:#fff; opacity:.9; }
-        .ov-body { padding:10px 14px 14px; max-height:420px; overflow:auto; }
+        .ov-body { padding:12px 16px 16px; max-height:560px; overflow:auto; background:linear-gradient(#fff7f7,#fff); }
         .ov-body[hidden] { display:none; }
-        .ov-item { display:flex; align-items:center; gap:12px; padding:10px 12px; border:1px solid #f5d0d4; border-right:5px solid #ef4444; border-radius:10px; margin-top:8px; background:#fff8f8; flex-wrap:wrap; }
+        .ov-stats { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:10px; }
+        .ov-stat { flex:1 1 150px; background:#fff; border:1px solid #f5d0d4; border-radius:12px; padding:8px 12px; display:flex; flex-direction:column; }
+        .ov-stat b { font-size:17px; color:#b91c1c; }
+        .ov-stat span { font-size:12px; color:#6b7a90; }
+        .ov-bulk { display:flex; gap:8px; align-items:center; flex-wrap:wrap; background:#fff; border:1px dashed #ef9a9a; border-radius:12px; padding:8px 12px; margin-bottom:6px; }
+        .ov-bulk label.ov-all { display:flex; align-items:center; gap:6px; font-weight:700; color:#7f1d1d; cursor:pointer; }
+        .ov-bulk select, .ov-bulk input, .ov-form select, .ov-form input { padding:7px 10px; border:1px solid #cfd8e6; border-radius:8px; font:inherit; font-size:13px; background:#fff; }
+        .ov-item { border:1px solid #f5d0d4; border-right:6px solid #ef4444; border-radius:12px; margin-top:9px; background:#fff; transition:box-shadow .15s; }
+        .ov-item.ov-heavyrow { border-right-color:#7f1d1d; background:#fffafa; }
+        .ov-item:hover { box-shadow:0 4px 14px rgba(185,28,28,.12); }
+        .ov-row { display:flex; align-items:center; gap:12px; padding:10px 12px; flex-wrap:wrap; }
+        .ov-row input[type=checkbox] { width:18px; height:18px; accent-color:#b91c1c; flex:0 0 auto; }
         .ov-main { flex:1; min-width:220px; }
         .ov-main strong { color:#1a3a5f; font-size:15px; }
         .ov-main p { margin:3px 0 0; color:#4a5a70; font-size:13px; }
@@ -2260,7 +2294,24 @@
         .ov-late { background:#fee2e2; color:#b91c1c; font-weight:700; padding:2px 10px; border-radius:12px; font-size:12.5px; }
         .ov-late.ov-heavy { background:#b91c1c; color:#fff; }
         .ov-actions { display:flex; gap:6px; flex-wrap:wrap; }
-        .ov-actions button { padding:6px 12px; font-size:12.5px; }
+        .ov-act { border:1px solid transparent; border-radius:9px; padding:7px 12px; font:inherit; font-size:12.5px; font-weight:700; cursor:pointer; color:#fff; display:inline-flex; align-items:center; gap:6px; }
+        .ov-act.postpone { background:linear-gradient(135deg,#1d4ed8,#3b82f6); }
+        .ov-act.reserve { background:linear-gradient(135deg,#6d28d9,#a78bfa); }
+        .ov-act.cancel { background:linear-gradient(135deg,#c2410c,#fb923c); }
+        .ov-act.view { background:#fff; color:#1a3a5f; border-color:#cfd8e6; }
+        .ov-act.on { outline:3px solid rgba(15,23,42,.25); }
+        .ov-form { display:flex; gap:8px; align-items:flex-end; flex-wrap:wrap; padding:10px 14px 12px; border-top:1px dashed #f3b4ba; background:#fff5f5; border-radius:0 0 12px 12px; }
+        .ov-form .f { display:flex; flex-direction:column; gap:3px; font-size:12px; color:#555; }
+        .ov-form .f.grow { flex:1 1 200px; }
+        .ov-form .f.grow input { width:100%; box-sizing:border-box; }
+        .ov-go { background:#15803d; color:#fff; border:0; border-radius:9px; padding:8px 16px; font:inherit; font-weight:700; cursor:pointer; }
+        .ov-x { background:#fff; color:#555; border:1px solid #cfd8e6; border-radius:9px; padding:8px 12px; font:inherit; cursor:pointer; }
+        .ov-bulk select, .ov-bulk input[type=date], .ov-form input[type=date] { width:auto !important; flex:0 0 auto; margin:0; }
+        .ov-bulk input[type=text] { width:auto !important; flex:1 1 180px; margin:0; }
+        .ov-bulk input[type=checkbox], .ov-row input[type=checkbox] { width:18px !important; height:18px; margin:0; padding:0; }
+        .ov-bulk label.ov-all { white-space:nowrap; width:auto !important; margin:0; }
+        .ov-bulk button, .ov-form button, .ov-act { width:auto !important; margin:0; }
+        .ov-form .f { margin:0; } .ov-form .f input { margin:0; }
         .ov-more { display:block; width:100%; margin-top:10px; padding:8px; border:1px dashed #ef4444; background:#fff; color:#b91c1c; border-radius:10px; cursor:pointer; font-family:inherit; }
         @media print { .ov-box { display:none !important; } }
         /* ===== اختيار جلسات الحكم المتعددة (طباعة المحجوزة) ===== */
@@ -2385,6 +2436,27 @@
         .pd-btn-main:hover { transform:translateY(-1px); box-shadow:0 5px 14px rgba(11,61,145,.32); }
         .pd-filter-note { margin-bottom:12px; padding:8px 12px; border-radius:8px; background:#fff8e6; border:1px solid #f5d98b; color:#8a6100; font-size:13px; }
 
+        /* ===== قضايا المتابعة ===== */
+        nav#side-nav a[data-section="follow-up-page"] { --ic1:#6d28d9; --ic2:#c4b5fd; }
+        .fu-toolbar { display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin:10px 0; }
+        .fu-toolbar input[type=search] { flex:1 1 280px; padding:10px 12px; border:1px solid #cfd8dc; border-radius:10px; font:inherit; }
+        .fu-count { color:#555; font-weight:600; }
+        .fu-hint { color:#667; font-size:13px; margin:6px 0 12px; line-height:1.7; }
+        .fu-summary { background:#f5f3ff; border:1px solid #ddd6fe; border-radius:10px; padding:10px 14px; margin-bottom:12px; line-height:1.9; font-size:14px; }
+        .fu-summary b { color:#5b21b6; }
+        .fu-badge { display:inline-block; background:#ede9fe; color:#5b21b6; border-radius:10px; padding:1px 9px; font-size:12px; margin-inline-start:6px; }
+        .fu-action-form { display:flex; gap:10px; align-items:flex-end; flex-wrap:wrap; margin-bottom:12px; }
+        .fu-action-form .form-group { margin-bottom:0; }
+        .fu-radio { display:flex; gap:8px; align-items:flex-start; font-weight:400; margin:6px 0; line-height:1.7; cursor:pointer; }
+        .fu-radio input { margin-top:6px; }
+        .fu-act-table { width:100%; border-collapse:collapse; font-size:14px; }
+        .fu-act-table th { background:#ede9fe; color:#4c1d95; padding:8px; }
+        .fu-act-table td { padding:7px 8px; border-bottom:1px solid #eee; text-align:center; }
+        .fu-act-table td.r { text-align:right; }
+        #fu-table td.r { text-align:right; }
+        #fu-table td.actions { min-width:230px; }
+        #fu-table td.actions button { margin:2px; }
+        .btn-fu-refer { background:linear-gradient(135deg,#7c3aed,#a78bfa) !important; color:#fff !important; }
         .pd-kpis { display:grid; grid-template-columns:repeat(6, minmax(0,1fr)); gap:12px; margin-bottom:16px; }
         .pd-kpi { --c:#1976d2; position:relative; display:flex; align-items:center; gap:10px; padding:12px; background:#fff; border:1px solid #e6ecf5; border-radius:12px; cursor:pointer; overflow:hidden; transition:transform .2s, box-shadow .2s; }
         .pd-kpi::before { content:""; position:absolute; inset-block:0; inset-inline-start:0; width:4px; background:var(--c); }
@@ -2652,8 +2724,7 @@
             <!-- الشعار في المنتصف -->
             <div class="logo-container">
                 <div class="logo">
-                    <img src="assets/images/shaar_1.jpg" onerror="this.onerror=null;this.src='icon-512.png'" alt="شعار هيئة قضايا الدولة" class="logo-img"
-                         onerror="this.onerror=null;this.replaceWith(Object.assign(document.createElement('i'),{className:'fas fa-balance-scale icon-primary'}));">
+                    <img src="assets/images/shaar_1.png" onerror="this.onerror=function(){this.onerror=null;this.src='icon-512.png'};this.src='assets/images/shaar_1.jpg'" alt="شعار هيئة قضايا الدولة" class="logo-img">
                 </div>
                 <div class="header-text">
                     <h1>نظام إدارة القضايا</h1>
@@ -2665,7 +2736,7 @@
         <!-- باقي كود التطبيق -->
         <nav id="side-nav" aria-label="القائمة الرئيسية">
             <div class="nav-brand">
-                <img src="assets/images/shaar_1.jpg" onerror="this.onerror=null;this.src='icon-512.png'" alt="" class="nav-brand-logo">
+                <img src="assets/images/shaar_1.png" onerror="this.onerror=null;this.src='icon-512.png'" alt="" class="nav-brand-logo">
                 <div class="nav-brand-text">
                     <strong>نظام إدارة القضايا</strong>
                     <small>هيئة قضايا الدولة</small>
@@ -2681,6 +2752,7 @@
                 <li><a href="#" class="nav-link" data-section="judgments" title="الأحكام"><i class="fas fa-gavel icon-large icon-gold"></i><span class="nav-label">الأحكام</span></a></li>
                 <li><a href="#" class="nav-link" data-section="cancelled-cases-page" title="المشطوب"><i class="fas fa-ban icon-large icon-red"></i><span class="nav-label">المشطوب</span></a></li>
                 <li><a href="#" class="nav-link" data-section="suspended-cases-page" title="الموقوف"><i class="fas fa-pause icon-large icon-orange"></i><span class="nav-label">الموقوف</span></a></li>
+                <li><a href="#" class="nav-link" data-section="follow-up-page" title="المتابعة"><i class="fas fa-binoculars icon-large icon-purple"></i><span class="nav-label">المتابعة</span></a></li>
                 <li><a href="#" class="nav-link" data-section="archived-cases-page" title="الأرشيف"><i class="fas fa-archive icon-large icon-teal"></i><span class="nav-label">الأرشيف</span></a></li>
                 <li><a href="#" class="nav-link" data-section="session-roll" title="رول الجلسة"><i class="fas fa-file-alt icon-large icon-purple"></i><span class="nav-label">رول الجلسة</span></a></li>
                 <li><a href="#" class="nav-link" data-section="previous-sessions" title="الجلسات السابقة"><i class="fas fa-history icon-large icon-teal"></i><span class="nav-label">الجلسات السابقة</span></a></li>
@@ -2736,6 +2808,7 @@
                 <div class="pd-kpi" data-go="suspended-cases-page" style="--c:#f39c12"><div class="pd-kpi-ic"><i class="fas fa-pause"></i></div><div class="pd-kpi-b"><h3 id="suspended-cases-dash">0</h3><p>قضايا موقوفة</p><small></small></div></div>
                 <div class="pd-kpi" data-go="cancelled-cases-page" style="--c:#e74c3c"><div class="pd-kpi-ic"><i class="fas fa-ban"></i></div><div class="pd-kpi-b"><h3 id="cancelled-cases-dash">0</h3><p>قضايا مشطوبة</p><small></small></div></div>
                 <div class="pd-kpi" data-go="archived-cases-page" style="--c:#7f8c8d"><div class="pd-kpi-ic"><i class="fas fa-box-archive"></i></div><div class="pd-kpi-b"><h3 id="archived-cases-dash">0</h3><p>قضايا مؤرشفة</p><small></small></div></div>
+                <div class="pd-kpi" data-go="follow-up-page" style="--c:#6d28d9"><div class="pd-kpi-ic"><i class="fas fa-binoculars"></i></div><div class="pd-kpi-b"><h3 id="fu-kpi-count">0</h3><p>قضايا المتابعة</p></div></div>
                 <div class="pd-kpi" data-go="under-filing" style="--c:#34495e"><div class="pd-kpi-ic"><i class="fas fa-cloud-upload-alt"></i></div><div class="pd-kpi-b"><h3 id="pd-kpi-uf">0</h3><p>تحت الرفع</p><small id="pd-sub-uf"></small></div></div>
                 <div class="pd-kpi" data-go="judgments" style="--c:#16a085"><div class="pd-kpi-ic"><i class="fas fa-percent"></i></div><div class="pd-kpi-b"><h3 id="pd-kpi-win">0%</h3><p>نسبة الأحكام لصالح</p><small>من إجمالي الأحكام</small></div></div>
                 <div class="pd-kpi" data-go="session-roll" style="--c:#2980b9"><div class="pd-kpi-ic"><i class="fas fa-calendar-week"></i></div><div class="pd-kpi-b"><h3 id="pd-kpi-week">0</h3><p>جلسات خلال 7 أيام</p><small id="pd-sub-week"></small></div></div>
@@ -2745,7 +2818,7 @@
             <div class="ov-box" id="ov-box" hidden>
                 <div class="ov-head" id="ov-head">
                     <div class="ov-ico"><i class="fas fa-bell"></i></div>
-                    <div>
+                    <div class="ov-htext">
                         <div class="ov-title" id="ov-title"></div>
                         <div class="ov-sub" id="ov-sub"></div>
                     </div>
@@ -3709,6 +3782,30 @@
                     <tbody id="archived-cases-body">
                         <!-- سيتم ملؤها بالبيانات -->
                     </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- قسم مستقل: قضايا المتابعة -->
+        <section id="follow-up-page" class="section">
+            <h3><i class="fas fa-binoculars icon-primary"></i> قضايا المتابعة</h3>
+            <div class="fu-toolbar">
+                <input type="search" id="fu-search" placeholder="بحث: رقم الدعوى/السنة أو اسم المدعي/المدعى عليه أو سبب المتابعة...">
+                <button type="button" class="btn-success" id="fu-add-btn"><i class="fas fa-plus-circle"></i> تسجيل دعوى متابعة</button>
+                <button type="button" class="btn-info" id="fu-print-btn"><i class="fas fa-print"></i> طباعة</button>
+                <button type="button" class="btn-word" id="fu-word-btn"><i class="fas fa-file-word"></i> تصدير Word</button>
+                <span class="fu-count">العدد: <b id="fu-count">0</b></span>
+            </div>
+            <p class="fu-hint">سجّل هنا الدعاوى التي تتابعها (كل البيانات اختيارية)، وسجّل إجراءات المتابعة بالتاريخ، وأرسل الخطابات وارفع المستندات. ويمكن إحالة أي قضية من أي قسم إلى المتابعة بزر «إحالة للمتابعة»، ثم إعادتها للتداول أو أرشفتها.</p>
+            <div class="table-container">
+                <table id="fu-table">
+                    <thead>
+                        <tr>
+                            <th>م</th><th>رقم وسنة ونوع الدعوى</th><th>المدعي</th><th>المدعى عليه</th>
+                            <th>رقم المتداول</th><th>الحكم الصادر</th><th>سبب المتابعة</th><th>آخر إجراء</th><th class="no-print">الإجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody id="fu-body"></tbody>
                 </table>
             </div>
         </section>
@@ -5187,6 +5284,92 @@
         </div>
     </div>
 
+    <!-- ===== قضايا المتابعة: النوافذ ===== -->
+    <div id="fu-form-modal" class="modal">
+        <div class="modal-content" style="max-width: 720px;">
+            <div class="modal-header"><h3 id="fu-form-title">تسجيل دعوى متابعة</h3><button type="button" class="close-modal fu-close">&times;</button></div>
+            <form id="fu-form" autocomplete="off">
+                <input type="hidden" id="fu-form-id">
+                <div class="form-row">
+                    <div class="form-group"><label for="fu-f-number">رقم الدعوى</label><input type="text" id="fu-f-number"></div>
+                    <div class="form-group"><label for="fu-f-year">سنة الدعوى</label><input type="text" id="fu-f-year" inputmode="numeric"></div>
+                    <div class="form-group"><label for="fu-f-type">نوع الدعوى</label><input type="text" id="fu-f-type" list="fu-dl-types"></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label for="fu-f-plaintiff">اسم المدعي</label><input type="text" id="fu-f-plaintiff" list="fu-dl-lit"></div>
+                    <div class="form-group"><label for="fu-f-defendant">اسم المدعى عليه</label><input type="text" id="fu-f-defendant" list="fu-dl-lit"></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label for="fu-f-circ">رقم المتداول</label><input type="text" id="fu-f-circ"></div>
+                </div>
+                <div class="form-group"><label for="fu-f-judgment">الحكم الصادر فيها</label><textarea id="fu-f-judgment" rows="3"></textarea></div>
+                <div class="form-group"><label for="fu-f-reason">سبب المتابعة</label><textarea id="fu-f-reason" rows="3"></textarea></div>
+                <datalist id="fu-dl-types"></datalist><datalist id="fu-dl-lit"></datalist>
+                <div style="display:flex;gap:10px;margin-top:10px;"><button type="submit" class="btn-success" style="flex:1"><i class="fas fa-save"></i> حفظ</button><button type="button" class="btn-secondary fu-close" style="flex:0 0 auto">إلغاء</button></div>
+            </form>
+        </div>
+    </div>
+
+    <div id="fu-actions-modal" class="modal">
+        <div class="modal-content" style="max-width: 860px;">
+            <div class="modal-header"><h3 id="fu-actions-title">إجراءات المتابعة</h3><button type="button" class="close-modal fu-close">&times;</button></div>
+            <input type="hidden" id="fu-actions-id">
+            <div id="fu-actions-summary" class="fu-summary"></div>
+            <form id="fu-action-form" class="fu-action-form" autocomplete="off">
+                <input type="hidden" id="fu-action-edit-id">
+                <div class="form-group" style="flex:0 0 170px"><label for="fu-action-date">تاريخ الإجراء</label><input type="date" id="fu-action-date" required></div>
+                <div class="form-group" style="flex:1 1 260px"><label for="fu-action-text">الإجراء الذي تم</label><input type="text" id="fu-action-text" required placeholder="مثال: مخاطبة الجهة، حضور جلسة، طلب صورة الحكم..."></div>
+                <button type="submit" class="btn-success" id="fu-action-save"><i class="fas fa-plus"></i> إضافة</button>
+                <button type="button" class="btn-secondary" id="fu-action-cancel" hidden>إلغاء التعديل</button>
+            </form>
+            <div id="fu-actions-list"></div>
+        </div>
+    </div>
+
+    <div id="fu-refer-modal" class="modal">
+        <div class="modal-content" style="max-width: 560px;">
+            <div class="modal-header"><h3>إحالة القضية إلى المتابعة</h3><button type="button" class="close-modal fu-close">&times;</button></div>
+            <div id="fu-refer-summary" class="fu-summary"></div>
+            <div class="form-group"><label for="fu-refer-reason">سبب المتابعة (اختياري)</label><textarea id="fu-refer-reason" rows="3"></textarea></div>
+            <p class="fu-hint">ستُنقل القضية من موضعها الحالي إلى قسم المتابعة مع الاحتفاظ بكامل بياناتها وسجل جلساتها، ويمكن إعادتها للتداول لاحقًا.</p>
+            <div style="display:flex;gap:10px;"><button type="button" class="btn-success" id="fu-refer-ok" style="flex:1"><i class="fas fa-binoculars"></i> إحالة للمتابعة</button><button type="button" class="btn-secondary fu-close">إلغاء</button></div>
+        </div>
+    </div>
+
+    <div id="fu-return-modal" class="modal">
+        <div class="modal-content" style="max-width: 600px;">
+            <div class="modal-header"><h3>إعادة القضية للتداول</h3><button type="button" class="close-modal fu-close">&times;</button></div>
+            <div id="fu-return-summary" class="fu-summary"></div>
+            <div class="form-group"><label for="fu-return-date">تاريخ جلسة الإعادة</label><input type="date" id="fu-return-date" required></div>
+            <div class="form-group">
+                <label>سجل الدعوى بعد الإعادة</label>
+                <label class="fu-radio"><input type="radio" name="fu-return-mode" value="include" checked> تضمين إجراءات المتابعة في سجل الدعوى (يُحفظ السجل السابق ثم إجراءات المتابعة ثم جلسة الإعادة)</label>
+                <label class="fu-radio"><input type="radio" name="fu-return-mode" value="fresh"> اعتبار جلسة الإعادة هي الإجراء الأول في السجل (يبدأ السجل من جلسة الإعادة)</label>
+            </div>
+            <div style="display:flex;gap:10px;"><button type="button" class="btn-success" id="fu-return-ok" style="flex:1"><i class="fas fa-redo"></i> إعادة للتداول</button><button type="button" class="btn-secondary fu-close">إلغاء</button></div>
+        </div>
+    </div>
+
+    <div id="fu-archive-modal" class="modal">
+        <div class="modal-content" style="max-width: 560px;">
+            <div class="modal-header"><h3>أرشفة قضية المتابعة</h3><button type="button" class="close-modal fu-close">&times;</button></div>
+            <div id="fu-archive-summary" class="fu-summary"></div>
+            <div class="form-group"><label for="fu-archive-reason">سبب الأرشفة</label><input type="text" id="fu-archive-reason"></div>
+            <div style="display:flex;gap:10px;"><button type="button" class="btn-success" id="fu-archive-ok" style="flex:1"><i class="fas fa-archive"></i> أرشفة</button><button type="button" class="btn-secondary fu-close">إلغاء</button></div>
+        </div>
+    </div>
+
+    <div id="fu-docs-modal" class="modal">
+        <div class="modal-content" style="max-width: 650px;">
+            <div class="modal-header"><h3 id="fu-docs-title">مستندات المتابعة</h3><button type="button" class="close-modal fu-close">&times;</button></div>
+            <input type="hidden" id="fu-docs-id">
+            <div class="form-group"><label for="fu-doc-type">نوع المستند (اختياري)</label><input type="text" id="fu-doc-type" placeholder="مثال: صحيفة دعوى، مذكرة، مستند مؤيد..."></div>
+            <div class="form-group"><label for="fu-doc-file">اختر الملف</label><input type="file" id="fu-doc-file" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.xlsx,.xls"></div>
+            <button type="button" id="fu-doc-upload" class="btn-success" style="width:100%; margin-bottom:15px;"><i class="fas fa-upload"></i> رفع المستند</button>
+            <div id="fu-docs-list"><i>لا يوجد مستندات</i></div>
+        </div>
+    </div>
+
     <!-- نافذة وقف حكم -->
     <div id="suspend-judgment-modal" class="modal">
         <div class="modal-content" style="max-width: 700px;">
@@ -5358,7 +5541,7 @@
         const FIREBASE_DATA_KEYS = [
             'cases', 'favorableJudgments', 'againstJudgments', 'reservedCases', 'cancelledCases',
             'suspendedCases', 'archivedCases', 'notifications', 'departments',
-            'underFilingCases', 'underFilingAppeals', 'caseTypes', 'litigantOptions'
+            'underFilingCases', 'underFilingAppeals', 'followUpCases', 'caseTypes', 'litigantOptions'
         ];
 
         // قراءة الطابع الزمني لآخر حفظ فقط (طلب صغير جدًا) لمعرفة هل تغيّرت البيانات على السيرفر
@@ -5677,6 +5860,7 @@
                             departments = JSON.parse(localStorage.getItem('departments')) || [];
                             underFilingCases = JSON.parse(localStorage.getItem('underFilingCases')) || [];
                             underFilingAppeals = JSON.parse(localStorage.getItem('underFilingAppeals')) || [];
+                            followUpCases = JSON.parse(localStorage.getItem('followUpCases')) || [];
                             caseTypes = resolveCaseTypes(null);
                             litigantOptions = resolveLitigants(null);
                             return;
@@ -5693,6 +5877,7 @@
                         departments = data.departments || [];
                         underFilingCases = data.underFilingCases || [];
                         underFilingAppeals = data.underFilingAppeals || [];
+                        followUpCases = data.followUpCases || [];
                         caseTypes = resolveCaseTypes(data.caseTypes);
                         litigantOptions = resolveLitigants(data.litigantOptions);
                         return;
@@ -5720,6 +5905,7 @@
                 departments = data.departments || JSON.parse(localStorage.getItem('departments') || '[]') || [];
                 underFilingCases = data.underFilingCases || [];
                 underFilingAppeals = data.underFilingAppeals || [];
+                followUpCases = data.followUpCases || [];
                 caseTypes = resolveCaseTypes(data.caseTypes);
                 litigantOptions = resolveLitigants(data.litigantOptions);
 
@@ -5739,6 +5925,7 @@
                     localStorage.setItem('departments', JSON.stringify(departments));
                     localStorage.setItem('underFilingCases', JSON.stringify(underFilingCases));
                     localStorage.setItem('underFilingAppeals', JSON.stringify(underFilingAppeals));
+                    localStorage.setItem('followUpCases', JSON.stringify(followUpCases));
                     localStorage.setItem('caseTypes', JSON.stringify(caseTypes));
                     localStorage.setItem('litigantOptions', JSON.stringify(litigantOptions));
                     if (data.lastSavedAt) {
@@ -5760,6 +5947,7 @@
                 departments = JSON.parse(localStorage.getItem('departments')) || [];
                 underFilingCases = JSON.parse(localStorage.getItem('underFilingCases')) || [];
                 underFilingAppeals = JSON.parse(localStorage.getItem('underFilingAppeals')) || [];
+                followUpCases = JSON.parse(localStorage.getItem('followUpCases')) || [];
                 caseTypes = resolveCaseTypes(null);
                 litigantOptions = resolveLitigants(null);
             }
@@ -5791,6 +5979,7 @@
                         departments = seed.departments || [];
                         underFilingCases = seed.underFilingCases || [];
                         underFilingAppeals = seed.underFilingAppeals || [];
+                        followUpCases = seed.followUpCases || [];
                         caseTypes = resolveCaseTypes(seed.caseTypes);
                         litigantOptions = resolveLitigants(seed.litigantOptions);
 
@@ -5805,6 +5994,7 @@
                         localStorage.setItem('departments', JSON.stringify(departments));
                         localStorage.setItem('underFilingCases', JSON.stringify(underFilingCases));
                         localStorage.setItem('underFilingAppeals', JSON.stringify(underFilingAppeals));
+                        localStorage.setItem('followUpCases', JSON.stringify(followUpCases));
                         console.log('تم استيراد بيانات النسخة الاحتياطية المرفقة بنجاح');
                     }
                 } catch (e) {
@@ -5830,9 +6020,9 @@
         //  3) إن لم يكن هناك اتصال تبقى التعديلات «معلّقة» وتُرفع تلقائيًا فور عودة الاتصال.
         // ====================================================================
         const SYNC_ARRAY_KEYS = ['cases', 'favorableJudgments', 'againstJudgments', 'reservedCases', 'cancelledCases',
-            'suspendedCases', 'archivedCases', 'notifications', 'departments', 'underFilingCases', 'underFilingAppeals'];
+            'suspendedCases', 'archivedCases', 'notifications', 'departments', 'underFilingCases', 'underFilingAppeals', 'followUpCases'];
         const SYNC_STR_KEYS = ['caseTypes', 'litigantOptions'];
-        const SYNC_STAGE_KEYS = ['cases', 'reservedCases', 'cancelledCases', 'suspendedCases'];
+        const SYNC_STAGE_KEYS = ['cases', 'reservedCases', 'cancelledCases', 'suspendedCases', 'followUpCases'];
         const SYNC_ACCESS = {
             cases: [() => cases, v => { cases = v; }],
             favorableJudgments: [() => favorableJudgments, v => { favorableJudgments = v; }],
@@ -5845,6 +6035,7 @@
             departments: [() => departments, v => { departments = v; }],
             underFilingCases: [() => underFilingCases, v => { underFilingCases = v; }],
             underFilingAppeals: [() => underFilingAppeals, v => { underFilingAppeals = v; }],
+            followUpCases: [() => followUpCases, v => { followUpCases = v; }],
             caseTypes: [() => caseTypes, v => { caseTypes = v; }],
             litigantOptions: [() => litigantOptions, v => { litigantOptions = v; }]
         };
@@ -5980,6 +6171,7 @@
         let __syncBusy = false, __syncAgain = false, __syncConfirmTimer = null;
         async function syncNow() {
             if (__syncBusy) { __syncAgain = true; return false; }
+            try { undoFlush(); } catch (e) { /* تجاهل */ }
             __syncBusy = true;
             let ok = false;
             try {
@@ -6036,6 +6228,7 @@
                     }
                     // تطبيق الناتج في الذاكرة ثم حفظه محليًا
                     SYNC_ARRAY_KEYS.concat(SYNC_STR_KEYS).forEach(k => SYNC_ACCESS[k][1](merged[k]));
+                    try { undoRebase(); } catch (e) { /* تجاهل */ }   // ما وصل من المزامنة ليس إجراءً للمستخدم فلا يُتراجع عنه
                     window.__savingToAPI = true;
                     try { await syncPersistLocal(newTS); } finally { window.__savingToAPI = false; }
                     // أساس المزامنة الجديد + السجلات التي دفعناها (للتأكيد لاحقًا)
@@ -6068,6 +6261,7 @@
 
         let __saveTimer = null;
         async function saveDataToAPI() {
+            try { undoSchedule(); } catch (e) { /* تجاهل */ }
             try { if (typeof gsScheduleRefresh === 'function') gsScheduleRefresh(); } catch (e) { /* تجاهل */ }
             window.__savingToAPI = true;
             try {
@@ -6098,6 +6292,169 @@
         // البيانات إلى Firebase على طول وبتستبدل البيانات الحقيقية فيه. دلوقتي
         // saveDataToAPI() بتتنادى بشكل صريح وواضح في كل نقطة تعديل فعلية فقط
         // (بعد ما تكون كل المصفوفات محدّثة بشكل صحيح)، وده أأمن بكتير.
+
+
+        // ====================================================================
+        // التراجع عن الإجراءات (Undo)
+        // --------------------------------------------------------------------
+        // كل إجراء يُسجَّل كـ«فرق» على السجلات التي تغيّرت فقط (أُضيف / حُذف / تعدّل) بدل نسخة كاملة،
+        // والتراجع يعكس هذا الفرق فقط، فلا يمس أي تعديلات أخرى أو بيانات وصلت من جهاز آخر عبر المزامنة.
+        // كل ضغطة على زر التراجع تعيد خطوة واحدة (حتى 50 خطوة خلال الجلسة الحالية).
+        // ====================================================================
+        const UNDO_KEYS = SYNC_ARRAY_KEYS.filter(k => k !== 'notifications').concat(SYNC_STR_KEYS);
+        const UNDO_MAX = 50;
+        const UNDO_NAMES = { cases: 'المتداولة', reservedCases: 'المحجوزة للحكم', cancelledCases: 'المشطوبة', suspendedCases: 'الموقوفة',
+            archivedCases: 'الأرشيف', favorableJudgments: 'أحكام الصالح', againstJudgments: 'أحكام الضد', underFilingCases: 'تحت الرفع',
+            underFilingAppeals: 'استئنافات تحت الرفع', departments: 'الدوائر', caseTypes: 'أنواع الدعاوى', litigantOptions: 'أسماء المدعي/المدعى عليه' };
+        let undoStack = [], undoBase = null, undoTimer = null;
+
+        function undoSnap() {
+            const snap = {};
+            UNDO_KEYS.forEach(k => {
+                const m = new Map();
+                (SYNC_ACCESS[k][0]() || []).forEach((r, i) => { m.set(syncRecId(r), { h: syncHash(r), j: JSON.stringify(r), i }); });
+                snap[k] = m;
+            });
+            return snap;
+        }
+        function undoSchedule() { clearTimeout(undoTimer); undoTimer = setTimeout(undoFlush, 300); }
+        function undoFlush() { clearTimeout(undoTimer); undoTimer = null; undoCapture(); }
+        function undoRebase() { undoBase = undoSnap(); }
+        function undoReset() { clearTimeout(undoTimer); undoStack = []; undoBase = undoSnap(); undoUpdateUI(); }
+
+        function undoRef(j) {
+            try {
+                const r = JSON.parse(j);
+                if (!r || typeof r !== 'object') return '';
+                const n = r.caseNumber != null ? r.caseNumber : r.number, y = r.caseYear != null ? r.caseYear : r.year;
+                return n ? ` ${n}${y ? '/' + y : ''}` : '';
+            } catch (e) { return ''; }
+        }
+        function undoLabel(patch, cur) {
+            const keys = Object.keys(patch);
+            const ref = (k, id) => { const rec = cur[k].get(id); return rec ? undoRef(rec.j) : ''; };
+            if (keys.length === 2) {
+                // نقل قضية بين الأقسام (حجز / شطب / وقف / أرشفة / حكم / إعادة...)
+                const [a, b] = keys;
+                for (const [from, to] of [[a, b], [b, a]]) {
+                    const rem = patch[from].removed[0], add = patch[to].added[0];
+                    if (rem && add && rem.id === add && patch[from].removed.length === 1 && patch[to].added.length === 1) {
+                        const r = undoRef(rem.j);
+                        if (to === 'reservedCases') return 'حجز القضية' + r + ' للحكم';
+                        if (to === 'cancelledCases') return 'شطب القضية' + r;
+                        if (to === 'suspendedCases') return 'وقف القضية' + r;
+                        if (to === 'archivedCases') return 'أرشفة القضية' + r;
+                        if (to === 'favorableJudgments' || to === 'againstJudgments') return 'تسجيل حكم في القضية' + r;
+                        if (to === 'cases') return 'إعادة القضية' + r + ' للتداول';
+                        return 'نقل القضية' + r + ' إلى ' + (UNDO_NAMES[to] || to);
+                    }
+                }
+            }
+            if (keys.length === 1) {
+                const k = keys[0], p = patch[k], name = UNDO_NAMES[k] || k;
+                const isCase = ['cases', 'reservedCases', 'cancelledCases', 'suspendedCases', 'archivedCases', 'favorableJudgments', 'againstJudgments'].includes(k);
+                if (p.changed.length === 1 && !p.added.length && !p.removed.length) {
+                    const o = p.changed[0];
+                    const nw = cur[k].get(o.id);
+                    let sess = false;
+                    try { sess = JSON.parse(o.j).sessionDate !== JSON.parse(nw.j).sessionDate; } catch (e) { /* تجاهل */ }
+                    if (isCase) return (sess ? 'ترحيل جلسة القضية' : 'تعديل بيانات القضية') + undoRef(o.j);
+                    return 'تعديل في ' + name;
+                }
+                if (p.added.length === 1 && !p.removed.length && !p.changed.length) return isCase ? 'إضافة قضية جديدة' + ref(k, p.added[0]) : 'إضافة في ' + name;
+                if (p.removed.length === 1 && !p.added.length && !p.changed.length) return isCase ? 'حذف القضية' + undoRef(p.removed[0].j) : 'حذف من ' + name;
+            }
+            let n = 0; keys.forEach(k => { n += patch[k].added.length + patch[k].removed.length + patch[k].changed.length; });
+            return 'إجراء مجمّع (' + n + ' تغييرات)';
+        }
+        function undoCapture() {
+            if (!undoBase) { undoBase = undoSnap(); return; }
+            const cur = undoSnap(), patch = {}; let any = false;
+            UNDO_KEYS.forEach(k => {
+                const a = undoBase[k], b = cur[k], p = { added: [], removed: [], changed: [] };
+                b.forEach((v, id) => { const o = a.get(id); if (!o) p.added.push(id); else if (o.h !== v.h) p.changed.push({ id, j: o.j }); });
+                a.forEach((o, id) => { if (!b.has(id)) p.removed.push({ id, j: o.j, i: o.i }); });
+                if (p.added.length || p.removed.length || p.changed.length) { patch[k] = p; any = true; }
+            });
+            const label = any ? undoLabel(patch, cur) : '';
+            undoBase = cur;
+            if (!any) return;
+            undoStack.push({ patch, label, ts: Date.now() });
+            if (undoStack.length > UNDO_MAX) undoStack.shift();
+            undoUpdateUI();
+        }
+        function undoApply(entry) {
+            UNDO_KEYS.forEach(k => {
+                const p = entry.patch[k]; if (!p) return;
+                let arr = (SYNC_ACCESS[k][0]() || []).slice();
+                if (p.added.length) { const set = new Set(p.added); arr = arr.filter(r => !set.has(syncRecId(r))); }
+                p.changed.forEach(c => {
+                    const rec = JSON.parse(c.j), idx = arr.findIndex(r => syncRecId(r) === c.id);
+                    if (idx >= 0) arr[idx] = rec; else arr.push(rec);
+                });
+                p.removed.slice().sort((x, y) => x.i - y.i).forEach(rm => {
+                    if (arr.some(r => syncRecId(r) === rm.id)) return;
+                    arr.splice(Math.min(rm.i, arr.length), 0, JSON.parse(rm.j));
+                });
+                SYNC_ACCESS[k][1](arr);
+            });
+        }
+        function undoStep() {
+            undoFlush();
+            const fab = document.getElementById('undo-fab');
+            if (!undoStack.length) { try { showAlert('لا توجد إجراءات للتراجع عنها', 'warning'); } catch (e) { /* تجاهل */ } return; }
+            const entry = undoStack.pop();
+            try {
+                undoApply(entry);
+                undoBase = undoSnap();           // الحالة بعد التراجع هي الأساس الجديد (فلا تُسجَّل كإجراء جديد)
+                saveDataToAPI();
+                refreshAllViews();
+                try { showAlert('↩ تم التراجع عن: ' + entry.label, 'success'); } catch (e) { /* تجاهل */ }
+            } catch (e) {
+                console.error('Undo failed', e);
+                try { showAlert('تعذّر التراجع عن هذا الإجراء', 'error'); } catch (e2) { /* تجاهل */ }
+            }
+            if (fab) { fab.classList.remove('undo-spin'); void fab.offsetWidth; fab.classList.add('undo-spin'); }
+            undoUpdateUI();
+        }
+        function undoUpdateUI() {
+            const fab = document.getElementById('undo-fab');
+            if (!fab) return;
+            const n = undoStack.length, last = n ? undoStack[n - 1].label : '';
+            fab.classList.toggle('undo-empty', !n);
+            fab.querySelector('.undo-fab-badge').textContent = n;
+            fab.querySelector('.undo-fab-main').textContent = n ? 'تراجع خطوة' : 'التراجع';
+            fab.querySelector('small').textContent = n ? last : 'لا توجد إجراءات للتراجع عنها';
+            fab.title = n ? 'تراجع عن: ' + last + '  (Ctrl+Z)' : 'لا توجد إجراءات للتراجع عنها';
+            fab.setAttribute('aria-label', fab.title);
+        }
+        function undoBuildUI() {
+            if (document.getElementById('undo-fab')) return;
+            const b = document.createElement('button');
+            b.type = 'button'; b.id = 'undo-fab'; b.className = 'undo-fab undo-empty';
+            b.innerHTML = '<span class="undo-fab-ico"><i class="fas fa-undo-alt"></i></span><span class="undo-fab-txt"><span class="undo-fab-main">التراجع</span><small></small></span><span class="undo-fab-badge">0</span>';
+            b.addEventListener('click', undoStep);
+            document.body.appendChild(b);
+            undoUpdateUI();
+        }
+        (function undoInit() {
+            const run = () => { undoBuildUI(); if (!undoBase) { try { undoBase = undoSnap(); } catch (e) { /* تجاهل */ } } };
+            if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', run); else run();
+            document.addEventListener('keydown', ev => {
+                if (!(ev.ctrlKey || ev.metaKey) || ev.shiftKey || ev.altKey || String(ev.key).toLowerCase() !== 'z') return;
+                const t = ev.target;
+                if (t && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName))) return;   // لا نتدخل في التراجع داخل حقول الكتابة
+                ev.preventDefault();
+                undoStep();
+            });
+            // بعد كل تحميل كامل للبيانات (بدء التشغيل أو إعادة التحميل) نبدأ سجل تراجع جديد
+            const origLoad = loadDataFromAPI;
+            loadDataFromAPI = async function () {
+                const r = await origLoad.apply(this, arguments);
+                try { undoReset(); } catch (e) { console.warn('undoReset', e); }
+                return r;
+            };
+        })();
 
         // بيانات التطبيق
         let cases = [];
@@ -6218,6 +6575,7 @@
         // بيانات قسم "تحت الرفع" (مستقل تمامًا عن قوائم القضايا المتداولة)
         let underFilingCases = [];
         let underFilingAppeals = [];
+        let followUpCases = [];
         let programmerName = 'المستشار محمود العوابدي - هيئة قضايا الدولة - أحد رواد العدالة الرقمية - جميع الحقوق محفوظة للمطور 2025';
         let notifications = [];
         
@@ -7915,6 +8273,7 @@ let rollExcluded = [];          // [{department, item}] قضايا أُزيلت 
                 pdSetNum('suspended-cases-dash', d.suspended.length);
                 pdSetNum('cancelled-cases-dash', d.cancelled.length);
                 pdSetNum('archived-cases-dash', d.archived.length);
+                pdSetNum('fu-kpi-count', pdArr(typeof followUpCases !== 'undefined' ? followUpCases : []).length);
                 pdSetNum('pd-kpi-uf', ufC.length + ufA.length);
                 pdSetNum('pd-kpi-win', k.win, '%');
                 pdSetNum('pd-kpi-week', k.week.length);
@@ -9719,6 +10078,7 @@ let rollExcluded = [];          // [{department, item}] قضايا أُزيلت 
             departments = data.departments || [];
             underFilingCases = data.underFilingCases || [];
             underFilingAppeals = data.underFilingAppeals || [];
+            followUpCases = data.followUpCases || [];
             caseTypes = resolveCaseTypes(data.caseTypes);
             litigantOptions = resolveLitigants(data.litigantOptions);
             programmerName = data.programmerName || programmerName;
@@ -9734,6 +10094,7 @@ let rollExcluded = [];          // [{department, item}] قضايا أُزيلت 
             localStorage.setItem('departments', JSON.stringify(departments));
             localStorage.setItem('underFilingCases', JSON.stringify(underFilingCases));
             localStorage.setItem('underFilingAppeals', JSON.stringify(underFilingAppeals));
+            localStorage.setItem('followUpCases', JSON.stringify(followUpCases));
             localStorage.setItem('caseTypes', JSON.stringify(caseTypes));
             localStorage.setItem('litigantOptions', JSON.stringify(litigantOptions));
             localStorage.setItem('programmerName', programmerName);
@@ -9814,6 +10175,8 @@ let rollExcluded = [];          // [{department, item}] قضايا أُزيلت 
                     else if (session.type === 'reserved') sessionType = 'محجوزة';
                     else if (session.type === 'cancelled') sessionType = 'مشطوبة';
                     else if (session.type === 'judgment') sessionType = 'حكم';
+                    else if (session.type === 'followup') sessionType = 'إجراء متابعة';
+                    else if (session.type === 'followup-return') sessionType = 'إعادة من المتابعة';
                     
                     sessionHistoryHTML += `
                         <tr>
@@ -10789,6 +11152,7 @@ let rollExcluded = [];          // [{department, item}] قضايا أُزيلت 
                    cancelledCases.find(c => c.id === caseId) ||
                    suspendedCases.find(c => c.id === caseId) ||
                    archivedCases.find(c => c.id === caseId || c.caseId === caseId) ||
+                   (followUpCases || []).find(c => c.id === caseId) ||
                    null;
         }
         
@@ -11825,6 +12189,8 @@ let rollExcluded = [];          // [{department, item}] قضايا أُزيلت 
                     else if (session.type === 'reserved') sessionType = 'محجوزة';
                     else if (session.type === 'cancelled') sessionType = 'مشطوبة';
                     else if (session.type === 'judgment') sessionType = 'حكم';
+                    else if (session.type === 'followup') sessionType = 'إجراء متابعة';
+                    else if (session.type === 'followup-return') sessionType = 'إعادة من المتابعة';
                     
                     sessionHistoryHTML += `
                         <tr>
@@ -12568,6 +12934,8 @@ let rollExcluded = [];          // [{department, item}] قضايا أُزيلت 
                             else if (session.type === 'reserved') sessionType = 'محجوزة';
                             else if (session.type === 'cancelled') sessionType = 'مشطوبة';
                             else if (session.type === 'judgment') sessionType = 'حكم';
+                            else if (session.type === 'followup') sessionType = 'إجراء متابعة';
+                            else if (session.type === 'followup-return') sessionType = 'إعادة من المتابعة';
                             
                             sessionHistoryHTML += `
                                 <tr>
@@ -13237,6 +13605,8 @@ let rollExcluded = [];          // [{department, item}] قضايا أُزيلت 
                     else if (session.type === 'reserved') sessionType = 'محجوزة';
                     else if (session.type === 'cancelled') sessionType = 'مشطوبة';
                     else if (session.type === 'judgment') sessionType = 'حكم';
+                    else if (session.type === 'followup') sessionType = 'إجراء متابعة';
+                    else if (session.type === 'followup-return') sessionType = 'إعادة من المتابعة';
                     
                     sessionHistoryHTML += `
                         <tr>
@@ -17055,6 +17425,7 @@ let rollExcluded = [];          // [{department, item}] قضايا أُزيلت 
                 departments: departments,
                 underFilingCases: underFilingCases,
                 underFilingAppeals: underFilingAppeals,
+                followUpCases: followUpCases,
                 caseTypes: caseTypes,
                 litigantOptions: litigantOptions,
                 programmerName: programmerName,
@@ -17137,6 +17508,7 @@ let rollExcluded = [];          // [{department, item}] قضايا أُزيلت 
                 notifications = [];
                 underFilingCases = [];
                 underFilingAppeals = [];
+                followUpCases = [];
                 
                 localStorage.removeItem('cases');
                 localStorage.removeItem('favorableJudgments');
@@ -17148,6 +17520,7 @@ let rollExcluded = [];          // [{department, item}] قضايا أُزيلت 
                 localStorage.removeItem('notifications');
                 localStorage.removeItem('underFilingCases');
                 localStorage.removeItem('underFilingAppeals');
+                localStorage.removeItem('followUpCases');
                 localStorage.removeItem('lastBackup');
 
                 if (window.electronAPI && window.electronAPI.saveData) {
@@ -17164,6 +17537,7 @@ let rollExcluded = [];          // [{department, item}] قضايا أُزيلت 
                             departments: [],
                             underFilingCases: [],
                             underFilingAppeals: [],
+                            followUpCases: [],
                             forceEmpty: true
                         });
                     } catch (e) {
@@ -18387,6 +18761,7 @@ let rollExcluded = [];          // [{department, item}] قضايا أُزيلت 
                 renderArchivedCasesTable();
                 renderUnderFilingCasesTable();
                 renderUnderFilingAppealsTable();
+                try { if (window.fuRender) window.fuRender(); } catch (e3) {}
                 try { renderDepartmentsTable(); refreshAllDepartmentSelects(); } catch (e2) {}
                 updateStats();
                 updateDashboard();
@@ -19923,7 +20298,8 @@ let rollExcluded = [];          // [{department, item}] قضايا أُزيلت 
             suspended: { label: 'موقوفة',                color: '#7f8c8d', rank: 6 },
             ufCase:    { label: 'تحت الرفع (قضية)',      color: '#0d9488', rank: 7 },
             ufAppeal:  { label: 'تحت الرفع (استئناف)',   color: '#16a085', rank: 8 },
-            archived:  { label: 'أرشيف',                 color: '#34495e', rank: 9 }
+            archived:  { label: 'أرشيف',                 color: '#34495e', rank: 9 },
+            followup:  { label: 'المتابعة',              color: '#6d28d9', rank: 10 }
         };
         const GS_PAGE_SIZE = 20;
         const GS_STOPWORDS = ['رقم', 'لسنه', 'لسنة', 'سنه', 'سنة', 'دعوي', 'دعوى', 'الدعوي', 'الدعوى', 'قضيه', 'قضية', 'القضيه', 'القضية', 'ضد', 'بتاريخ'];
@@ -19984,6 +20360,7 @@ let rollExcluded = [];          // [{department, item}] قضايا أُزيلت 
             add('ufCase', underFilingCases);
             add('ufAppeal', underFilingAppeals);
             add('archived', archivedCases);
+            add('followup', followUpCases);
             return out;
         }
 
@@ -20120,6 +20497,10 @@ let rollExcluded = [];          // [{department, item}] قضايا أُزيلت 
                         B('btn-word btn-export-judgment', 'fas fa-file-word', 'Word', id, t),
                         B('btn-success btn-share-judgment-whatsapp', 'fab fa-whatsapp', 'مشاركة', id, t),
                         B('btn-danger btn-delete-judgment', 'fas fa-trash', 'حذف', id, t)].join('');
+                }
+                case 'followup': {
+                    const F = (a, ic, lb, cls) => `<button type="button" class="${cls || 'btn-info'} gs-fu-btn" data-a="${a}" data-id="${gsEsc(id)}"><i class="${ic}"></i> ${lb}</button>`;
+                    return [F('actions', 'fas fa-tasks', 'الإجراءات'), F('letters', 'fas fa-envelope-open-text', 'خطابات', 'btn-primary'), F('docs', 'fas fa-paperclip', 'مستندات', 'btn-purple'), F('return', 'fas fa-redo', 'إعادة للتداول', 'btn-return'), F('archive', 'fas fa-archive', 'أرشفة', 'btn-archive')].join('');
                 }
                 case 'ufCase': return [
                     B('btn-info uf-edit-case-btn', 'fas fa-edit', 'فتح', id),
@@ -20507,22 +20888,53 @@ let rollExcluded = [];          // [{department, item}] قضايا أُزيلت 
         else dtInit();
 
         // ========== تنبيه القضايا التي انتقضت جلستها دون إجراء ==========
-        let ovState = { open: true, limit: 10 };
+        let ovState = { open: true, limit: 10, sel: new Set(), form: null, sig: '', bulkAct: 'postpone', bulkDate: '', bulkReason: '' };
         function ovDaysLate(dateStr) {
             const a = new Date(dateStr + 'T12:00:00'), b = new Date(pdISO(new Date()) + 'T12:00:00');
             return Math.max(1, Math.round((b - a) / 86400000));
         }
         function ovLateText(n) { return n === 1 ? 'متأخرة يوم' : (n === 2 ? 'متأخرة يومين' : (n <= 10 ? 'متأخرة ' + n + ' أيام' : 'متأخرة ' + n + ' يومًا')); }
-        function ovRender() {
-            const box = document.getElementById('ov-box');
-            if (!box) return;
+        const OV_ACTS = {
+            postpone: { label: 'ترحيل', icon: 'fa-calendar-alt', dateLabel: 'تاريخ الجلسة الجديد', ph: 'سبب الترحيل (اختياري)', ok: 'تنفيذ الترحيل' },
+            reserve:  { label: 'حجز للحكم', icon: 'fa-gavel', dateLabel: 'تاريخ جلسة الحكم', ph: 'ملاحظات (اختياري)', ok: 'تنفيذ الحجز' },
+            cancel:   { label: 'شطب', icon: 'fa-ban', dateLabel: 'تاريخ الشطب', ph: 'سبب الشطب (اختياري)', ok: 'تنفيذ الشطب' }
+        };
+        function ovLateCases() {
             const today = pdISO(new Date());
-            // القضايا المتداولة التي مرّ تاريخ جلستها ولم تُرحَّل ولم تُحجز للحكم ولم تُشطب (ما زالت في قائمة المتداولة بجلسة قديمة)
-            const moved = new Set([].concat(pdArr(reservedCases), pdArr(cancelledCases), pdArr(suspendedCases)).map(x => x && x.id));
-            const late = pdArr(cases).filter(c => c && c.sessionDate && String(c.sessionDate).slice(0, 10) < today && c.status !== 'completed' && !moved.has(c.id))
+            const moved = new Set([].concat(pdArr(reservedCases), pdArr(cancelledCases), pdArr(suspendedCases), pdArr(typeof followUpCases !== 'undefined' ? followUpCases : [])).map(x => x && x.id));
+            return pdArr(cases).filter(c => c && c.sessionDate && String(c.sessionDate).slice(0, 10) < today && c.status !== 'completed' && !moved.has(c.id))
                 .sort((a, b) => String(a.sessionDate).localeCompare(String(b.sessionDate)) ||
                     (parseInt(a.caseYear || a.year) || 0) - (parseInt(b.caseYear || b.year) || 0) ||
                     (parseInt(a.caseNumber || a.number) || 0) - (parseInt(b.caseNumber || b.number) || 0));
+        }
+        // تنفيذ إجراء على قضية من نفس المكان، عبر نفس منطق نموذج الإجراء الأصلي (ترحيل/حجز/شطب)
+        function ovApply(id, act, date, reason) {
+            const f = document.getElementById('postpone-form'); if (!f) return false;
+            if (!cases.some(c => c.id === id)) return false;
+            document.getElementById('postpone-case-id').value = id;
+            document.getElementById('postpone-type').value = act;
+            document.getElementById('new-session-date').value = date;
+            document.getElementById('postpone-reason').value = reason || '';
+            f.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
+            return !cases.some(c => c.id === id && act !== 'postpone') || act === 'postpone';
+        }
+        function ovFormHTML(c, act) {
+            const m = OV_ACTS[act], today = pdISO(new Date());
+            return `<div class="ov-form" data-id="${pdEsc(c.id)}" data-act="${act}">
+                <div class="f"><span>${m.dateLabel}</span><input type="date" class="ov-date" value="${act === 'cancel' ? today : ''}"></div>
+                <div class="f grow"><span>${m.ph}</span><input type="text" class="ov-reason" placeholder="${m.ph}"></div>
+                <button type="button" class="ov-go"><i class="fas fa-check"></i> ${m.ok}</button>
+                <button type="button" class="ov-x">إلغاء</button>
+            </div>`;
+        }
+        function ovRender(force) {
+            const box = document.getElementById('ov-box');
+            if (!box) return;
+            const late = ovLateCases();
+            const sig = late.map(c => c.id + ':' + c.sessionDate).join('|') + '#' + ovState.open + ovState.limit + (ovState.form ? ovState.form.id + ovState.form.act : '') + [...ovState.sel].join(',');
+            if (!force && sig === ovState.sig) return;
+            ovState.sig = sig;
+            ovState.sel = new Set([...ovState.sel].filter(id => late.some(c => c.id === id)));
             box.hidden = false;
             const body = document.getElementById('ov-body');
             if (!late.length) {
@@ -20539,26 +20951,42 @@ let rollExcluded = [];          // [{department, item}] قضايا أُزيلت 
             document.getElementById('ov-count').style.color = '';
             document.getElementById('ov-toggle').style.display = '';
             document.getElementById('ov-title').textContent = 'تنبيه: قضايا انتقضت جلستها ولم يُتخذ فيها إجراء';
-            document.getElementById('ov-sub').textContent = 'يلزم ترحيلها أو حجزها للحكم أو شطبها';
+            document.getElementById('ov-sub').textContent = 'اتخذ الإجراء من هنا مباشرة: ترحيل أو حجز للحكم أو شطب';
             document.getElementById('ov-count').textContent = pdNum(late.length);
             document.getElementById('ov-toggle').className = 'fas ov-toggle ' + (ovState.open ? 'fa-chevron-up' : 'fa-chevron-down');
             body.hidden = !ovState.open;
             const visible = late.slice(0, ovState.limit);
-            body.innerHTML = visible.map(c => {
+            const oldest = ovDaysLate(String(late[0].sessionDate).slice(0, 10));
+            const depts = new Set(late.map(c => c.department || '—')).size;
+            const heavy = late.filter(c => ovDaysLate(String(c.sessionDate).slice(0, 10)) > 7).length;
+            const allSel = ovState.sel.size === late.length;
+            const stats = `<div class="ov-stats"><div class="ov-stat"><b>${pdNum(late.length)}</b><span>قضية تحتاج إجراء</span></div><div class="ov-stat"><b>${pdNum(oldest)} يوم</b><span>أقدم تأخير</span></div><div class="ov-stat"><b>${pdNum(heavy)}</b><span>متأخرة أكثر من أسبوع</span></div><div class="ov-stat"><b>${pdNum(depts)}</b><span>عدد الدوائر المعنية</span></div></div>`;
+            const bulk = `<div class="ov-bulk"><label class="ov-all"><input type="checkbox" id="ov-all" ${allSel ? 'checked' : ''}> تحديد الكل (${pdNum(ovState.sel.size)})</label>
+                <select id="ov-bulk-act">${Object.keys(OV_ACTS).map(k => `<option value="${k}" ${ovState.bulkAct === k ? 'selected' : ''}>${OV_ACTS[k].label}</option>`).join('')}</select>
+                <input type="date" id="ov-bulk-date" value="${pdEsc(ovState.bulkDate)}" title="التاريخ">
+                <input type="text" id="ov-bulk-reason" placeholder="السبب (اختياري)" value="${pdEsc(ovState.bulkReason)}">
+                <button type="button" class="ov-go" id="ov-bulk-go" ${ovState.sel.size ? '' : 'disabled style="opacity:.5"'}><i class="fas fa-bolt"></i> تنفيذ على المحدد</button></div>`;
+            body.innerHTML = stats + bulk + visible.map(c => {
                 const n = ovDaysLate(String(c.sessionDate).slice(0, 10));
-                return `<div class="ov-item">
-                    <div class="ov-main">
-                        <strong>${caseNumYearType(c)}</strong>
-                        <p>${pdEsc(c.plaintiff || '')} ضد ${pdEsc(c.defendant || '')}${c.department ? ' — ' + pdEsc(c.department) : ''}</p>
+                const fm = ovState.form && ovState.form.id === c.id ? ovState.form.act : null;
+                const id = pdEsc(c.id);
+                return `<div class="ov-item ${n > 7 ? 'ov-heavyrow' : ''}" data-id="${id}">
+                    <div class="ov-row">
+                        <input type="checkbox" class="ov-chk" ${ovState.sel.has(c.id) ? 'checked' : ''}>
+                        <div class="ov-main">
+                            <strong>${caseNumYearType(c)}</strong>
+                            <p>${pdEsc(c.plaintiff || '')} ضد ${pdEsc(c.defendant || '')}${c.department ? ' — ' + pdEsc(c.department) : ''}</p>
+                        </div>
+                        <div class="ov-meta">
+                            <span>جلسة ${formatDate(c.sessionDate)}</span>
+                            <span class="ov-late ${n > 7 ? 'ov-heavy' : ''}">${ovLateText(n)}</span>
+                        </div>
+                        <div class="ov-actions">
+                            ${Object.keys(OV_ACTS).map(k => `<button type="button" class="ov-act ${k} ${fm === k ? 'on' : ''}" data-act="${k}"><i class="fas ${OV_ACTS[k].icon}"></i> ${OV_ACTS[k].label}</button>`).join('')}
+                            <button type="button" class="ov-act view btn-view-case" data-id="${id}"><i class="fas fa-eye"></i> عرض</button>
+                        </div>
                     </div>
-                    <div class="ov-meta">
-                        <span>جلسة ${formatDate(c.sessionDate)}</span>
-                        <span class="ov-late ${n > 7 ? 'ov-heavy' : ''}">${ovLateText(n)}</span>
-                    </div>
-                    <div class="ov-actions">
-                        <button type="button" class="btn-info btn-postpone-case" data-id="${pdEsc(c.id)}"><i class="fas fa-calendar-alt"></i> اتخاذ إجراء</button>
-                        <button type="button" class="btn-info btn-view-case" data-id="${pdEsc(c.id)}"><i class="fas fa-eye"></i> عرض</button>
-                    </div>
+                    ${fm ? ovFormHTML(c, fm) : ''}
                 </div>`;
             }).join('') + (late.length > visible.length ? `<button type="button" class="ov-more">عرض المزيد (${late.length - visible.length} قضية)</button>` : '');
         }
@@ -20568,8 +20996,46 @@ let rollExcluded = [];          // [{department, item}] قضايا أُزيلت 
                 const body = document.getElementById('ov-body');
                 if (!head || head.dataset.bound) return;
                 head.dataset.bound = '1';
-                head.addEventListener('click', () => { if (document.getElementById('ov-box').classList.contains('ov-ok')) return; ovState.open = !ovState.open; ovRender(); });
-                body.addEventListener('click', ev => { if (ev.target.closest('.ov-more')) { ovState.limit += 10; ovRender(); } });
+                const done = (n, label) => { try { document.querySelectorAll('.section.active > .alert.alert-success').forEach(a => a.remove()); } catch (e) {} showAlert(label, 'success'); };
+                head.addEventListener('click', () => { if (document.getElementById('ov-box').classList.contains('ov-ok')) return; ovState.open = !ovState.open; ovRender(true); });
+                body.addEventListener('change', ev => {
+                    const t = ev.target;
+                    if (t.id === 'ov-all') { const late = ovLateCases(); ovState.sel = t.checked ? new Set(late.map(c => c.id)) : new Set(); ovRender(true); }
+                    else if (t.classList.contains('ov-chk')) { const id = t.closest('.ov-item').dataset.id; t.checked ? ovState.sel.add(id) : ovState.sel.delete(id); ovRender(true); }
+                    else if (t.id === 'ov-bulk-act') ovState.bulkAct = t.value;
+                    else if (t.id === 'ov-bulk-date') ovState.bulkDate = t.value;
+                });
+                body.addEventListener('input', ev => { if (ev.target.id === 'ov-bulk-reason') ovState.bulkReason = ev.target.value; });
+                body.addEventListener('click', ev => {
+                    if (ev.target.closest('.ov-more')) { ovState.limit += 10; ovRender(true); return; }
+                    const actBtn = ev.target.closest('.ov-act[data-act]');
+                    if (actBtn) {
+                        const id = actBtn.closest('.ov-item').dataset.id, act = actBtn.dataset.act;
+                        ovState.form = (ovState.form && ovState.form.id === id && ovState.form.act === act) ? null : { id, act };
+                        ovRender(true); return;
+                    }
+                    if (ev.target.closest('.ov-x')) { ovState.form = null; ovRender(true); return; }
+                    const go = ev.target.closest('.ov-form .ov-go');
+                    if (go) {
+                        const f = go.closest('.ov-form'), date = f.querySelector('.ov-date').value, reason = f.querySelector('.ov-reason').value.trim();
+                        if (!date) { f.querySelector('.ov-date').focus(); showAlert('حدد التاريخ أولاً', 'warning'); return; }
+                        ovState.form = null;
+                        ovApply(f.dataset.id, f.dataset.act, date, reason);
+                        ovRender(true); return;
+                    }
+                    if (ev.target.closest('#ov-bulk-go')) {
+                        const ids = [...ovState.sel], act = ovState.bulkAct, date = ovState.bulkDate;
+                        if (!ids.length) return;
+                        if (!date) { document.getElementById('ov-bulk-date').focus(); showAlert('حدد التاريخ أولاً', 'warning'); return; }
+                        if (!confirm('تنفيذ «' + OV_ACTS[act].label + '» على ' + ids.length + ' قضية بتاريخ ' + date + '؟')) return;
+                        const before = new Set(document.querySelectorAll('.alert'));
+                        ids.forEach(id => ovApply(id, act, date, ovState.bulkReason.trim()));
+                        document.querySelectorAll('.alert').forEach(a => { if (!before.has(a)) a.remove(); });
+                        ovState.sel = new Set(); ovState.form = null;
+                        showAlert('تم تنفيذ «' + OV_ACTS[act].label + '» على ' + ids.length + ' قضية', 'success');
+                        ovRender(true);
+                    }
+                });
             };
             if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', run); else run();
         })();
@@ -21520,6 +21986,333 @@ let rollExcluded = [];          // [{department, item}] قضايا أُزيلت 
             if (btn) btn.remove();
         });
     </script>
+    <script>
+    // ================= قضايا المتابعة =================
+    (function () {
+        const $ = id => document.getElementById(id);
+        const esc = v => String(v == null ? '' : v).replace(/[&<>"']/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
+        const clone = o => JSON.parse(JSON.stringify(o));
+        const todayISO = () => { const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); };
+        const dmy = s => s ? String(s).slice(0, 10).split('-').reverse().join('/') : '';
+        const STAGE_LABELS = { active: 'متداولة', reserved: 'محجوزة للحكم', favorable: 'حكم لصالح', against: 'حكم ضد', cancelled: 'مشطوبة', suspended: 'موقوفة', archived: 'الأرشيف', manual: 'تسجيل مباشر' };
+        const SRC = { active: 'cases', reserved: 'reservedCases', cancelled: 'cancelledCases', suspended: 'suspendedCases', archived: 'archivedCases', favorable: 'favorableJudgments', against: 'againstJudgments' };
+        const get = k => SYNC_ACCESS[k][0]() || [];
+        const set = (k, v) => { SYNC_ACCESS[k][1](v); try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} };
+        const uid = p => p + '_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7);
+        function persist(keys) {
+            (keys || []).forEach(k => { try { localStorage.setItem(k, JSON.stringify(get(k))); } catch (e) {} });
+            try { saveDataToAPI(); } catch (e) { console.warn(e); }
+            try { refreshAllViews(); } catch (e) {}
+            render();
+        }
+        const openM = id => { $(id).style.display = 'flex'; };
+        const closeM = id => { $(id).style.display = 'none'; };
+        document.querySelectorAll('.fu-close').forEach(b => b.addEventListener('click', () => { const m = b.closest('.modal'); if (m) m.style.display = 'none'; }));
+        const find = id => get('followUpCases').find(r => String(r.id) === String(id));
+        const caseNo = r => (r.number || r.year) ? (esc(r.number || '—') + ' / ' + esc(r.year || '—')) : '<span style="color:#aaa">—</span>';
+        const caseFull = r => caseNo(r) + (r.caseType ? '<div style="font-size:12px;color:#4c1d95;margin-top:2px">' + esc(r.caseType) + '</div>' : '');
+        const lastAction = r => { const a = (r.actions || []).slice().sort((x, y) => String(y.date).localeCompare(String(x.date)))[0]; return a ? dmy(a.date) + ' — ' + esc(a.text) : '<span style="color:#aaa">لا يوجد</span>'; };
+        const summaryHTML = r => '<div><b>الدعوى:</b> ' + (r.number || '—') + ' / ' + (r.year || '—') + (r.caseType ? ' — ' + esc(r.caseType) : '') + '</div><div><b>المدعي:</b> ' + esc(r.plaintiff || '—') + ' &nbsp; <b>المدعى عليه:</b> ' + esc(r.defendant || '—') + '</div>' + (r.reason ? '<div><b>سبب المتابعة:</b> ' + esc(r.reason) + '</div>' : '');
+
+        // ---------- عرض الجدول ----------
+        function render() {
+            const body = $('fu-body'); if (!body) return;
+            const q = ($('fu-search').value || '').trim().toLowerCase();
+            const all = get('followUpCases').slice().sort((a, b) => String(b.referredAt || b.createdAt || '').localeCompare(String(a.referredAt || a.createdAt || '')));
+            const list = q ? all.filter(r => [r.number, r.year, r.caseType, r.plaintiff, r.defendant, r.circulationNumber, r.judgment, r.reason].join(' ').toLowerCase().includes(q) || (r.number + '/' + r.year).includes(q)) : all;
+            $('fu-count').textContent = all.length;
+            if (!list.length) { body.innerHTML = '<tr><td colspan="9" style="text-align:center;color:#888;padding:22px">' + (all.length ? 'لا توجد نتائج مطابقة' : 'لا توجد قضايا متابعة مسجلة') + '</td></tr>'; return; }
+            body.innerHTML = list.map((r, i) => '<tr data-id="' + esc(r.id) + '"><td>' + (i + 1) + '</td><td>' + caseFull(r) + (r.originStage && r.originStage !== 'manual' ? '<span class="fu-badge">من: ' + esc(STAGE_LABELS[r.originStage] || '') + '</span>' : '') + '</td><td class="r">' + esc(r.plaintiff) + '</td><td class="r">' + esc(r.defendant) + '</td><td>' + esc(r.circulationNumber) + '</td><td class="r">' + esc(r.judgment) + '</td><td class="r">' + esc(r.reason) + '</td><td class="r">' + lastAction(r) + '</td>' +
+                '<td class="actions">' +
+                '<button class="btn-info fu-act" data-a="actions" data-id="' + esc(r.id) + '"><i class="fas fa-tasks"></i> إجراءات (' + (r.actions || []).length + ')</button>' +
+                '<button class="btn-warning fu-act" data-a="edit" data-id="' + esc(r.id) + '"><i class="fas fa-edit"></i> تعديل</button>' +
+                '<button class="btn-primary fu-act" data-a="letters" data-id="' + esc(r.id) + '"><i class="fas fa-envelope-open-text"></i> خطابات</button>' +
+                '<button class="btn-purple fu-act" data-a="docs" data-id="' + esc(r.id) + '"><i class="fas fa-paperclip"></i> مستندات</button>' +
+                '<button class="btn-return fu-act" data-a="return" data-id="' + esc(r.id) + '"><i class="fas fa-redo"></i> إعادة للتداول</button>' +
+                '<button class="btn-archive fu-act" data-a="archive" data-id="' + esc(r.id) + '"><i class="fas fa-archive"></i> أرشفة</button>' +
+                '<button class="btn-danger fu-act" data-a="delete" data-id="' + esc(r.id) + '"><i class="fas fa-trash"></i></button>' +
+                '</td></tr>').join('');
+        }
+        window.fuRender = render;
+
+        // ---------- الطباعة والتصدير إلى Word ----------
+        function currentList() {
+            const q = ($('fu-search').value || '').trim().toLowerCase();
+            const all = get('followUpCases').slice().sort((a, b) => String(b.referredAt || b.createdAt || '').localeCompare(String(a.referredAt || a.createdAt || '')));
+            return q ? all.filter(r => [r.number, r.year, r.caseType, r.plaintiff, r.defendant, r.circulationNumber, r.judgment, r.reason].join(' ').toLowerCase().includes(q) || (r.number + '/' + r.year).includes(q)) : all;
+        }
+        function reportTable(list) {
+            const rows = list.map((r, i) => {
+                const acts = (r.actions || []).slice().sort((a, b) => String(a.date).localeCompare(String(b.date))).map(a => dmy(a.date) + ': ' + esc(a.text)).join('<br>');
+                return '<tr><td>' + (i + 1) + '</td><td>' + ((r.number || r.year) ? esc(r.number || '—') + ' / ' + esc(r.year || '—') : '—') + (r.caseType ? '<br>' + esc(r.caseType) : '') + '</td><td>' + esc(r.plaintiff) + '</td><td>' + esc(r.defendant) + '</td><td>' + esc(r.circulationNumber) + '</td><td>' + esc(r.judgment) + '</td><td>' + esc(r.reason) + '</td><td>' + (acts || '—') + '</td></tr>';
+            }).join('');
+            return '<table dir="rtl" style="direction:rtl;width:100%;border-collapse:collapse"><thead><tr><th style="width:4%">م</th><th style="width:12%">رقم وسنة ونوع الدعوى</th><th style="width:14%">المدعي</th><th style="width:14%">المدعى عليه</th><th style="width:8%">رقم المتداول</th><th style="width:16%">الحكم الصادر</th><th style="width:14%">سبب المتابعة</th><th style="width:18%">إجراءات المتابعة</th></tr></thead><tbody>' + rows + '</tbody></table>';
+        }
+        $('fu-print-btn').addEventListener('click', () => {
+            const list = currentList(); if (!list.length) { showAlert('لا توجد قضايا متابعة للطباعة', 'warning'); return; }
+            const html = '<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><title>قضايا المتابعة</title><style>@page{size:A4 landscape;margin:12mm}body{font-family:Arial;direction:rtl}h2,p.sub{text-align:center;margin:6px 0}p.sub{color:#444;font-size:13px}table{border-collapse:collapse;width:100%;margin-top:12px;font-size:12.5px}th,td{border:1px solid #000;padding:5px;text-align:center;vertical-align:middle}th{background:#f2f2f2}thead{display:table-header-group}tr{page-break-inside:avoid}</style></head><body><h2>هيئة قضايا الدولة — قضايا المتابعة</h2><p class="sub">عدد القضايا: ' + list.length + ' — تاريخ الطباعة: ' + dmy(todayISO()) + '</p>' + reportTable(list) + '<script>window.onload=function(){window.print();}<\/script></body></html>';
+            const w = window.open('', '_blank'); if (!w) { showAlert('تعذر فتح نافذة الطباعة', 'danger'); return; } w.document.write(html); w.document.close();
+        });
+        $('fu-word-btn').addEventListener('click', () => {
+            const list = currentList(); if (!list.length) { showAlert('لا توجد قضايا متابعة للتصدير', 'warning'); return; }
+            const content = '<div class="header"><h1>هيئة قضايا الدولة</h1><h2>نظام إدارة القضايا</h2><h3>قضايا المتابعة</h3><p>عدد القضايا: ' + list.length + '</p><p>تاريخ التصدير: ' + dmy(todayISO()) + '</p></div>' + reportTable(list);
+            exportToWord(content, 'قضايا_المتابعة_' + todayISO());
+            showAlert('تم تصدير قضايا المتابعة إلى ملف Word', 'success');
+        });
+
+        // ---------- تسجيل/تعديل ----------
+        function fillDatalists() {
+            try { $('fu-dl-types').innerHTML = (caseTypes || []).map(t => '<option value="' + esc(t) + '">').join(''); } catch (e) {}
+            try { $('fu-dl-lit').innerHTML = (litigantOptions || []).map(t => '<option value="' + esc(t) + '">').join(''); } catch (e) {}
+        }
+        function openForm(r) {
+            fillDatalists();
+            $('fu-form-title').textContent = r ? 'تعديل بيانات دعوى المتابعة' : 'تسجيل دعوى متابعة';
+            $('fu-form-id').value = r ? r.id : '';
+            $('fu-f-number').value = r ? (r.number || '') : '';
+            $('fu-f-year').value = r ? (r.year || '') : '';
+            $('fu-f-type').value = r ? (r.caseType || '') : '';
+            $('fu-f-plaintiff').value = r ? (r.plaintiff || '') : '';
+            $('fu-f-defendant').value = r ? (r.defendant || '') : '';
+            $('fu-f-circ').value = r ? (r.circulationNumber || '') : '';
+            $('fu-f-judgment').value = r ? (r.judgment || '') : '';
+            $('fu-f-reason').value = r ? (r.reason || '') : '';
+            openM('fu-form-modal');
+        }
+        $('fu-add-btn').addEventListener('click', () => openForm(null));
+        $('fu-search').addEventListener('input', render);
+        $('fu-form').addEventListener('submit', e => {
+            e.preventDefault();
+            const id = $('fu-form-id').value;
+            const v = k => $(k).value.trim();
+            const data = { number: v('fu-f-number'), year: v('fu-f-year'), caseType: v('fu-f-type'), plaintiff: v('fu-f-plaintiff'), defendant: v('fu-f-defendant'), circulationNumber: v('fu-f-circ'), judgment: v('fu-f-judgment'), reason: v('fu-f-reason') };
+            const arr = get('followUpCases').slice();
+            if (id) { const i = arr.findIndex(r => String(r.id) === id); if (i < 0) return; arr[i] = Object.assign({}, arr[i], data); }
+            else arr.push(Object.assign({ id: uid('fu'), createdAt: new Date().toISOString(), referredAt: new Date().toISOString(), originStage: 'manual', origin: null, actions: [], status: 'active' }, data));
+            set('followUpCases', arr);
+            closeM('fu-form-modal');
+            persist();
+            showAlert(id ? 'تم تحديث البيانات' : 'تم تسجيل دعوى المتابعة', 'success');
+        });
+
+        // ---------- الإجراءات ----------
+        function renderActions() {
+            const r = find($('fu-actions-id').value); if (!r) return;
+            $('fu-actions-summary').innerHTML = summaryHTML(r);
+            const acts = (r.actions || []).slice().sort((a, b) => String(a.date).localeCompare(String(b.date)));
+            $('fu-actions-list').innerHTML = acts.length ? '<table class="fu-act-table"><thead><tr><th>م</th><th>التاريخ</th><th>الإجراء</th><th>خيارات</th></tr></thead><tbody>' + acts.map((a, i) => '<tr><td>' + (i + 1) + '</td><td>' + dmy(a.date) + '</td><td class="r">' + esc(a.text) + '</td><td><button class="btn-warning fu-ae" data-id="' + esc(a.id) + '"><i class="fas fa-edit"></i></button> <button class="btn-danger fu-ad" data-id="' + esc(a.id) + '"><i class="fas fa-trash"></i></button></td></tr>').join('') + '</tbody></table>' : '<p class="fu-hint">لا توجد إجراءات مسجلة بعد.</p>';
+        }
+        function resetActionForm() { $('fu-action-edit-id').value = ''; $('fu-action-date').value = todayISO(); $('fu-action-text').value = ''; $('fu-action-save').innerHTML = '<i class="fas fa-plus"></i> إضافة'; $('fu-action-cancel').hidden = true; }
+        function openActions(id) { const r = find(id); if (!r) return; $('fu-actions-id').value = r.id; $('fu-actions-title').textContent = 'إجراءات المتابعة'; resetActionForm(); renderActions(); openM('fu-actions-modal'); }
+        $('fu-action-cancel').addEventListener('click', resetActionForm);
+        $('fu-action-form').addEventListener('submit', e => {
+            e.preventDefault();
+            const arr = get('followUpCases').slice(); const i = arr.findIndex(r => String(r.id) === $('fu-actions-id').value); if (i < 0) return;
+            const rec = Object.assign({}, arr[i]); rec.actions = (rec.actions || []).slice();
+            const date = $('fu-action-date').value, text = $('fu-action-text').value.trim(); if (!date || !text) return;
+            const eid = $('fu-action-edit-id').value;
+            if (eid) { const k = rec.actions.findIndex(a => a.id === eid); if (k >= 0) rec.actions[k] = Object.assign({}, rec.actions[k], { date, text }); }
+            else rec.actions.push({ id: uid('fa'), date, text, recordedDate: new Date().toISOString() });
+            arr[i] = rec; set('followUpCases', arr); resetActionForm(); persist(); renderActions();
+        });
+        $('fu-actions-list').addEventListener('click', e => {
+            const b = e.target.closest('button'); if (!b) return;
+            const arr = get('followUpCases').slice(); const i = arr.findIndex(r => String(r.id) === $('fu-actions-id').value); if (i < 0) return;
+            const a = (arr[i].actions || []).find(x => x.id === b.dataset.id); if (!a) return;
+            if (b.classList.contains('fu-ae')) { $('fu-action-edit-id').value = a.id; $('fu-action-date').value = a.date; $('fu-action-text').value = a.text; $('fu-action-save').innerHTML = '<i class="fas fa-save"></i> حفظ التعديل'; $('fu-action-cancel').hidden = false; $('fu-action-text').focus(); }
+            else if (b.classList.contains('fu-ad')) { if (!confirm('حذف هذا الإجراء؟')) return; const rec = Object.assign({}, arr[i]); rec.actions = rec.actions.filter(x => x.id !== a.id); arr[i] = rec; set('followUpCases', arr); persist(); renderActions(); }
+        });
+
+        // ---------- الخطابات ----------
+        function openLetters(r) {
+            openLettersForCase({ id: r.id, caseId: r.id, number: r.number, year: r.year, caseNumber: r.number, caseYear: r.year, caseType: r.caseType, plaintiff: r.plaintiff, defendant: r.defendant, circulationNumber: r.circulationNumber, subject: r.subject || '', department: r.department || '', sessionDate: (r.origin && r.origin.sessionDate) || '', sessionHistory: (r.origin && r.origin.sessionHistory) || [] }, r.id);
+        }
+
+        // ---------- المستندات ----------
+        function caseDataFor(r) { return { number: r.number || '', year: r.year || '', caseNumber: r.number || '', caseYear: r.year || '', plaintiff: r.plaintiff || '', defendant: r.defendant || '' }; }
+        function openDocs(r) {
+            $('fu-docs-id').value = r.id; $('fu-docs-title').textContent = 'مستندات المتابعة: ' + ((r.number || r.year) ? (r.number || '') + '/' + (r.year || '') : (r.plaintiff || ''));
+            $('fu-doc-type').value = ''; $('fu-doc-file').value = '';
+            resetDocsListId(); $('fu-docs-list').id = 'doc-list-' + r.id; // refreshDocuments يبحث عن doc-list-<id>
+            refreshDocuments(r.id).then(() => {}); openM('fu-docs-modal');
+        }
+        function resetDocsListId() { const el = document.querySelector('#fu-docs-modal [id^="doc-list-"]'); if (el) el.id = 'fu-docs-list'; }
+        document.querySelector('#fu-docs-modal .close-modal').addEventListener('click', resetDocsListId);
+        $('fu-doc-upload').addEventListener('click', () => {
+            const r = find($('fu-docs-id').value); const file = $('fu-doc-file').files && $('fu-doc-file').files[0];
+            if (!r) return; if (!file) { showAlert('من فضلك اختر ملفًا للرفع', 'warning'); return; }
+            const reader = new FileReader();
+            reader.onload = async ev => {
+                try {
+                    const bytes = new Uint8Array(ev.target.result); let bin = ''; for (let i = 0; i < bytes.length; i += 0x8000) bin += String.fromCharCode.apply(null, bytes.subarray(i, i + 0x8000));
+                    const res = await window.electronAPI.saveFile({ caseId: r.id, filename: file.name, dataBase64: btoa(bin), docType: $('fu-doc-type').value.trim(), caseData: caseDataFor(r) });
+                    if (res && res.success) { showAlert('تم رفع المستند بنجاح', 'success'); $('fu-doc-file').value = ''; $('fu-doc-type').value = ''; refreshDocuments(r.id); }
+                    else showAlert('فشل رفع المستند' + (res && res.error ? ': ' + res.error : ''), 'danger');
+                } catch (err) { console.error(err); showAlert('خطأ أثناء رفع الملف', 'danger'); }
+            };
+            reader.readAsArrayBuffer(file);
+        });
+
+        // ---------- الإحالة إلى المتابعة ----------
+        function findSource(id, type) {
+            id = String(id);
+            if (type === 'favorable' || type === 'against') {
+                const rec = get(SRC[type]).find(j => String(j.caseId) === id || String(j.id) === id);
+                return rec ? { stage: type, key: SRC[type], rec } : null;
+            }
+            for (const st of ['active', 'reserved', 'cancelled', 'suspended']) {
+                const rec = get(SRC[st]).find(c => String(c.id) === id);
+                if (rec) return { stage: st, key: SRC[st], rec };
+            }
+            const rec = get('archivedCases').find(c => String(c.id) === id || String(c.caseId) === id);
+            return rec ? { stage: 'archived', key: 'archivedCases', rec } : null;
+        }
+        function stageOfButton(btn) {
+            if (btn.classList.contains('btn-case-letters-from-judgment')) return btn.getAttribute('data-type');
+            return null;
+        }
+        let referCtx = null;
+        function openRefer(id, type) {
+            const src = findSource(id, type);
+            if (!src) { showAlert('تعذر العثور على القضية', 'warning'); return; }
+            const fu = fromSource(src, '');
+            referCtx = { src, fu };
+            $('fu-refer-summary').innerHTML = summaryHTML(fu) + '<div><b>الموضع الحالي:</b> ' + esc(STAGE_LABELS[src.stage]) + '</div>';
+            $('fu-refer-reason').value = '';
+            openM('fu-refer-modal');
+        }
+        function fromSource(src, reason) {
+            const r = src.rec, isJ = src.stage === 'favorable' || src.stage === 'against';
+            let number, year;
+            if (isJ) { const p = String(r.caseNumber || '').split('/'); number = (p[0] || '').trim(); year = (p[1] || '').trim(); }
+            else { number = String(r.number || r.caseNumber || '').trim(); year = String(r.year || r.caseYear || '').trim(); }
+            return {
+                id: String(isJ ? (r.caseId || r.id) : (src.stage === 'archived' ? (r.caseId || r.id) : r.id)),
+                number, year, caseType: r.caseType || '', plaintiff: r.plaintiff || '', defendant: r.defendant || '',
+                circulationNumber: r.circulationNumber || '',
+                judgment: isJ ? ((src.stage === 'favorable' ? 'حكم لصالح: ' : 'حكم ضد: ') + (r.text || '')).trim() : (r.judgmentText || r.judgment || r.text || ''),
+                reason: reason || '', subject: r.subject || '', department: r.department || '',
+                createdAt: new Date().toISOString(), referredAt: new Date().toISOString(),
+                originStage: src.stage, origin: clone(r), actions: [], status: 'active'
+            };
+        }
+        $('fu-refer-ok').addEventListener('click', () => {
+            if (!referCtx) return;
+            const { src } = referCtx; const fu = fromSource(src, $('fu-refer-reason').value.trim());
+            set(src.key, get(src.key).filter(x => x !== src.rec && String(x.id) !== String(src.rec.id)));
+            const arr = get('followUpCases').filter(x => String(x.id) !== String(fu.id)); arr.push(fu); set('followUpCases', arr);
+            closeM('fu-refer-modal'); referCtx = null;
+            persist([src.key]);
+            showAlert('تمت إحالة القضية إلى المتابعة', 'success');
+        });
+
+        // ---------- الإعادة للتداول ----------
+        let retId = null;
+        function openReturn(r) {
+            retId = r.id; $('fu-return-summary').innerHTML = summaryHTML(r) + '<div><b>عدد إجراءات المتابعة:</b> ' + (r.actions || []).length + '</div>';
+            $('fu-return-date').value = ''; document.querySelector('input[name="fu-return-mode"][value="include"]').checked = true; openM('fu-return-modal');
+        }
+        $('fu-return-ok').addEventListener('click', () => {
+            const r = find(retId); if (!r) return;
+            const date = $('fu-return-date').value; if (!date) { showAlert('حدد تاريخ جلسة الإعادة', 'warning'); $('fu-return-date').focus(); return; }
+            const mode = document.querySelector('input[name="fu-return-mode"]:checked').value;
+            const o = r.origin || {}, now = new Date().toISOString();
+            let hist;
+            if (mode === 'fresh') hist = [{ date, type: 'initial', reason: 'جلسة الإعادة من المتابعة', recordedDate: now, notes: '' }];
+            else hist = (Array.isArray(o.sessionHistory) ? clone(o.sessionHistory) : [])
+                .concat((r.actions || []).slice().sort((a, b) => String(a.date).localeCompare(String(b.date))).map(a => ({ date: a.date, type: 'followup', reason: 'إجراء متابعة', recordedDate: a.recordedDate || now, notes: a.text })))
+                .concat([{ date, type: 'followup-return', reason: 'إعادة للتداول من المتابعة', recordedDate: now, notes: r.reason || '' }]);
+            let id = String(r.id); if (get('cases').some(c => String(c.id) === id)) id = uid('case');
+            const c = {
+                id, number: r.number, year: r.year, plaintiff: r.plaintiff, defendant: r.defendant, subject: r.subject || o.subject || '',
+                department: r.department || o.department || '', caseType: r.caseType, circulationNumber: r.circulationNumber,
+                sessionDate: date, firstSessionDate: mode === 'fresh' ? date : (o.firstSessionDate || (hist[0] && hist[0].date) || date),
+                notes: o.notes || '', status: 'pending', createdAt: o.createdAt || now, sessionHistory: hist
+            };
+            const cs = get('cases').slice(); cs.push(c); set('cases', cs);
+            set('followUpCases', get('followUpCases').filter(x => String(x.id) !== String(r.id)));
+            closeM('fu-return-modal'); persist(['cases']);
+            showAlert('أُعيدت القضية للتداول بجلسة ' + dmy(date), 'success');
+        });
+
+        // ---------- الأرشفة ----------
+        let arcId = null;
+        function openArchive(r) { arcId = r.id; $('fu-archive-summary').innerHTML = summaryHTML(r); $('fu-archive-reason').value = ''; openM('fu-archive-modal'); }
+        $('fu-archive-ok').addEventListener('click', () => {
+            const r = find(arcId); if (!r) return;
+            const reason = $('fu-archive-reason').value.trim(); if (!reason) { showAlert('أدخل سبب الأرشفة', 'warning'); $('fu-archive-reason').focus(); return; }
+            const o = r.origin || {}, now = new Date().toISOString();
+            const hist = (Array.isArray(o.sessionHistory) ? clone(o.sessionHistory) : []).concat((r.actions || []).map(a => ({ date: a.date, type: 'followup', reason: 'إجراء متابعة', recordedDate: a.recordedDate || now, notes: a.text })));
+            const rec = {
+                id: uid('archive'), caseId: r.id, number: r.number, year: r.year, caseNumber: r.number, caseYear: r.year,
+                plaintiff: r.plaintiff, defendant: r.defendant, subject: r.subject || o.subject || '', department: r.department || o.department || '',
+                caseType: r.caseType, circulationNumber: r.circulationNumber, firstSessionDate: o.firstSessionDate || '',
+                judgmentText: r.judgment || '', text: r.judgment || '', archiveDate: todayISO(), archiveReason: reason,
+                archiveNotes: 'أُرشفت من قسم المتابعة' + (r.reason ? ' — سبب المتابعة: ' + r.reason : ''), sessionHistory: hist, followUp: { reason: r.reason || '', actions: clone(r.actions || []) }, createdAt: now
+            };
+            const ar = get('archivedCases').slice(); ar.push(rec); set('archivedCases', ar);
+            set('followUpCases', get('followUpCases').filter(x => String(x.id) !== String(r.id)));
+            closeM('fu-archive-modal'); persist(['archivedCases']);
+            showAlert('تمت أرشفة القضية', 'success');
+        });
+
+        // ---------- أزرار الجدول ----------
+        $('fu-body').addEventListener('click', e => {
+            const b = e.target.closest('.fu-act'); if (!b) return; const r = find(b.dataset.id); if (!r) return;
+            switch (b.dataset.a) {
+                case 'actions': openActions(r.id); break;
+                case 'edit': openForm(r); break;
+                case 'letters': openLetters(r); break;
+                case 'docs': openDocs(r); break;
+                case 'return': openReturn(r); break;
+                case 'archive': openArchive(r); break;
+                case 'delete':
+                    if (!confirm('حذف قضية المتابعة نهائيًا؟')) return;
+                    set('followUpCases', get('followUpCases').filter(x => String(x.id) !== String(r.id))); persist(); break;
+            }
+        });
+
+        // أزرار البحث العام + زر الإحالة العام
+        document.addEventListener('click', e => {
+            const b = e.target.closest('button'); if (!b) return;
+            if (b.classList.contains('btn-fu-refer')) { e.preventDefault(); e.stopPropagation(); openRefer(b.getAttribute('data-id'), b.getAttribute('data-type')); return; }
+            if (b.classList.contains('gs-fu-btn')) {
+                const r = find(b.getAttribute('data-id')); if (!r) return; e.preventDefault();
+                const a = b.getAttribute('data-a');
+                if (a === 'actions') openActions(r.id); else if (a === 'letters') openLetters(r); else if (a === 'return') openReturn(r); else if (a === 'archive') openArchive(r); else if (a === 'docs') openDocs(r);
+            }
+        }, true);
+
+        // ---------- حقن زر «إحالة للمتابعة» بجانب زر الخطابات في كل الأقسام ----------
+        function inject() {
+            document.querySelectorAll('.btn-case-letters:not([data-fu]), .btn-case-letters-from-judgment:not([data-fu])').forEach(btn => {
+                btn.setAttribute('data-fu', '1');
+                if (btn.closest('#follow-up-page')) return;
+                const nb = document.createElement('button');
+                nb.type = 'button'; nb.className = 'btn-fu-refer'; nb.title = 'إحالة القضية إلى المتابعة';
+                nb.setAttribute('data-id', btn.getAttribute('data-id') || '');
+                const t = stageOfButton(btn); if (t) nb.setAttribute('data-type', t);
+                nb.innerHTML = '<i class="fas fa-binoculars"></i> إحالة للمتابعة';
+                if (btn.getAttribute('style')) nb.setAttribute('style', btn.getAttribute('style'));
+                btn.insertAdjacentElement('afterend', nb);
+            });
+        }
+        let pend = false;
+        const mo = new MutationObserver(() => { if (pend) return; pend = true; requestAnimationFrame(() => { pend = false; inject(); }); });
+        mo.observe(document.body, { childList: true, subtree: true });
+        inject();
+
+        // عرض عند فتح القسم
+        const nav = document.querySelector('.nav-link[data-section="follow-up-page"]');
+        if (nav) nav.addEventListener('click', render);
+        render();
+        window.fuOpenActions = openActions; window.fuOpenLetters = id => { const r = find(id); if (r) openLetters(r); };
+        window.fuOpenReturn = id => { const r = find(id); if (r) openReturn(r); };
+        window.fuOpenArchive = id => { const r = find(id); if (r) openArchive(r); };
+        window.fuOpenDocs = id => { const r = find(id); if (r) openDocs(r); };
+    })();
+    </script>
+
 </body>
 </html>
 
