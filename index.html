@@ -2436,6 +2436,11 @@
         .pd-btn-main:hover { transform:translateY(-1px); box-shadow:0 5px 14px rgba(11,61,145,.32); }
         .pd-filter-note { margin-bottom:12px; padding:8px 12px; border-radius:8px; background:#fff8e6; border:1px solid #f5d98b; color:#8a6100; font-size:13px; }
 
+        /* ===== النسخ الاحتياطية التلقائية ===== */
+        .bk-item { display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap; padding:10px 12px; border:1px solid #e2e8f0; border-radius:10px; margin-bottom:8px; background:#fff; }
+        .bk-reason { color:#0369a1; background:#e0f2fe; border-radius:10px; padding:1px 10px; font-size:12px; margin-right:6px; }
+        .bk-counts { color:#64748b; font-size:12.5px; margin-top:3px; }
+        .bk-btns { display:flex; gap:6px; }
         /* ===== قضايا المتابعة ===== */
         nav#side-nav a[data-section="follow-up-page"] { --ic1:#6d28d9; --ic2:#c4b5fd; }
         .fu-toolbar { display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin:10px 0; }
@@ -4122,6 +4127,13 @@
                 <input type="file" id="import-file" style="display: none;" accept=".json">
             </div>
             
+            <div class="file-upload-container" id="bk-card">
+                <h4><i class="fas fa-shield-halved icon-primary"></i> النسخ الاحتياطية التلقائية (حماية من فقدان البيانات)</h4>
+                <p style="color:#475569;">يحتفظ البرنامج تلقائيًا بنسخ من بياناتك على هذا الجهاز: عند بدء التشغيل، وقبل رفع تعديلات إلى السحابة، وقبل أي مزامنة غير معتادة. يمكنك استعادة أي نسخة منها.</p>
+                <button type="button" class="btn-info" data-bk="now" style="margin-bottom:10px;"><i class="fas fa-camera"></i> حفظ نسخة الآن</button>
+                <div id="bk-list"></div>
+            </div>
+
             <div class="file-upload-container">
                 <h4><i class="fas fa-file-import icon-primary"></i> استيراد البيانات من ملف</h4>
                 <p>اختر ملف البيانات (.json) الذي تم تصديره مسبقاً:</p>
@@ -5952,57 +5964,10 @@
                 litigantOptions = resolveLitigants(null);
             }
 
-            // ========== استيراد النسخة الاحتياطية المرفقة (مرة واحدة فقط) ==========
-            // إذا لم توجد أي بيانات محفوظة بعد على هذا الجهاز، يتم تحميلها تلقائيًا
-            // من ملف النسخة الاحتياطية backup-seed.json المرفق مع التطبيق.
-            const hasAnyData = (
-                (cases && cases.length) || (favorableJudgments && favorableJudgments.length) ||
-                (againstJudgments && againstJudgments.length) || (reservedCases && reservedCases.length) ||
-                (cancelledCases && cancelledCases.length) || (suspendedCases && suspendedCases.length) ||
-                (archivedCases && archivedCases.length) || (notifications && notifications.length)
-            );
-            const seedAlreadyTried = localStorage.getItem('seedImportAttempted') === 'true';
-
-            if (!hasAnyData && !seedAlreadyTried) {
-                try {
-                    const seedResp = await fetch('./backup-seed.json');
-                    if (seedResp.ok) {
-                        const seed = await seedResp.json();
-                        cases = seed.cases || [];
-                        favorableJudgments = seed.favorableJudgments || [];
-                        againstJudgments = seed.againstJudgments || [];
-                        reservedCases = seed.reservedCases || [];
-                        cancelledCases = seed.cancelledCases || [];
-                        suspendedCases = seed.suspendedCases || [];
-                        archivedCases = seed.archivedCases || [];
-                        notifications = seed.notifications || [];
-                        departments = seed.departments || [];
-                        underFilingCases = seed.underFilingCases || [];
-                        underFilingAppeals = seed.underFilingAppeals || [];
-                        followUpCases = seed.followUpCases || [];
-                        caseTypes = resolveCaseTypes(seed.caseTypes);
-                        litigantOptions = resolveLitigants(seed.litigantOptions);
-
-                        localStorage.setItem('cases', JSON.stringify(cases));
-                        localStorage.setItem('favorableJudgments', JSON.stringify(favorableJudgments));
-                        localStorage.setItem('againstJudgments', JSON.stringify(againstJudgments));
-                        localStorage.setItem('reservedCases', JSON.stringify(reservedCases));
-                        localStorage.setItem('cancelledCases', JSON.stringify(cancelledCases));
-                        localStorage.setItem('suspendedCases', JSON.stringify(suspendedCases));
-                        localStorage.setItem('archivedCases', JSON.stringify(archivedCases));
-                        localStorage.setItem('notifications', JSON.stringify(notifications));
-                        localStorage.setItem('departments', JSON.stringify(departments));
-                        localStorage.setItem('underFilingCases', JSON.stringify(underFilingCases));
-                        localStorage.setItem('underFilingAppeals', JSON.stringify(underFilingAppeals));
-                        localStorage.setItem('followUpCases', JSON.stringify(followUpCases));
-                        console.log('تم استيراد بيانات النسخة الاحتياطية المرفقة بنجاح');
-                    }
-                } catch (e) {
-                    console.warn('تعذر استيراد النسخة الاحتياطية المرفقة', e);
-                } finally {
-                    localStorage.setItem('seedImportAttempted', 'true');
-                }
-            }
+            // ملحوظة أمان: كان هنا استيراد تلقائي لملف backup-seed.json المرفق عند فتح البرنامج على جهاز فارغ.
+            // أُلغي نهائيًا لأنه كان يُدخل بيانات قديمة/افتراضية إلى أي جهاز جديد (أو فرغت بياناته)،
+            // ثم تنتقل هذه البيانات إلى السحابة وبقية الأجهزة بالمزامنة. الجهاز الفارغ يأخذ بياناته من السحابة فقط،
+            // أو من ملف نسخة احتياطية تختاره أنت بنفسك من «إدارة البيانات».
         }
 
         // ====================================================================
@@ -6168,6 +6133,135 @@
             syncLsSet('lastSavedAt', String(ts));
         }
 
+
+        // ====================================================================
+        // حماية البيانات: تقرير المخاطر + نسخ احتياطية تلقائية (IndexedDB)
+        // ====================================================================
+        const BK_DB = 'caseManagerAutoBackups', BK_STORE = 'snaps';
+        const BK_KEEP_RECENT = 8, BK_KEEP_DAYS = 14;
+        const SYNC_COUNT_KEYS = ['cases', 'reservedCases', 'cancelledCases', 'suspendedCases', 'archivedCases', 'favorableJudgments', 'againstJudgments', 'followUpCases', 'underFilingCases', 'underFilingAppeals'];
+
+        function syncUnionById(a, b) {
+            const out = (a || []).slice(), seen = new Set(out.map(syncRecId));
+            (b || []).forEach(r => { const id = syncRecId(r); if (!seen.has(id)) { seen.add(id); out.push(r); } });
+            return out;
+        }
+        function syncRiskReport(remote, merged, hasBase) {
+            let remoteTotal = 0, mergedTotal = 0, localOnly = 0;
+            SYNC_COUNT_KEYS.forEach(k => {
+                const rIds = new Set((remote[k] || []).map(syncRecId));
+                remoteTotal += rIds.size; mergedTotal += (merged[k] || []).length;
+                (merged[k] || []).forEach(r => { if (!rIds.has(syncRecId(r))) localOnly++; });
+            });
+            const netLoss = remoteTotal - mergedTotal;   // نقل قضية بين الأقسام لا يغيّر الإجمالي، فلا يُعدّ فقدانًا
+            if (remoteTotal > 0 && netLoss >= Math.max(5, Math.ceil(remoteTotal * 0.15))) {
+                return { risky: true, kind: 'loss', message:
+                    'تحذير حماية البيانات\n\nالمزامنة على وشك حذف ' + netLoss + ' سجلاً من السحابة (من أصل ' + remoteTotal + ').\n' +
+                    'هذا غير معتاد، وقد يعني أن بيانات هذا الجهاز ناقصة أو تالفة.\n\n' +
+                    '• إلغاء (موصى به): استعادة هذه السجلات من السحابة وعدم حذف شيء.\n' +
+                    '• موافق: تنفيذ الحذف فعلًا (فقط إن كنت أنت من حذفها عمدًا).' };
+            }
+            if (!hasBase && remoteTotal > 0 && localOnly >= 3) {
+                return { risky: true, kind: 'foreign', message:
+                    'تحذير حماية البيانات\n\nهذا الجهاز لم يتزامن مع السحابة من قبل، ويحتوي ' + localOnly + ' سجلاً غير موجودة فيها (قد تكون بيانات قديمة أو تجريبية).\n\n' +
+                    '• إلغاء (موصى به): تجاهل بيانات هذا الجهاز واستخدام بيانات السحابة.\n' +
+                    '• موافق: إضافة هذه السجلات إلى السحابة.' };
+            }
+            return { risky: false };
+        }
+
+        function bkOpen() {
+            return new Promise((resolve, reject) => {
+                if (typeof indexedDB === 'undefined') { reject(new Error('no indexedDB')); return; }
+                const r = indexedDB.open(BK_DB, 1);
+                r.onupgradeneeded = () => { r.result.createObjectStore(BK_STORE, { keyPath: 'id' }); };
+                r.onsuccess = () => resolve(r.result);
+                r.onerror = () => reject(r.error);
+            });
+        }
+        function bkTx(db, mode, fn) {
+            return new Promise((resolve, reject) => {
+                const tx = db.transaction(BK_STORE, mode), st = tx.objectStore(BK_STORE);
+                let result; try { result = fn(st); } catch (e) { reject(e); return; }
+                tx.oncomplete = () => resolve(result && result.result !== undefined ? result.result : result);
+                tx.onerror = () => reject(tx.error);
+            });
+        }
+        async function bkAll() {
+            const db = await bkOpen();
+            const list = await new Promise((resolve, reject) => { const q = db.transaction(BK_STORE, 'readonly').objectStore(BK_STORE).getAll(); q.onsuccess = () => resolve(q.result || []); q.onerror = () => reject(q.error); });
+            db.close();
+            return list.sort((a, b) => b.ts - a.ts);
+        }
+        function bkPick(state) {
+            const data = {};
+            SYNC_ARRAY_KEYS.concat(SYNC_STR_KEYS).forEach(k => { data[k] = JSON.parse(JSON.stringify((state ? state[k] : SYNC_ACCESS[k][0]()) || [])); });
+            return data;
+        }
+        function bkCounts(data) { const c = {}; SYNC_COUNT_KEYS.forEach(k => { c[k] = (data[k] || []).length; }); return c; }
+        // لقطة فورية (state = كائن بيانات السحابة أو null لبيانات هذا الجهاز الحالية)
+        function bkSnapshotNow(reason, state) {
+            const data = bkPick(state), counts = bkCounts(data);
+            const total = Object.values(counts).reduce((x, y) => x + y, 0);
+            if (!total) return Promise.resolve(false);
+            const ts = Date.now(), h = syncHash(data);
+            return (async () => {
+                try {
+                    const list = await bkAll();
+                    if (list[0] && list[0].h === h && ts - list[0].ts < 10 * 60 * 1000) return false;   // لقطة مطابقة حديثة
+                    const db = await bkOpen();
+                    await bkTx(db, 'readwrite', st => st.put({ id: ts + '-' + Math.random().toString(36).slice(2, 6), ts, reason, h, counts, data }));
+                    // الإبقاء على: أحدث N لقطة + لقطة لكل يوم لآخر X يوم
+                    const all = (await bkAll()), keep = new Set(all.slice(0, BK_KEEP_RECENT).map(x => x.id)), days = new Set();
+                    all.forEach(x => { const d = new Date(x.ts).toDateString(); if (!days.has(d) && Date.now() - x.ts < BK_KEEP_DAYS * 86400000) { days.add(d); keep.add(x.id); } });
+                    await bkTx(db, 'readwrite', st => { all.forEach(x => { if (!keep.has(x.id)) st.delete(x.id); }); });
+                    db.close();
+                    return true;
+                } catch (e) { console.warn('bkSnapshot failed', e); return false; }
+            })();
+        }
+        async function bkAutoSnapshot(reason, minAgeMs, state) {
+            try {
+                const list = await bkAll();
+                if (list[0] && Date.now() - list[0].ts < minAgeMs) return;
+            } catch (e) { return; }
+            return bkSnapshotNow(reason, state || null);
+        }
+
+        // ---------- واجهة النسخ الاحتياطية التلقائية ----------
+        async function bkRenderList() {
+            const box = document.getElementById('bk-list'); if (!box) return;
+            let list = [];
+            try { list = await bkAll(); } catch (e) { box.innerHTML = '<div style="color:#b91c1c;">تعذر الوصول إلى مخزن النسخ التلقائية في هذا المتصفح.</div>'; return; }
+            if (!list.length) { box.innerHTML = '<div style="color:#64748b;padding:8px;">لا توجد نسخ تلقائية بعد. تُنشأ تلقائيًا عند بدء التشغيل وقبل أي مزامنة غير معتادة.</div>'; return; }
+            box.innerHTML = list.map(x => {
+                const c = x.counts || {};
+                return `<div class="bk-item">
+                    <div><b>${new Date(x.ts).toLocaleString('ar-EG')}</b> <span class="bk-reason">${escapeCaseTypeHtml(x.reason)}</span>
+                    <div class="bk-counts">متداولة ${c.cases || 0} · محجوزة ${c.reservedCases || 0} · أحكام ${(c.favorableJudgments || 0) + (c.againstJudgments || 0)} · مشطوبة ${c.cancelledCases || 0} · موقوفة ${c.suspendedCases || 0} · أرشيف ${c.archivedCases || 0} · متابعة ${c.followUpCases || 0}</div></div>
+                    <div class="bk-btns"><button type="button" class="btn-success" data-bk="restore" data-id="${x.id}"><i class="fas fa-undo"></i> استعادة</button>
+                    <button type="button" class="btn-info" data-bk="download" data-id="${x.id}"><i class="fas fa-download"></i> تنزيل</button></div></div>`;
+            }).join('');
+        }
+        async function bkRestore(id) {
+            const list = await bkAll(), snap = list.find(x => x.id === id); if (!snap) return;
+            if (!confirm('استعادة نسخة ' + new Date(snap.ts).toLocaleString('ar-EG') + '؟\n\nستحل بياناتها محل البيانات الحالية على هذا الجهاز وفي السحابة. سنحفظ لك نسخة من البيانات الحالية أولًا.')) return;
+            await bkSnapshotNow('بيانات قبل الاستعادة من نسخة تلقائية', null);
+            applyImportedData(Object.assign({}, snap.data));
+            bkRenderList();
+        }
+        async function bkDownload(id) {
+            const list = await bkAll(), snap = list.find(x => x.id === id); if (!snap) return;
+            const blob = new Blob([JSON.stringify(Object.assign({}, snap.data, { exportDate: new Date(snap.ts).toISOString() }), null, 2)], { type: 'application/json' });
+            const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'نسخة_تلقائية_' + new Date(snap.ts).toISOString().slice(0, 16).replace(/[:T]/g, '-') + '.json';
+            document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 500);
+        }
+        document.addEventListener('click', ev => {
+            const b = ev.target && ev.target.closest ? ev.target.closest('[data-bk]') : null; if (!b) return;
+            if (b.dataset.bk === 'restore') bkRestore(b.dataset.id); else if (b.dataset.bk === 'download') bkDownload(b.dataset.id);
+            else if (b.dataset.bk === 'now') bkSnapshotNow('نسخة يدوية', null).then(() => { bkRenderList(); try { showAlert('تم حفظ نسخة احتياطية الآن', 'success'); } catch (e) { /* تجاهل */ } });
+        });
+
         let __syncBusy = false, __syncAgain = false, __syncConfirmTimer = null;
         async function syncNow() {
             if (__syncBusy) { __syncAgain = true; return false; }
@@ -6181,7 +6275,12 @@
                     const remote = await syncReadRemote();
                     const localEmpty = SYNC_ARRAY_KEYS.every(k => !(SYNC_ACCESS[k][0]() || []).length);
                     const baseAll = syncLsGet('syncBase', null);
-                    const hasBase = !!baseAll;
+                    let hasBase = !!baseAll;
+                    // جهاز فقد بياناته المحلية (مسح تخزين المتصفح مثلًا) مع بقاء «أساس المزامنة»: لا نعتبر ذلك حذفًا من المستخدم
+                    if (hasBase && localEmpty && !remote._empty) {
+                        hasBase = false;
+                        try { bkSnapshotNow('بيانات الجهاز كانت فارغة — أُعيد تحميلها من السحابة', remote); } catch (e) { /* تجاهل */ }
+                    }
                     // حالة جهاز جديد/فارغ: نأخذ ما على السيرفر كما هو
                     // حالة سيرفر فارغ تمامًا وبيانات محلية: نرفع المحلي
                     const localTS = Number(syncLsGet('syncLocalEditTS', 0)) || Number(localStorage.getItem('lastSavedAt') || 0);
@@ -6204,6 +6303,24 @@
                     });
                     syncDedupeStages(merged);
                     merged.notifications = merged.notifications.slice().sort((a, b) => String(b.timestamp || '').localeCompare(String(a.timestamp || '')) || String(b.id).localeCompare(String(a.id))).slice(0, 50);
+                    // ===== حماية من الحذف الجماعي ومن إغراق السحابة ببيانات جهاز غريب =====
+                    try {
+                        const allowFlag = syncLsGet('syncAllowMassChange', '');
+                        const risk = syncRiskReport(remote, merged, hasBase);
+                        if (risk.risky && !(allowFlag === 1 || allowFlag === '1')) {
+                            bkSnapshotNow('نسخة السحابة قبل مزامنة غير معتادة', remote);
+                            bkSnapshotNow('بيانات هذا الجهاز قبل مزامنة غير معتادة', null);
+                            if (!confirm(risk.message)) {
+                                if (risk.kind === 'foreign') {
+                                    SYNC_ARRAY_KEYS.concat(SYNC_STR_KEYS).forEach(k => { merged[k] = (remote[k] || []).slice(); });
+                                } else {
+                                    SYNC_ARRAY_KEYS.forEach(k => { merged[k] = syncUnionById(merged[k], remote[k]); });
+                                    SYNC_STR_KEYS.forEach(k => { merged[k] = Array.from(new Set((merged[k] || []).concat(remote[k] || []))); });
+                                }
+                                syncDedupeStages(merged);
+                            }
+                        }
+                    } catch (e) { console.warn('syncRiskReport', e); }
                     const mergedEmpty = SYNC_ARRAY_KEYS.every(k => !merged[k].length);
                     if (mergedEmpty && !remote._empty) throw new Error('refuse-empty-merge');   // حماية: لا نرفع حالة فارغة فوق بيانات موجودة
 
@@ -6217,6 +6334,7 @@
                     });
                     let newTS = remote._ts;
                     if (pushAny) {
+                        try { bkAutoSnapshot('نسخة السحابة قبل رفع تعديلات', 30 * 60 * 1000, remote); } catch (e) { /* تجاهل */ }
                         newTS = Math.max(Date.now(), remote._ts + 1);
                         toPush.lastSavedAt = newTS;
                         const resp = await fetch(`${FIREBASE_DB_BASE}/.json`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(toPush) });
@@ -6242,6 +6360,7 @@
                     syncMarkStampsFromMemory();
                     if (localChanged) { try { refreshAllViews(); } catch (e) { console.warn(e); } }
                     ok = true;
+                    try { localStorage.removeItem('syncAllowMassChange'); } catch (e) { /* تجاهل */ }
                     if (pushAny) { clearTimeout(__syncConfirmTimer); __syncConfirmTimer = setTimeout(() => { syncNow(); }, 4000); }
                     break;
                 }
@@ -6452,6 +6571,7 @@
             loadDataFromAPI = async function () {
                 const r = await origLoad.apply(this, arguments);
                 try { undoReset(); } catch (e) { console.warn('undoReset', e); }
+                try { bkAutoSnapshot('عند بدء التشغيل', 6 * 3600 * 1000, null); } catch (e) { /* تجاهل */ }
                 return r;
             };
         })();
@@ -10067,6 +10187,7 @@ let rollExcluded = [];          // [{department, item}] قضايا أُزيلت 
         // ========== دالة مشتركة لمعالجة استيراد الملفات ==========
         // تطبيق بيانات مستوردة (من ملف أو من نسخة احتياطية مؤرخة) واستبدال البيانات الحالية بها
         function applyImportedData(data) {
+            try { localStorage.setItem('syncAllowMassChange', '1'); } catch (e) { /* تجاهل: استيراد/استعادة صريحة من المستخدم */ }
             cases = data.cases || [];
             favorableJudgments = data.favorableJudgments || [];
             againstJudgments = data.againstJudgments || [];
@@ -10956,6 +11077,8 @@ let rollExcluded = [];          // [{department, item}] قضايا أُزيلت 
                 } else if (targetSection === 'previous-sessions') {
                     renderPreviousSessionsDepartments();
                     renderPreviousSessionsTable();
+                } else if (targetSection === 'data-management') {
+                    bkRenderList();
                 } else if (targetSection === 'under-filing') {
                     renderUnderFilingCasesTable();
                     renderUnderFilingAppealsTable();
