@@ -45,8 +45,18 @@ function writeConfig(cfg) {
 
 function getStorageFolder() {
     const cfg = readConfig();
-    if (cfg.storageFolder && fs.existsSync(cfg.storageFolder)) {
-        return cfg.storageFolder;
+    if (cfg.storageFolder) {
+        if (fs.existsSync(cfg.storageFolder)) return cfg.storageFolder;
+        // المجلد المختار غير موجود حاليًا (قرص خارجي غير موصول، أو تمت إعادة تسميته...).
+        // لا نستبدل المسار المحفوظ أبدًا (كان هذا يجعل المستندات "تختفي" لأن البرنامج
+        // يتحول لمجلد افتراضي فارغ ويحفظه بدل المجلد الحقيقي)؛ نحاول إنشاءه، وإلا نستخدم
+        // المجلد الافتراضي مؤقتًا دون تغيير الإعدادات.
+        try { fs.mkdirSync(cfg.storageFolder, { recursive: true }); return cfg.storageFolder; } catch (e) {
+            console.warn('تعذر الوصول لمجلد التخزين المختار، سيُستخدم مجلد مؤقت:', e.message);
+            const tmpDefault = path.join(app.getPath('documents'), DEFAULT_STORAGE_DIRNAME);
+            fs.mkdirSync(tmpDefault, { recursive: true });
+            return tmpDefault;
+        }
     }
     // مجلد افتراضي داخل "المستندات" الخاصة بالمستخدم أول مرة يتم تشغيل التطبيق
     const defaultFolder = path.join(app.getPath('documents'), DEFAULT_STORAGE_DIRNAME);
@@ -78,7 +88,7 @@ function getAppDataBackupFilePath() {
 const TRACKED_DATA_KEYS = [
     'cases', 'favorableJudgments', 'againstJudgments', 'reservedCases',
     'cancelledCases', 'suspendedCases', 'archivedCases', 'notifications', 'departments',
-    'underFilingCases', 'underFilingAppeals'
+    'underFilingCases', 'underFilingAppeals', 'followUpCases'
 ];
 
 function isCompletelyEmptyData(data) {
@@ -153,6 +163,9 @@ ipcMain.handle('saveData', async (event, data) => {
         fs.writeFileSync(tmpPath, JSON.stringify(data, null, 2), 'utf-8');
         fs.renameSync(tmpPath, p);
 
+        // نسخة احتياطية يومية مؤرخة (واحدة لكل يوم)، يُحتفظ بآخر 30 يومًا
+        try { writeDailyBackup(p); } catch (e) { console.warn('تعذر أخذ النسخة اليومية:', e.message); }
+
         return { success: true };
     } catch (e) {
         console.error('saveData error:', e);
@@ -160,20 +173,164 @@ ipcMain.handle('saveData', async (event, data) => {
     }
 });
 
-function readIndex() {
+
+// ---------------------------------------------------------------
+// نسخ احتياطية مؤرخة داخل مجلد backups بجانب بيانات البرنامج
+// ---------------------------------------------------------------
+const BACKUP_KEEP_DAYS = 30;
+const BACKUP_NAME_RE = /^app-data-(\d{4}-\d{2}-\d{2})(?:_\d{6})?(?:-[A-Za-z0-9_؀-ۿ]+)?\.json$/;
+
+// اسم مجلد النسخ الاحتياطية: «نسخة احتياطية» داخل نفس مجلد حفظ بيانات القضايا
+const BACKUPS_DIRNAME = 'نسخة احتياطية';
+function getBackupsFolder() {
+    const root = getStorageFolder();
+    const dir = path.join(root, BACKUPS_DIRNAME);
+    const legacy = path.join(root, 'backups');   // الاسم القديم: ننقل محتواه حتى لا تضيع النسخ السابقة
     try {
-        const p = getIndexFilePath();
-        if (fs.existsSync(p)) {
-            return JSON.parse(fs.readFileSync(p, 'utf-8'));
+        if (fs.existsSync(legacy) && fs.statSync(legacy).isDirectory()) {
+            if (!fs.existsSync(dir)) {
+                fs.renameSync(legacy, dir);
+            } else {
+                fs.readdirSync(legacy).forEach(name => {
+                    const from = path.join(legacy, name), to = path.join(dir, name);
+                    try { if (!fs.existsSync(to)) fs.renameSync(from, to); } catch (e) { /* تجاهل */ }
+                });
+                try { fs.rmdirSync(legacy); } catch (e) { /* يبقى إن لم يفرغ */ }
+            }
         }
+    } catch (e) { console.warn('تعذر نقل مجلد النسخ القديم:', e.message); }
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+    return dir;
+}
+
+function localDateStamp(d = new Date()) {
+    const z = n => String(n).padStart(2, '0');
+    return `${d.getFullYear()}-${z(d.getMonth() + 1)}-${z(d.getDate())}`;
+}
+
+function pruneOldBackups() {
+    const dir = getBackupsFolder();
+    const limit = Date.now() - BACKUP_KEEP_DAYS * 24 * 3600 * 1000;
+    fs.readdirSync(dir).forEach(name => {
+        if (!BACKUP_NAME_RE.test(name)) return;
+        try {
+            const full = path.join(dir, name);
+            if (fs.statSync(full).mtimeMs < limit) fs.unlinkSync(full);
+        } catch (e) { /* تجاهل */ }
+    });
+}
+
+// تُستدعى بعد كل حفظ ناجح؛ تُنشئ نسخة اليوم مرة واحدة فقط (أول حفظ في اليوم) ما لم تكن البيانات فاضية
+function writeDailyBackup(dataFilePath) {
+    const dir = getBackupsFolder();
+    const target = path.join(dir, `app-data-${localDateStamp()}.json`);
+    if (fs.existsSync(target)) return;
+    try {
+        const current = JSON.parse(fs.readFileSync(dataFilePath, 'utf-8'));
+        if (isCompletelyEmptyData(current)) return;
+    } catch (e) { return; }
+    fs.copyFileSync(dataFilePath, target);
+    pruneOldBackups();
+}
+
+ipcMain.handle('createBackup', async (event, { label } = {}) => {
+    try {
+        const p = getAppDataFilePath();
+        if (!fs.existsSync(p)) return { success: false, error: 'لا توجد بيانات محفوظة بعد' };
+        const safeLabel = String(label || 'manual').replace(/[^A-Za-z0-9_؀-ۿ]/g, '').slice(0, 20) || 'manual';
+        const now = new Date();
+        const z = n => String(n).padStart(2, '0');
+        const name = `app-data-${localDateStamp(now)}_${z(now.getHours())}${z(now.getMinutes())}${z(now.getSeconds())}-${safeLabel}.json`;
+        fs.copyFileSync(p, path.join(getBackupsFolder(), name));
+        return { success: true, name };
     } catch (e) {
-        console.warn('تعذرت قراءة فهرس المستندات:', e.message);
+        return { success: false, error: e.message };
     }
-    return {};
+});
+
+// نسخة احتياطية من بيانات تُرسَلها الواجهة (مثل نسخة السحابة قبل مزامنة غير معتادة)
+ipcMain.handle('createBackupFromData', async (event, { label, data } = {}) => {
+    try {
+        if (!data || typeof data !== 'object') return { success: false, error: 'بيانات غير صالحة' };
+        const clean = { ...data }; delete clean.forceEmpty;
+        if (isCompletelyEmptyData(clean)) return { success: false, error: 'البيانات فارغة' };
+        const safeLabel = String(label || 'تلقائي').replace(/[^A-Za-z0-9_؀-ۿ]/g, '').slice(0, 20) || 'تلقائي';
+        const now = new Date();
+        const z = n => String(n).padStart(2, '0');
+        const name = `app-data-${localDateStamp(now)}_${z(now.getHours())}${z(now.getMinutes())}${z(now.getSeconds())}-${safeLabel}.json`;
+        fs.writeFileSync(path.join(getBackupsFolder(), name), JSON.stringify(clean, null, 2), 'utf-8');
+        pruneOldBackups();
+        return { success: true, name };
+    } catch (e) {
+        return { success: false, error: e.message };
+    }
+});
+
+ipcMain.handle('listBackups', async () => {
+    try {
+        const dir = getBackupsFolder();
+        const files = fs.readdirSync(dir).filter(n => BACKUP_NAME_RE.test(n)).map(name => {
+            const st = fs.statSync(path.join(dir, name));
+            return { name, size: st.size, modifiedAt: st.mtimeMs };
+        }).sort((a, b) => b.modifiedAt - a.modifiedAt);
+        return { success: true, files, folder: dir };
+    } catch (e) {
+        return { success: false, files: [], error: e.message };
+    }
+});
+
+// يرجع محتوى النسخة (كائن البيانات) ليطبّقه الواجهة بعد تأكيد المستخدم
+ipcMain.handle('readBackup', async (event, { name } = {}) => {
+    try {
+        const safe = path.basename(String(name || ''));
+        if (!BACKUP_NAME_RE.test(safe)) return { success: false, error: 'اسم نسخة غير صالح' };
+        const full = path.join(getBackupsFolder(), safe);
+        if (!fs.existsSync(full)) return { success: false, error: 'النسخة غير موجودة' };
+        return { success: true, data: JSON.parse(fs.readFileSync(full, 'utf-8')) };
+    } catch (e) {
+        return { success: false, error: e.message };
+    }
+});
+
+ipcMain.handle('openBackupsFolder', async () => {
+    try { await shell.openPath(getBackupsFolder()); return { success: true }; }
+    catch (e) { return { success: false, error: e.message }; }
+});
+
+// قراءة JSON آمنة: لو الملف تالف نجرب النسخة الاحتياطية، ولو الاثنين تالفين
+// نحتفظ بالتالف باسم جديد (لا نكتب فوقه أبدًا) ونرجع كائنًا فارغًا.
+function readJsonSafe(p) {
+    const tryParse = (f) => { try { return JSON.parse(fs.readFileSync(f, 'utf-8')); } catch (e) { return undefined; } };
+    if (!fs.existsSync(p)) {
+        const b = tryParse(p + '.bak');
+        return b && typeof b === 'object' ? b : {};
+    }
+    const v = tryParse(p);
+    if (v && typeof v === 'object') return v;
+    const b = tryParse(p + '.bak');
+    try { fs.copyFileSync(p, p + '.corrupt-' + Date.now()); } catch (e) { /* تجاهل */ }
+    console.warn('ملف فهرس تالف، تم الرجوع للنسخة الاحتياطية:', p);
+    return b && typeof b === 'object' ? b : {};
+}
+
+// كتابة ذرّية: ملف مؤقت ثم استبدال، مع الاحتفاظ بنسخة .bak من آخر نسخة سليمة
+function writeJsonAtomic(p, data) {
+    const tmp = p + '.tmp';
+    fs.writeFileSync(tmp, JSON.stringify(data, null, 2), 'utf-8');
+    try {
+        if (fs.existsSync(p)) {
+            try { JSON.parse(fs.readFileSync(p, 'utf-8')); fs.copyFileSync(p, p + '.bak'); } catch (e) { /* الحالي تالف: لا نفسد النسخة الاحتياطية */ }
+        }
+    } catch (e) { /* تجاهل */ }
+    fs.renameSync(tmp, p);
+}
+
+function readIndex() {
+    return readJsonSafe(getIndexFilePath());
 }
 
 function writeIndex(indexData) {
-    fs.writeFileSync(getIndexFilePath(), JSON.stringify(indexData, null, 2), 'utf-8');
+    writeJsonAtomic(getIndexFilePath(), indexData);
 }
 
 function sanitizeName(name) {
@@ -196,19 +353,11 @@ function getCaseFoldersIndexPath() {
 }
 
 function readCaseFoldersIndex() {
-    try {
-        const p = getCaseFoldersIndexPath();
-        if (fs.existsSync(p)) {
-            return JSON.parse(fs.readFileSync(p, 'utf-8'));
-        }
-    } catch (e) {
-        console.warn('تعذرت قراءة فهرس مجلدات القضايا:', e.message);
-    }
-    return {};
+    return readJsonSafe(getCaseFoldersIndexPath());
 }
 
 function writeCaseFoldersIndex(data) {
-    fs.writeFileSync(getCaseFoldersIndexPath(), JSON.stringify(data, null, 2), 'utf-8');
+    writeJsonAtomic(getCaseFoldersIndexPath(), data);
 }
 
 function buildCaseFolderName(caseData, caseId) {
@@ -257,8 +406,19 @@ function normalizeForFolderMatch(s) {
 // اسم المدعي + المدعي عليه (وهو الأسلوب الثابت اللي المستخدم بيسمي بيه
 // كل مجلداته)، ولو مالقتش، بتدور على رقم وسنة الدعوى في أي ترتيب داخل
 // اسم المجلد (قبل أو بعد بعض).
-function findExistingFolderForCase(storageFolder, caseData, excludeFolderName) {
+// استخراج رقم وسنة الدعوى من اسم مجلد بصيغة "..._رقم_سنة" (إن وُجدا)
+function parseNumberYearFromFolderName(name) {
+    const tokens = String(name).split(/[_\-\s]+/);
+    for (let i = tokens.length - 1; i >= 1; i--) {
+        if (/^\d{4}$/.test(tokens[i]) && /^\d+$/.test(tokens[i - 1])) return { number: tokens[i - 1], year: tokens[i] };
+    }
+    return null;
+}
+
+function findExistingFolderForCase(storageFolder, caseData, excludeFolder) {
     if (!caseData) return null;
+    // excludeFolder: اسم مجلد واحد أو مجموعة (Set) من المجلدات المستبعدة
+    const excluded = excludeFolder instanceof Set ? excludeFolder : new Set(excludeFolder ? [excludeFolder] : []);
 
     let entries = [];
     try {
@@ -277,8 +437,14 @@ function findExistingFolderForCase(storageFolder, caseData, excludeFolderName) {
     if (plaintiff && defendant) {
         const prefix = `${plaintiff}_${defendant}`;
         for (const e of entries) {
-            if (excludeFolderName && e.name === excludeFolderName) continue;
-            if (e.name.indexOf(prefix) === 0) return e.name;
+            if (excluded.has(e.name)) continue;
+            if (e.name.indexOf(prefix) === 0) {
+                // قضايا كثيرة بنفس الخصمين لكن بأرقام مختلفة: لا نعتبر مجلد قضية أخرى
+                // (رقمها/سنتها مختلفان) مجلدًا لهذه القضية
+                const ny = parseNumberYearFromFolderName(e.name);
+                if (ny && number && year && !(numbersMatch(ny.number, number) && numbersMatch(ny.year, year))) continue;
+                return e.name;
+            }
         }
     }
 
@@ -290,7 +456,7 @@ function findExistingFolderForCase(storageFolder, caseData, excludeFolderName) {
     // بس لمجرد تطابق الرقم والسنة، من غير أي تحقق من هوية الأطراف.
     if (number && year && (plaintiff || defendant)) {
         for (const e of entries) {
-            if (excludeFolderName && e.name === excludeFolderName) continue;
+            if (excluded.has(e.name)) continue;
 
             const tokens = e.name.split(/[_\-\s]+/);
             let numberYearMatches = false;
@@ -436,7 +602,25 @@ function getCaseFolderPath(caseId, caseData) {
         // خاص بنفس القضية دي، غير المجلد المربوط حاليًا. لو لقينا واحد، ده
         // معناه إن الربط الحالي (لو موجود) كان غلط من محاولة قديمة، فبننقل
         // أي ملفات كانت اتحفظت فيه للمجلد الصحيح، ونصحح الربط.
-        const realFolder = findExistingFolderForCase(baseDir, caseData, folderName);
+        // مهم: لو القضية مربوطة بمجلد موجود فعلاً على القرص ولا تشاركه قضية أخرى، نثق فيه
+        // ولا نبحث عن "مجلد أفضل" (كان البحث بالبادئة ينقل ملفات القضية لمجلد قضية
+        // أخرى بنفس الخصمين). نبحث فقط عند عدم وجود ربط سليم، ونستبعد مجلدات القضايا الأخرى.
+        const mappedRel = isUnderFiling ? path.join('تحت الرفع', folderName || '') : (folderName || '');
+        const mappedOnDisk = !!folderName && fs.existsSync(path.join(baseDir, folderName));
+        const sharedWithOthers = !!folderName && Object.keys(mapping).some(id => id !== caseId && mapping[id] === mappedRel);
+        let realFolder = null;
+        if (!mappedOnDisk || sharedWithOthers) {
+            const claimedByOthers = new Set();
+            Object.keys(mapping).forEach(id => {
+                if (id === caseId) return;
+                const rel = mapping[id];
+                if (isUnderFiling) {
+                    if (rel && rel.indexOf(UNDER_FILING_PREFIX) === 0) claimedByOthers.add(rel.slice(UNDER_FILING_PREFIX.length));
+                } else if (rel && rel.indexOf(UNDER_FILING_PREFIX) !== 0) claimedByOthers.add(rel);
+            });
+            if (folderName) claimedByOthers.add(folderName); // لا ندمج المجلد في نفسه
+            realFolder = findExistingFolderForCase(baseDir, caseData, claimedByOthers);
+        }
 
         if (realFolder && realFolder !== folderName) {
             if (folderName) {
@@ -474,16 +658,25 @@ function getCaseFolderPath(caseId, caseData) {
                 if (desiredName && desiredName !== folderName) {
                     const oldPath = path.join(baseDir, folderName);
                     const newPath = path.join(baseDir, desiredName);
+                    let renamedOk = false;
                     try {
-                        if (fs.existsSync(oldPath) && !fs.existsSync(newPath)) {
+                        if (!fs.existsSync(oldPath)) {
+                            renamedOk = true; // لا يوجد مجلد قديم فعلي، نكمل بالاسم الجديد
+                        } else if (!fs.existsSync(newPath)) {
                             fs.renameSync(oldPath, newPath);
+                            renamedOk = true;
                         }
                     } catch (e) {
                         console.warn('تعذر إعادة تسمية مجلد القضية:', e.message);
                     }
-                    folderName = desiredName;
-                    mapping[caseId] = isUnderFiling ? path.join('تحت الرفع', folderName) : folderName;
-                    writeCaseFoldersIndex(mapping);
+                    // لا نغير الربط إلا لو تمت إعادة التسمية فعلاً؛ وإلا (الاسم الجديد
+                    // مستخدم لمجلد آخر مثلاً) نبقى على المجلد الحالي بملفاته بدل أن
+                    // "نضيّع" المستندات بتحويل الربط لمجلد فارغ/لقضية أخرى
+                    if (renamedOk) {
+                        folderName = desiredName;
+                        mapping[caseId] = isUnderFiling ? path.join('تحت الرفع', folderName) : folderName;
+                        writeCaseFoldersIndex(mapping);
+                    }
                 }
             }
         }
@@ -887,10 +1080,110 @@ ipcMain.handle('saveFile', async (event, { caseId, filename, dataBase64, docType
     }
 });
 
+// ---------------------------------------------------------------
+// مزامنة فهرس المستندات مع القرص (الإصلاح الجذري لاختفاء المستندات):
+// الملفات الحقيقية هي المرجع. أي ملف موجود في مجلد القضية على القرص وغير مسجل في
+// الفهرس يُسجَّل تلقائيًا، وأي ملف مسجل ولكنه تحرك لمجلد آخر يُعاد لمكانه.
+// ---------------------------------------------------------------
+function listSubDirs(dir) {
+    try { return fs.readdirSync(dir, { withFileTypes: true }).filter(e => e.isDirectory()).map(e => e.name); } catch (e) { return []; }
+}
+
+function reconcileCaseFiles(caseId) {
+    const root = getStorageFolder();
+    const mapping = readCaseFoldersIndex();
+    const index = readIndex();
+    const list = index[caseId] || [];
+    let changed = false;
+    let mappingChanged = false;
+
+    let rel = mapping[caseId];
+
+    // لو الربط (caseId -> مجلد) ضاع، نحاول استرجاعه من بيانات القضية المحفوظة مع مستنداتها
+    if (!rel || !fs.existsSync(path.join(root, rel))) {
+        const cd = list.map(e => e && e.caseData).find(Boolean);
+        if (cd) {
+            const isUF = !!cd.underFiling;
+            const baseDir = isUF ? path.join(root, 'تحت الرفع') : root;
+            const claimed = new Set();
+            Object.keys(mapping).forEach(id => {
+                if (id === caseId) return;
+                const r = mapping[id];
+                if (!r) return;
+                if (isUF) { if (r.indexOf(UNDER_FILING_PREFIX) === 0) claimed.add(r.slice(UNDER_FILING_PREFIX.length)); }
+                else if (r.indexOf(UNDER_FILING_PREFIX) !== 0) claimed.add(r);
+            });
+            if (fs.existsSync(baseDir)) {
+                const found = findExistingFolderForCase(baseDir, cd, claimed);
+                if (found) {
+                    rel = isUF ? path.join('تحت الرفع', found) : found;
+                    mapping[caseId] = rel;
+                    mappingChanged = true;
+                }
+            }
+        }
+    }
+    if (!rel) return { list, changed: false };
+    const folderPath = path.join(root, rel);
+    if (!fs.existsSync(folderPath)) return { list, changed: false };
+
+    let diskFiles = [];
+    try {
+        diskFiles = fs.readdirSync(folderPath, { withFileTypes: true })
+            .filter(f => f.isFile() && isImportableDocument(f.name)).map(f => f.name);
+    } catch (e) { return { list, changed: false }; }
+    const diskSet = new Set(diskFiles);
+
+    // 1) ملفات مسجلة لكنها غير موجودة في المجلد: ندور عليها في مجلدات أخرى ونعيدها
+    const missing = list.filter(e => e && e.storedFileName && !diskSet.has(e.storedFileName));
+    if (missing.length) {
+        const searchDirs = [];
+        listSubDirs(root).forEach(n => { if (n !== 'تحت الرفع') searchDirs.push(path.join(root, n)); });
+        listSubDirs(path.join(root, 'تحت الرفع')).forEach(n => searchDirs.push(path.join(root, 'تحت الرفع', n)));
+        const ownedElsewhere = new Set(); // مجلدات تخص قضايا أخرى: لا نأخذ منها شيئًا
+        Object.keys(mapping).forEach(id => { if (id !== caseId && mapping[id] !== rel) ownedElsewhere.add(path.join(root, mapping[id])); });
+        for (const e of missing) {
+            for (const d of searchDirs) {
+                if (d === folderPath || ownedElsewhere.has(d)) continue;
+                const cand = path.join(d, e.storedFileName);
+                if (fs.existsSync(cand) && !fs.existsSync(path.join(folderPath, e.storedFileName))) {
+                    try { fs.renameSync(cand, path.join(folderPath, e.storedFileName)); diskSet.add(e.storedFileName); diskFiles.push(e.storedFileName); break; } catch (err) { /* جرب غيره */ }
+                }
+            }
+        }
+    }
+
+    // 2) ملفات على القرص وغير مسجلة: نسجلها (فقط لو المجلد خاص بهذه القضية وحدها)
+    const sharers = Object.keys(mapping).filter(id => id !== caseId && mapping[id] === rel);
+    if (sharers.length === 0) {
+        const known = new Set(list.map(e => e && e.storedFileName));
+        for (const name of diskFiles) {
+            if (known.has(name)) continue;
+            let mtime = Date.now();
+            try { mtime = fs.statSync(path.join(folderPath, name)).mtimeMs; } catch (e) { /* تجاهل */ }
+            list.push({
+                id: `${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+                originalName: name,
+                storedFileName: name,
+                type: 'مستند مستورد',
+                uploadedAt: mtime,
+                caseData: null
+            });
+            changed = true;
+        }
+    }
+
+    if (changed) { index[caseId] = list; writeIndex(index); }
+    if (mappingChanged) writeCaseFoldersIndex(mapping);
+    return { list, changed };
+}
+
 ipcMain.handle('listFiles', async (event, { caseId }) => {
     try {
-        const index = readIndex();
-        const files = (index[caseId] || [])
+        let list;
+        try { list = reconcileCaseFiles(caseId).list; }
+        catch (e) { console.warn('تعذرت مزامنة مستندات القضية مع القرص:', e.message); list = readIndex()[caseId] || []; }
+        const files = list
             .map(f => ({ id: f.id, originalName: f.originalName, type: f.type, uploadedAt: f.uploadedAt }))
             .sort((a, b) => (a.uploadedAt || 0) - (b.uploadedAt || 0));
         return { success: true, files };
@@ -1224,7 +1517,11 @@ const NON_DOCUMENT_FILENAMES = new Set([
 ]);
 
 function isImportableDocument(filename) {
-    return !NON_DOCUMENT_FILENAMES.has(String(filename).toLowerCase());
+    const n = String(filename).toLowerCase();
+    if (NON_DOCUMENT_FILENAMES.has(n)) return false;
+    if (n.indexOf('~$') === 0) return false;                         // ملفات قفل Word المؤقتة
+    if (/^(documents-index|case-folders-index)\.json\.(bak|tmp|corrupt-\d+)$/.test(n)) return false;
+    return true;
 }
 
 // مسح مجلد التخزين واستيراد المستندات الموجودة بالفعل (اللي كانت
@@ -1236,11 +1533,22 @@ function isImportableDocument(filename) {
 ipcMain.handle('scanStorageFolders', async () => {
     try {
         const storageFolder = getStorageFolder();
+        const INTERNAL_DIRS = new Set(['تحت الرفع', 'backups', typeof BACKUPS_DIRNAME === 'string' ? BACKUPS_DIRNAME : 'backups']);
         const entries = fs.readdirSync(storageFolder, { withFileTypes: true })
-            .filter(e => e.isDirectory());
+            .filter(e => e.isDirectory() && !INTERNAL_DIRS.has(e.name));
+        // مجلدات قسم "تحت الرفع" (قضايا واستئنافات) كانت تُتجاهل كليًا في المسح، فلا تُطابَق أبدًا
+        const ufEntries = [];
+        try {
+            const ufBase = path.join(storageFolder, 'تحت الرفع');
+            if (fs.existsSync(ufBase)) {
+                fs.readdirSync(ufBase, { withFileTypes: true }).filter(e => e.isDirectory())
+                    .forEach(e => ufEntries.push({ name: e.name, rel: path.join('تحت الرفع', e.name), underFiling: true }));
+            }
+        } catch (e) { /* تجاهل */ }
+        const allEntries = entries.map(e => ({ name: e.name, rel: e.name, underFiling: false })).concat(ufEntries);
 
-        const folders = entries.map(dirEntry => {
-            const folderName = dirEntry.name;
+        const folders = allEntries.map(dirEntry => {
+            const folderName = dirEntry.rel;
             const folderPath = path.join(storageFolder, folderName);
             let files = [];
             try {
@@ -1260,13 +1568,13 @@ ipcMain.handle('scanStorageFolders', async () => {
             // محاولة استخراج "رقم_سنة" من أول التسمية
             let number = '';
             let year = '';
-            const m = folderName.match(/^(\d+)[_\-\s]+(\d{4})(?:[_\-\s]|$)/);
+            const m = dirEntry.underFiling ? null : folderName.match(/^(\d+)[_\-\s]+(\d{4})(?:[_\-\s]|$)/);
             if (m) {
                 number = m[1];
                 year = m[2];
             }
 
-            return { folderName, number, year, files };
+            return { folderName, number, year, files, underFiling: dirEntry.underFiling, displayName: dirEntry.name };
         });
 
         return { success: true, folders };
@@ -1291,7 +1599,11 @@ ipcMain.handle('importCaseFolder', async (event, { caseId, folderName }) => {
         }
 
         const mapping = readCaseFoldersIndex();
-        const existingFolderName = mapping[caseId];
+        let existingFolderName = mapping[caseId];
+        // ربط قديم لمجلد لم يعد موجودًا على القرص: نتجاهله ونربط القضية بالمجلد الحالي
+        if (existingFolderName && !fs.existsSync(path.join(storageFolder, existingFolderName))) {
+            existingFolderName = undefined;
+        }
 
         // لو القضية دي أصلاً ليها مجلد مخصص ومختلف عن المجلد اللي بنستورده،
         // منستبدلوش خالص (وإلا هنفقد إمكانية الوصول للمستندات القديمة اللي
@@ -1302,7 +1614,7 @@ ipcMain.handle('importCaseFolder', async (event, { caseId, folderName }) => {
         if (existingFolderName && existingFolderName !== folderName) {
             mergeFolderInto(storageFolder, folderName, existingFolderName, caseId);
             effectiveFolderName = existingFolderName;
-        } else if (!existingFolderName) {
+        } else if (!existingFolderName || mapping[caseId] !== folderName) {
             // القضية معهاش مجلد متسجل قبل كده؛ اربطها بالمجلد ده بشكل دائم
             // عشان أي مستند جديد يتضاف بعد كده يروح لنفس المجلد ده بالظبط
             mapping[caseId] = folderName;
