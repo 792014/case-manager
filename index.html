@@ -123,17 +123,13 @@
         })();
     </script>
     <script src="vendor/chart.umd.min.js"></script>
-    <script>window.Chart || document.write('<script src="chart.umd.min.js"><\/script>');</script>
     <script>window.Chart || document.write('<script src="https://cdn.jsdelivr.net/npm/chart.js"><\/script>');</script>
     <!-- مكتبتان محليتان لتصدير تقرير لوحة التحكم إلى PDF مباشرة (بديل المتصفح عند تعذّر تصدير Electron) -->
     <script src="vendor/jspdf.umd.min.js"></script>
-    <script>window.jspdf || document.write('<script src="jspdf.umd.min.js"><\/script>');</script>
     <script>window.jspdf || document.write('<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js"><\/script>');</script>
     <script src="vendor/html2canvas.min.js"></script>
-    <script>window.html2canvas || document.write('<script src="html2canvas.min.js"><\/script>');</script>
     <script>window.html2canvas || document.write('<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"><\/script>');</script>
     <script src="vendor/jszip.min.js"></script>
-    <script>window.JSZip || document.write('<script src="jszip.min.js"><\/script>');</script>
     <script>window.JSZip || document.write('<script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"><\/script>');</script>
     <!-- Mammoth removed: offline behavior uses system apps to open files natively -->
     
@@ -1936,20 +1932,6 @@
             .letters-preview-frame { min-height: 0 !important; max-height: none !important; overflow: visible !important; padding: 0 !important; border: 0 !important; background: #fff !important; }
             .docx-wrapper { padding: 0 !important; background: #fff !important; }
             .docx { margin: 0 auto !important; box-shadow: none !important; page-break-after: always; }
-        }
-        @media (max-width: 700px) {
-            .letters-modal-content { width: 100vw !important; max-width: 100vw !important; max-height: 100vh !important; border-radius: 0 !important; padding-bottom: 190px !important; box-sizing: border-box; }
-            .letters-preview-frame { padding: 4px !important; max-height: none !important; overflow-x: hidden !important; }
-            .letters-preview-frame .docx-wrapper { padding: 0 !important; background: #e9edf2 !important; align-items: flex-start !important; }
-            .letters-preview-frame .docx-wrapper > section.docx { margin-bottom: 8px !important; }
-            #letters-modal section .letters-actions { gap: 8px; }
-            #letters-modal section .letters-actions button { flex: 1 1 46% !important; min-height: 44px; }
-            .hafza-doc-row { grid-template-columns: 28px 1fr 56px 34px !important; }
-            .hafza-doc-row .hafza-no { grid-column: 1; grid-row: 1; }
-            .hafza-doc-row .hafza-kind { grid-column: 2; grid-row: 1; }
-            .hafza-doc-row .hafza-count { grid-column: 3; grid-row: 1; }
-            .hafza-doc-row button { grid-column: 4; grid-row: 1; }
-            .hafza-doc-row .hafza-text { grid-column: 1 / -1; grid-row: 2; }
         }
         @media (max-width: 700px) { .letters-fields { grid-template-columns: 1fr; } .letters-actions .btn-primary, .letters-actions .btn-secondary { flex: 1 1 auto; } }
         
@@ -4622,18 +4604,10 @@
                 <div class="letters-actions">
                     <button type="button" id="letters-open-word" class="btn-primary"><i class="fas fa-file-word"></i> فتح في Word للتعديل</button>
                     <button type="button" id="letters-refresh-preview" class="btn-info"><i class="fas fa-rotate"></i> تحديث المعاينة بعد التعديل</button>
-                    <button type="button" id="letters-export-pdf" class="btn-danger"><i class="fas fa-file-pdf"></i> تحويل إلى PDF</button>
                     <button type="button" id="letters-print" class="btn-secondary"><i class="fas fa-print"></i> طباعة المعاينة</button>
                     <button type="button" id="letters-save-to-device" class="btn-success"><i class="fas fa-download"></i> حفظ الخطاب على الجهاز</button>
+                    <button type="button" id="letters-save-pdf" class="btn-danger"><i class="fas fa-file-pdf"></i> حفظ PDF</button>
                     <button type="button" id="letters-preview-back" class="btn-secondary"><i class="fas fa-arrow-right"></i> العودة للنماذج</button>
-                </div>
-                <div id="letters-pdf-result" class="letters-note" hidden style="background:#e8f7ee;color:#14532d;">
-                    <b><i class="fas fa-circle-check"></i> ملف PDF جاهز (بالأرقام العربية وبنفس تنسيق النموذج)</b>
-                    <div class="letters-actions" style="margin-top:8px;">
-                        <button type="button" id="letters-pdf-share" class="btn-primary" hidden><i class="fas fa-share-nodes"></i> مشاركة / حفظ في الهاتف</button>
-                        <button type="button" id="letters-pdf-download" class="btn-success"><i class="fas fa-download"></i> تنزيل PDF</button>
-                        <button type="button" id="letters-pdf-open" class="btn-secondary"><i class="fas fa-up-right-from-square"></i> فتح PDF</button>
-                    </div>
                 </div>
                 <p class="letters-note">بعد التعديل في Word احفظه هناك (Ctrl+S) ثم حدّث المعاينة. زر «حفظ الخطاب على الجهاز» هو الحفظ الوحيد، ويحفظ آخر نسخة معدّلة. على الموبايل/المتصفح يُنزَّل الملف ليُفتح في Word.</p>
             </section>
@@ -5592,8 +5566,6 @@
     </div>
 
     <script src="vendor/docx-preview.min.js"></script>
-    <script>window.docx || document.write('<script src="docx-preview.min.js"><\/script>');</script>
-    <script>window.docx || document.write('<script src="https://cdn.jsdelivr.net/npm/docx-preview@0.3.3/dist/docx-preview.min.js"><\/script>');</script>
     <script>
         // ==================== إعدادات المزامنة عبر Firebase ====================
         // بيانات القضايا بتتخزن في جذر قاعدة بيانات Firebase Realtime Database مباشرة
@@ -14232,323 +14204,28 @@ function updateStats() {
             return bytes.buffer;
         }
 
+
+        // العلامة المائية في ترويسة النماذج (شعار كبير خلف النص) تُعرض في Word بتأثير «باهت» (washout)،
+        // بينما يرسمها محرك المعاينة بألوانها الكاملة فتغطي النص؛ نخففها لتطابق شكلها في Word.
+        function letterFixWatermarks(root) {
+            if (!root) return;
+            root.querySelectorAll('header svg, footer svg').forEach(svg => {
+                const z = /z-index:\s*(-\d+)/.exec(svg.getAttribute('style') || '');
+                if (z && Number(z[1]) < 0 && svg.querySelector('image')) {
+                    svg.style.opacity = '0.16';
+                    svg.style.filter = 'grayscale(0.25)';
+                }
+            });
+        }
         async function displayLetterPreview(base64) {
             const container = document.getElementById('letter-preview-document');
             container.replaceChildren();
+            try { await letterEnsureLibs(['jszip', 'docx']); } catch (e) { /* تُعرض الرسالة أدناه */ }
             if (!window.docx || typeof window.docx.renderAsync !== 'function') {
                 throw new Error('مكتبة معاينة Word غير متاحة محليًا. يمكن فتح الملف في Word بدلًا من ذلك.');
             }
-            const prep = await letterPrepareDocx(base64);
-            await window.docx.renderAsync(letterPreviewBytes(prep.base64), container, null, { breakPages: true, renderHeaders: true, renderFooters: true });
-            await letterPlaceOverlays(container, prep.overlays);
-            await letterApplyWatermark(container, base64);
-            letterFitPreview();
-        }
-
-        // ---------- الهاتف: تصغير صفحات المعاينة لتناسب عرض الشاشة ----------
-        function letterFitPreview() {
-            const frame = document.querySelector('.letters-preview-frame');
-            const wrap = document.querySelector('#letter-preview-document .docx-wrapper');
-            if (!frame || !wrap) return;
-            wrap.style.zoom = '';
-            const avail = frame.clientWidth - 16;
-            const need = wrap.scrollWidth;
-            if (avail > 0 && need > avail) wrap.style.zoom = String(Math.max(0.25, avail / need));
-        }
-        window.addEventListener('resize', () => { try { letterFitPreview(); } catch (e) {} });
-
-        // ====================================================================
-        // تحسين عرض نماذج Word في المعاينة والـPDF (مكتبة المعاينة لا ترسم الأشكال النصية العائمة ولا علامة الترويسة المائية)
-        // 1) صندوق بيانات القضية / الشعار / بيانات الجهة أعلى الخطاب: تُستخرج الأشكال العائمة وتُرسم في مواضعها
-        // 2) الشعار المائي خلف النص (من ترويسة النموذج)
-        // ====================================================================
-        const LNS = {
-            W: 'http://schemas.openxmlformats.org/wordprocessingml/2006/main',
-            WP: 'http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing',
-            A: 'http://schemas.openxmlformats.org/drawingml/2006/main',
-            MC: 'http://schemas.openxmlformats.org/markup-compatibility/2006',
-            R: 'http://schemas.openxmlformats.org/officeDocument/2006/relationships'
-        };
-        function letterAncestor(node, ns, name) {
-            for (let n = node.parentNode; n; n = n.parentNode) if (n.localName === name && n.namespaceURI === ns) return n;
-            return null;
-        }
-        function letterTwips(emu) { return Math.max(0, Math.round(emu / 635)); }
-
-        async function letterPrepareDocx(base64) {
-            const out = { base64, overlays: [] };
-            try {
-                const zip = await JSZip.loadAsync(letterPreviewBytes(base64));
-                const file = zip.file('word/document.xml');
-                if (!file) return out;
-                const xml = await file.async('string');
-                const doc = new DOMParser().parseFromString(xml, 'application/xml');
-                if (doc.getElementsByTagName('parsererror').length) return out;
-                const rootStart = (xml.match(/<w:document\b[^>]*>/) || [''])[0];
-                const header = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' + rootStart;
-                const ser = new XMLSerializer();
-                let counter = 0, changed = false;
-                const paras = Array.from(doc.getElementsByTagNameNS(LNS.W, 'p')).filter(p => !letterInTextBox(p));
-                // فقرات فارغة: تُعطى مسافة غير قابلة للكسر حتى لا يطويها العارض (كما يفعل Word)
-                paras.forEach(p => {
-                    if (letterAncestor(p, LNS.W, 'tbl') == null) return;
-                    if (Array.from(p.childNodes).some(c => c.localName === 'r' || c.localName === 'hyperlink')) return;
-                    const ppr = Array.from(p.childNodes).find(c => c.localName === 'pPr');
-                    const mark = ppr && Array.from(ppr.childNodes).find(c => c.localName === 'rPr');
-                    const r = doc.createElementNS(LNS.W, 'w:r');
-                    if (mark) r.appendChild(mark.cloneNode(true));
-                    const t = doc.createElementNS(LNS.W, 'w:t');
-                    t.textContent = '\u00a0';
-                    r.appendChild(t); p.appendChild(r); changed = true;
-                });
-                Array.from(doc.getElementsByTagNameNS(LNS.W, 'trHeight')).forEach(h => {
-                    if (parseInt(h.getAttributeNS(LNS.W, 'val'), 10) > 11000) { h.parentNode.removeChild(h); changed = true; }
-                });
-                for (const p of paras) {
-                    const boxes = [];
-                    Array.from(p.getElementsByTagNameNS(LNS.WP, 'anchor')).forEach(an => {
-                        if (letterAncestor(an, LNS.MC, 'Fallback')) return;
-                        if (letterAncestor(an, LNS.W, 'p') !== p) return;
-                        if (an.getAttribute('behindDoc') === '1') return;
-                        const kid = n => Array.from(an.childNodes).find(c => c.localName === n && c.namespaceURI === LNS.WP);
-                        const ph = kid('positionH'), pv = kid('positionV'), ex = kid('extent');
-                        if (!ph || !pv || !ex) return;
-                        const offH = Array.from(ph.childNodes).find(c => c.localName === 'posOffset');
-                        const offV = Array.from(pv.childNodes).find(c => c.localName === 'posOffset');
-                        if (!offH || !offV) return;
-                        const tx = an.getElementsByTagNameNS(LNS.W, 'txbxContent')[0] || null;
-                        const blip = !tx ? an.getElementsByTagNameNS(LNS.A, 'blip')[0] : null;
-                        if (!tx && !blip) return;
-                        const bodyPr = Array.from(an.getElementsByTagName('*')).find(e => e.localName === 'bodyPr');
-                        const ins = n => { const v = bodyPr && bodyPr.getAttribute(n); return v == null || v === '' ? null : parseInt(v, 10); };
-                        boxes.push({
-                            an, tx, blip, run: letterAncestor(an, LNS.W, 'r'),
-                            x: parseInt(offH.textContent, 10) || 0, y: parseInt(offV.textContent, 10) || 0,
-                            cx: parseInt(ex.getAttribute('cx'), 10) || 0, cy: parseInt(ex.getAttribute('cy'), 10) || 0,
-                            relH: ph.getAttribute('relativeFrom'), relV: pv.getAttribute('relativeFrom'),
-                            anchorV: bodyPr ? (bodyPr.getAttribute('anchor') || 't') : 't',
-                            l: ins('lIns') == null ? 91440 : ins('lIns'), t: ins('tIns') == null ? 45720 : ins('tIns'),
-                            r: ins('rIns') == null ? 91440 : ins('rIns'), b: ins('bIns') == null ? 45720 : ins('bIns')
-                        });
-                    });
-                    if (!boxes.some(b => b.tx)) continue;
-                    boxes.sort((a, b) => a.x - b.x);
-                    const minX = boxes[0].x, minY = Math.min(...boxes.map(b => b.y));
-                    const maxR = Math.max(...boxes.map(b => b.x + b.cx)), maxB = Math.max(...boxes.map(b => b.y - minY + b.cy));
-                    let cursor = minX, cells = '', grid = '';
-                    boxes.forEach(b => {
-                        if (b.x > cursor) { const gw = letterTwips(b.x - cursor); grid += '<w:gridCol w:w="' + gw + '"/>'; cells += '<w:tc><w:tcPr><w:tcW w:w="' + gw + '" w:type="dxa"/></w:tcPr><w:p><w:pPr><w:spacing w:before="0" w:after="0"/></w:pPr></w:p></w:tc>'; cursor = b.x; }
-                        const w = letterTwips(b.cx); cursor = b.x + b.cx;
-                        grid += '<w:gridCol w:w="' + w + '"/>';
-                        let inner;
-                        if (b.tx) inner = Array.from(b.tx.childNodes).filter(n => n.nodeType === 1).map(n => ser.serializeToString(n)).join('');
-                        else {
-                            const g = b.an.getElementsByTagNameNS(LNS.A, 'graphic')[0];
-                            inner = '<w:p><w:pPr><w:spacing w:before="0" w:after="0"/><w:jc w:val="center"/></w:pPr><w:r><w:drawing><wp:inline distT="0" distB="0" distL="0" distR="0"><wp:extent cx="' + b.cx + '" cy="' + b.cy + '"/><wp:docPr id="' + (9000 + counter) + '" name="img"/>' + ser.serializeToString(g) + '</wp:inline></w:drawing></w:r></w:p>';
-                        }
-                        const va = b.anchorV === 'ctr' ? 'center' : (b.anchorV === 'b' ? 'bottom' : 'top');
-                        const mar = b.tx ? '<w:tcMar><w:top w:w="' + (letterTwips(b.t) + letterTwips(b.y - minY)) + '" w:type="dxa"/><w:left w:w="' + letterTwips(b.l) + '" w:type="dxa"/><w:bottom w:w="' + letterTwips(b.b) + '" w:type="dxa"/><w:right w:w="' + letterTwips(b.r) + '" w:type="dxa"/></w:tcMar>'
-                            : '<w:tcMar><w:top w:w="' + letterTwips(b.y - minY) + '" w:type="dxa"/><w:left w:w="0" w:type="dxa"/><w:bottom w:w="0" w:type="dxa"/><w:right w:w="0" w:type="dxa"/></w:tcMar>';
-                        cells += '<w:tc><w:tcPr><w:tcW w:w="' + w + '" w:type="dxa"/>' + mar + '<w:vAlign w:val="' + va + '"/></w:tcPr>' + inner + '</w:tc>';
-                    });
-                    const totalW = letterTwips(maxR - minX), totalH = letterTwips(maxB);
-                    const tbl = '<w:tbl><w:tblPr><w:tblW w:w="' + totalW + '" w:type="dxa"/><w:tblLayout w:type="fixed"/><w:tblCellMar><w:left w:w="0" w:type="dxa"/><w:right w:w="0" w:type="dxa"/></w:tblCellMar></w:tblPr><w:tblGrid>' + grid + '</w:tblGrid><w:tr><w:trPr><w:trHeight w:val="' + totalH + '" w:hRule="atLeast"/></w:trPr>' + cells + '</w:tr></w:tbl>';
-                    const miniXml = header + '<w:body>' + tbl + '<w:p><w:pPr><w:spacing w:before="0" w:after="0" w:line="20" w:lineRule="exact"/></w:pPr></w:p><w:sectPr><w:pgSz w:w="' + totalW + '" w:h="' + (totalH + 40) + '"/><w:pgMar w:top="0" w:right="0" w:bottom="0" w:left="0" w:header="0" w:footer="0" w:gutter="0"/></w:sectPr></w:body></w:document>';
-                    const mini = await JSZip.loadAsync(letterPreviewBytes(base64));
-                    mini.file('word/document.xml', miniXml);
-                    const miniBase64 = await mini.generateAsync({ type: 'base64', compression: 'DEFLATE' });
-                    const token = 'hzbox' + (counter++);
-                    // علامة غير مرئية لتحديد موضع الفقرة بعد الرسم
-                    const marker = doc.createElementNS(LNS.W, 'w:r');
-                    const mt = doc.createElementNS(LNS.W, 'w:t');
-                    mt.setAttributeNS(LETTER_XML_NS, 'xml:space', 'preserve');
-                    mt.textContent = '⁣' + token + '⁣';
-                    marker.appendChild(mt);
-                    const first = boxes.map(b => b.run).find(Boolean);
-                    if (first && first.parentNode === p) p.insertBefore(marker, first); else p.appendChild(marker);
-                    boxes.forEach(b => { if (b.run && b.run.parentNode) b.run.parentNode.removeChild(b.run); });
-                    const tb = letterAncestor(p, LNS.W, 'tbl');
-                    const tp = tb && Array.from(tb.getElementsByTagNameNS(LNS.W, 'tblpPr'))[0];
-                    const shiftY = tp ? (parseInt(tp.getAttributeNS(LNS.W, 'tblpY'), 10) || 0) * 635 : 0;
-                    out.overlays.push({ token, miniBase64, relH: boxes[0].relH, relV: boxes[0].relV, left: minX, top: minY + shiftY, width: maxR - minX });
-                    changed = true;
-                }
-                if (changed) {
-                    let o = ser.serializeToString(doc);
-                    if (o.indexOf('<?xml') !== 0) o = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n' + o;
-                    zip.file('word/document.xml', o);
-                    out.base64 = await zip.generateAsync({ type: 'base64', compression: 'DEFLATE' });
-                }
-            } catch (e) { console.warn('letterPrepareDocx', e); return { base64, overlays: [] }; }
-            return out;
-        }
-
-        // يرسم الأشكال العائمة المستخرجة فوق الصفحة في موضعها (مرجع أفقي: هامش الصفحة، ورأسي: بداية الفقرة)
-        async function letterPlaceOverlays(container, overlays) {
-            for (const ov of overlays) {
-                try {
-                    const re = new RegExp('⁣' + ov.token + '⁣', 'g');
-                    let target = null;
-                    const walker = document.createTreeWalker(container, NodeFilter.SHOW_TEXT);
-                    let n;
-                    while ((n = walker.nextNode())) { if (n.nodeValue.indexOf(ov.token) !== -1) { target = n; break; } }
-                    if (!target) continue;
-                    const para = target.parentNode.closest('p') || target.parentNode;
-                    target.nodeValue = target.nodeValue.replace(re, '');
-                    const page = para.closest('section.docx');
-                    if (!page) continue;
-                    if (getComputedStyle(page).position === 'static') page.style.position = 'relative';
-                    const cs = getComputedStyle(page);
-                    const pr = page.getBoundingClientRect(), pp = para.getBoundingClientRect();
-                    const z = pr.width && page.offsetWidth ? pr.width / page.offsetWidth : 1;
-                    const x0 = ov.relH === 'page' ? 0 : parseFloat(cs.paddingLeft) || 0;
-                    const y0 = ov.relV === 'paragraph' ? (pp.top - pr.top) / z : (ov.relV === 'page' ? 0 : parseFloat(cs.paddingTop) || 0);
-                    const host = document.createElement('div');
-                    host.style.cssText = 'position:fixed;left:-30000px;top:0;width:1200px;direction:ltr;pointer-events:none;';
-                    document.body.appendChild(host);
-                    try {
-                        await window.docx.renderAsync(letterPreviewBytes(ov.miniBase64), host, null, { inWrapper: false, breakPages: false, renderHeaders: false, renderFooters: false });
-                        const sec = host.querySelector('section.docx');
-                        if (!sec) continue;
-                        sec.classList.add('hz-overlay'); sec.style.cssText += ';position:absolute;margin:0;padding:0;box-shadow:none;background:transparent;z-index:3;left:' + (x0 + ov.left / 9525) + 'px;top:' + (y0 + ov.top / 9525) + 'px;width:' + (ov.width / 9525) + 'px;min-height:0;height:auto;';
-                        page.appendChild(sec);
-                    } finally { host.remove(); }
-                } catch (e) { console.warn('overlay', e); }
-            }
-        }
-
-        // ---------- الشعار المائي من ترويسة النموذج (مركز الصفحة خلف النص) ----------
-        async function letterApplyWatermark(container, base64) {
-            try {
-                if (typeof JSZip === 'undefined') return;
-                const zip = await JSZip.loadAsync(letterPreviewBytes(base64));
-                const docRels = zip.file('word/_rels/document.xml.rels'), docXml = zip.file('word/document.xml');
-                if (!docRels || !docXml) return;
-                const dx = await docXml.async('string');
-                const hr = dx.match(/<w:headerReference[^>]*w:type="default"[^>]*r:id="([^"]+)"/) || dx.match(/<w:headerReference[^>]*r:id="([^"]+)"[^>]*w:type="default"/);
-                if (!hr) return;
-                const relsXml = await docRels.async('string');
-                const rel = relsXml.match(new RegExp('<Relationship[^>]*Id="' + hr[1] + '"[^>]*>'));
-                const tgt = rel && rel[0].match(/Target="([^"]+)"/);
-                if (!tgt) return;
-                const hName = tgt[1].replace(/^\/?(word\/)?/, '');
-                const hFile = zip.file('word/' + hName), hRels = zip.file('word/_rels/' + hName + '.rels');
-                if (!hFile || !hRels) return;
-                const hx = await hFile.async('string');
-                if (!/<a:blip\b/.test(hx) && !/<v:imagedata\b/.test(hx)) return;
-                const embed = (hx.match(/<a:blip[^>]*r:embed="([^"]+)"/) || hx.match(/<v:imagedata[^>]*r:id="([^"]+)"/) || [])[1];
-                const hrx = await hRels.async('string');
-                const relImg = embed && hrx.match(new RegExp('<Relationship[^>]*Id="' + embed + '"[^>]*>'));
-                const timg = relImg && relImg[0].match(/Target="([^"]+)"/);
-                const imgFile = timg && zip.file('word/' + timg[1].replace(/^\/?(word\/)?/, ''));
-                if (!imgFile) return;
-                const ext = /\.png$/i.test(timg[1]) ? 'png' : (/\.gif$/i.test(timg[1]) ? 'gif' : 'jpeg');
-                const url = 'data:image/' + ext + ';base64,' + await imgFile.async('base64');
-                const sz = hx.match(/<pic:spPr[\s\S]*?<a:ext cx="(\d+)" cy="(\d+)"/) || hx.match(/<wp:extent cx="(\d+)" cy="(\d+)"/);
-                const vw = hx.match(/<v:shape [^>]*style="[^"]*width:([\d.]+)pt;height:([\d.]+)pt/);
-                const wpx = sz ? Math.round(parseInt(sz[1], 10) / 9525) : (vw ? Math.round(parseFloat(vw[1]) * 4 / 3) : 640);
-                const hpx = sz ? Math.round(parseInt(sz[2], 10) / 9525) : (vw ? Math.round(parseFloat(vw[2]) * 4 / 3) : 700);
-                const faded = /<a:lum\b/.test(hx) || /<v:imagedata[^>]*gain=/.test(hx);   // علامة مائية «باهتة» في Word → شفافية
-                container.querySelectorAll('section.docx:not(.hz-overlay)').forEach(sec => {
-                    if (sec.querySelector(':scope > .hz-watermark')) return;
-                    sec.style.position = 'relative'; sec.style.zIndex = '0'; sec.style.isolation = 'isolate';
-                    const im = document.createElement('img');
-                    im.className = 'hz-watermark'; im.src = url; im.alt = '';
-                    im.style.cssText = 'position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:' + wpx + 'px;height:' + hpx + 'px;max-width:96%;object-fit:contain;opacity:' + (faded ? 0.16 : 1) + ';z-index:-1;pointer-events:none;';
-                    sec.insertBefore(im, sec.firstChild);
-                });
-            } catch (e) { console.warn('watermark', e); }
-        }
-
-        // ---------- تحويل الخطاب/الحافظة إلى PDF بنفس تنسيق النموذج وبالأرقام العربية ----------
-        function letterArabicDigits(text) { return String(text).replace(/[0-9]/g, d => '٠١٢٣٤٥٦٧٨٩'.charAt(+d)); }
-        async function letterDocxArabicDigits(base64) {
-            const zip = await JSZip.loadAsync(letterPreviewBytes(base64));
-            const names = Object.keys(zip.files).filter(n => /^word\/(document|header\d*|footer\d*)\.xml$/.test(n));
-            for (const n of names) {
-                const xml = await zip.file(n).async('string');
-                zip.file(n, xml.replace(/(<w:t(?:\s[^>]*)?>)([^<]*)(<\/w:t>)/g, (m, a, t, c) => a + letterArabicDigits(t) + c));
-            }
-            return zip.generateAsync({ type: 'base64', compression: 'DEFLATE' });
-        }
-        let letterPdfState = null;   // { blob, url, name }
-        function letterHidePdfResult() {
-            const box = document.getElementById('letters-pdf-result');
-            if (box) box.hidden = true;
-            if (letterPdfState && letterPdfState.url) { try { URL.revokeObjectURL(letterPdfState.url); } catch (e) {} }
-            letterPdfState = null;
-        }
-        async function exportCurrentLetterPdf() {
-            if (!activeLetterDocument || !activeLetterDocument.dataBase64) return;
-            if (typeof html2canvas !== 'function' || !window.jspdf || !window.jspdf.jsPDF || !window.docx) {
-                showAlert('مكتبات إنشاء PDF غير محمّلة. تأكد من الاتصال بالإنترنت أو من وجود مجلد vendor.', 'danger');
-                return;
-            }
-            const btn = document.getElementById('letters-export-pdf');
-            const oldHtml = btn ? btn.innerHTML : '';
-            if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جارٍ تجهيز PDF...'; }
-            letterHidePdfResult();
-            let host = null;
-            try {
-                const arDocx = await letterDocxArabicDigits(activeLetterDocument.dataBase64);
-                host = document.createElement('div');
-                host.style.cssText = 'position:fixed;left:-20000px;top:0;width:900px;background:#fff;direction:ltr;pointer-events:none;';
-                document.body.appendChild(host);
-                const prep = await letterPrepareDocx(arDocx);
-                await window.docx.renderAsync(letterPreviewBytes(prep.base64), host, null, { breakPages: true, renderHeaders: true, renderFooters: true, inWrapper: false });
-                await letterPlaceOverlays(host, prep.overlays);
-                await letterApplyWatermark(host, arDocx);
-                if (document.fonts && document.fonts.ready) { try { await document.fonts.ready; } catch (e) {} }
-                await Promise.all(Array.from(host.querySelectorAll('img')).map(im => im.complete ? 0 : new Promise(r => { im.onload = im.onerror = r; })));
-                const pages = Array.from(host.querySelectorAll('section.docx:not(.hz-overlay)'));
-                if (!pages.length) throw new Error('لا توجد صفحات للتحويل');
-                const { jsPDF } = window.jspdf;
-                const pdf = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait', compress: true });
-                for (let i = 0; i < pages.length; i++) {
-                    const pg = pages[i];
-                    pg.style.boxShadow = 'none'; pg.style.margin = '0';
-                    const canvas = await html2canvas(pg, { scale: 2, backgroundColor: '#ffffff', useCORS: true, logging: false });
-                    const w = 210, h = Math.min(297, w * canvas.height / canvas.width);
-                    if (i > 0) pdf.addPage('a4', 'portrait');
-                    pdf.addImage(canvas.toDataURL('image/jpeg', 0.92), 'JPEG', 0, 0, w, h, undefined, 'FAST');
-                    canvas.width = canvas.height = 0;
-                }
-                const name = String(activeLetterDocument.name || 'خطاب').replace(/\.docx$/i, '') + '.pdf';
-                const blob = pdf.output('blob');
-                letterPdfState = { blob, url: URL.createObjectURL(blob), name };
-                const box = document.getElementById('letters-pdf-result');
-                if (box) { box.hidden = false; box.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); }
-                const shareBtn = document.getElementById('letters-pdf-share');
-                if (shareBtn) {
-                    let canShare = false;
-                    try { canShare = !!(navigator.canShare && navigator.canShare({ files: [new File([blob], name, { type: 'application/pdf' })] })); } catch (e) {}
-                    shareBtn.hidden = !canShare;
-                }
-                showAlert('تم تجهيز ملف PDF (' + pages.length + ' صفحة) بالأرقام العربية', 'success');
-            } catch (e) {
-                console.error('pdf export', e);
-                showAlert('تعذر إنشاء PDF: ' + (e && e.message ? e.message : 'خطأ غير معروف'), 'danger');
-            } finally {
-                if (host) host.remove();
-                if (btn) { btn.disabled = false; btn.innerHTML = oldHtml; }
-            }
-        }
-        function downloadLetterPdf() {
-            if (!letterPdfState) return;
-            const a = document.createElement('a');
-            a.href = letterPdfState.url; a.download = letterPdfState.name;
-            document.body.appendChild(a); a.click(); a.remove();
-        }
-        async function shareLetterPdf() {
-            if (!letterPdfState) return;
-            try {
-                const file = new File([letterPdfState.blob], letterPdfState.name, { type: 'application/pdf' });
-                await navigator.share({ files: [file], title: letterPdfState.name });
-            } catch (e) { if (e && e.name !== 'AbortError') showAlert('تعذرت المشاركة، استخدم زر التنزيل', 'warning'); }
-        }
-        function openLetterPdf() {
-            if (!letterPdfState) return;
-            window.open(letterPdfState.url, '_blank');
+            await window.docx.renderAsync(letterPreviewBytes(base64), container, null, { breakPages: true, renderHeaders: true, renderFooters: true });
+            letterFixWatermarks(container);
         }
 
         function setLetterPreviewWarning(unmatchedFields) {
@@ -14596,7 +14273,6 @@ function updateStats() {
                     w.hidden = false;
                     w.textContent = (w.textContent ? w.textContent + ' ' : '') + 'تنبيه: نص هذا الخطاب طويل فلم يتسع الخطابان في صفحة واحدة بعد أقصى تصغير. قلّل نص الخطاب أو استخدم الوضع العادي.';
                 }
-                letterHidePdfResult();
                 setLettersPanel('letters-preview-panel');
                 try {
                     await displayLetterPreview(result.dataBase64);
@@ -14641,6 +14317,110 @@ function updateStats() {
             }
         }
 
+
+        // ====================================================================
+        // تحويل الخطاب/الحافظة إلى PDF بنفس تنسيق النموذج (يعمل على الموبايل والمتصفح وسطح المكتب)
+        // نعرض ملف Word نفسه بمحرك المعاينة بحجم الصفحة الحقيقي ثم نصوّر كل صفحة إلى صفحة A4 في PDF،
+        // فتبقى الترويسة والجداول والمربعات والمحاذاة كما في النموذج.
+        // ====================================================================
+        async function letterExportPdf() {
+            if (!activeLetterDocument || !activeLetterDocument.dataBase64) { showAlert('أنشئ المسودة أولًا ثم احفظها PDF', 'warning'); return; }
+            const btn = document.getElementById('letters-save-pdf');
+            const old = btn.innerHTML;
+            btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جارٍ تجهيز PDF...';
+            let host = null;
+            try {
+                await letterEnsureLibs(['jszip', 'docx', 'html2canvas', 'jspdf']);
+                host = document.createElement('div');
+                host.style.cssText = 'position:fixed;left:-30000px;top:0;background:#fff;direction:rtl;pointer-events:none;';
+                document.body.appendChild(host);
+                await window.docx.renderAsync(letterPreviewBytes(activeLetterDocument.dataBase64), host, null,
+                    { inWrapper: false, breakPages: true, renderHeaders: true, renderFooters: true });
+                letterFixWatermarks(host);
+                if (document.fonts && document.fonts.ready) { try { await document.fonts.ready; } catch (e) { /* تجاهل */ } }
+                // انتظار تحميل الصور (الشعار/الترويسة) قبل التصوير
+                await Promise.all(Array.from(host.querySelectorAll('img')).map(img => img.complete ? null : new Promise(r => { img.onload = img.onerror = r; })));
+                const pages = Array.from(host.querySelectorAll('section.docx'));
+                if (!pages.length) throw new Error('لا توجد صفحات للتحويل');
+                const { jsPDF } = window.jspdf;
+                const scale = Math.min(2, Math.max(1.5, window.devicePixelRatio || 1));   // وضوح جيد دون استهلاك ذاكرة الموبايل
+                let pdf = null, firstPage = true;
+                for (const el of pages) {
+                    const w = el.offsetWidth, h = el.offsetHeight;
+                    const canvas = await window.html2canvas(el, { scale, backgroundColor: '#ffffff', useCORS: true, logging: false });
+                    const landscape = w > h * 1.05;
+                    const pw = landscape ? 297 : 210, ph = landscape ? 210 : 297;
+                    if (!pdf) pdf = new jsPDF({ orientation: landscape ? 'l' : 'p', unit: 'mm', format: 'a4', compress: true });
+                    const pagePx = w * ph / pw;                       // ارتفاع صفحة A4 بنفس مقياس عرض الصفحة
+                    const addPageImg = (cv) => {
+                        if (!firstPage) pdf.addPage('a4', landscape ? 'l' : 'p');
+                        pdf.addImage(cv.toDataURL('image/jpeg', 0.93), 'JPEG', 0, 0, pw, ph);
+                        firstPage = false;
+                    };
+                    if (h <= pagePx * 1.02) {
+                        const data = canvas.toDataURL('image/jpeg', 0.93);
+                        const imgH = pw * canvas.height / canvas.width;
+                        if (!firstPage) pdf.addPage('a4', landscape ? 'l' : 'p');
+                        pdf.addImage(data, 'JPEG', 0, 0, pw, Math.min(imgH, ph));
+                        firstPage = false;
+                    } else {
+                        // محتوى أطول من صفحة (Word يقسّمه تلقائيًا): نقسّمه نحن عند نهايات الفقرات وصفوف الجداول فقط
+                        // مع تكرار الترويسة والتذييل في كل صفحة، فلا يُقطع مربع أو صف في المنتصف
+                        const k = canvas.width / w;                    // نسبة التكبير (scale)
+                        const sec = el.getBoundingClientRect();
+                        const hdr = el.querySelector('header'), ftr = el.querySelector('footer');
+                        const headerH = hdr ? Math.max(0, Math.min(hdr.getBoundingClientRect().bottom - sec.top, pagePx * 0.25)) : 0;
+                        const footerTop = ftr ? Math.max(headerH + 60, ftr.getBoundingClientRect().top - sec.top) : h;
+                        const footerH = h - footerTop;
+                        // نقاط الكسر: نهاية كل فقرة، ونهاية كل صف في جدول عدا صفه الأول، ولا نكسر بعد جدول من صف واحد
+                        // (وهو عادةً شريط عنوان) حتى لا ينفصل العنوان عن محتواه
+                        const rel = n => n.getBoundingClientRect().bottom - sec.top;
+                        const cands = [];
+                        el.querySelectorAll('article > p').forEach(n => cands.push(rel(n)));
+                        el.querySelectorAll('article > table').forEach(t => {
+                            Array.from(t.querySelectorAll(':scope > tbody > tr, :scope > tr')).forEach((tr, i) => { if (i > 0) cands.push(rel(tr)); });
+                        });
+                        const bounded = cands.filter(v => v > headerH && v <= footerTop + 1).sort((a, b) => a - b);
+                        cands.length = 0; bounded.forEach(v => cands.push(v));
+                        const gap = 14;
+                        let start = 0, n = 0;
+                        while (start < footerTop - 1 && n < 80) {
+                            const room = n === 0 ? (pagePx - footerH - gap) : (pagePx - headerH - footerH - gap * 2);
+                            const limit = start + room;
+                            let end;
+                            if (limit >= footerTop) end = footerTop;
+                            else { const ok = cands.filter(v => v > start + 40 && v <= limit); end = ok.length ? ok[ok.length - 1] : limit; }
+                            const pc = document.createElement('canvas');
+                            pc.width = canvas.width; pc.height = Math.round(pagePx * k);
+                            const ctx = pc.getContext('2d');
+                            ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, pc.width, pc.height);
+                            let destY = 0;
+                            if (n > 0 && headerH > 0) { ctx.drawImage(canvas, 0, 0, canvas.width, headerH * k, 0, 0, canvas.width, headerH * k); destY = headerH + gap; }
+                            ctx.drawImage(canvas, 0, start * k, canvas.width, (end - start) * k, 0, destY * k, canvas.width, (end - start) * k);
+                            if (footerH > 0) ctx.drawImage(canvas, 0, footerTop * k, canvas.width, footerH * k, 0, (pagePx - footerH) * k, canvas.width, footerH * k);
+                            addPageImg(pc);
+                            pc.width = pc.height = 0;
+                            start = end; n++;
+                        }
+                    }
+                    canvas.width = canvas.height = 0;   // تحرير الذاكرة
+                }
+                const base = String(activeLetterDocument.name || 'خطاب').replace(/\.docx$/i, '');
+                // نفس أسلوب تنزيل ملف Word في البرنامج (يضمن اسم الملف العربي على المتصفح والموبايل)
+                const url = URL.createObjectURL(pdf.output('blob'));
+                const a = document.createElement('a');
+                a.href = url; a.download = (letterSafeName(base) || 'مستند') + '.pdf';
+                document.body.appendChild(a); a.click(); a.remove();
+                setTimeout(() => URL.revokeObjectURL(url), 10000);
+                showAlert('تم تجهيز ملف PDF', 'success');
+            } catch (e) {
+                console.error('letterExportPdf', e);
+                showAlert('تعذر إنشاء PDF: ' + letterErrorMessage(e, ''), 'danger');
+            } finally {
+                if (host) host.remove();
+                btn.disabled = false; btn.innerHTML = old;
+            }
+        }
         function printCurrentLetterPreview() {
             window.print();
         }
@@ -14673,11 +14453,13 @@ function updateStats() {
             document.getElementById('letters-open-word').addEventListener('click', openCurrentLetterInWord);
             document.getElementById('letters-refresh-preview').addEventListener('click', refreshCurrentLetterPreview);
             document.getElementById('letters-print').addEventListener('click', printCurrentLetterPreview);
-            document.getElementById('letters-export-pdf').addEventListener('click', exportCurrentLetterPdf);
-            document.getElementById('letters-pdf-download').addEventListener('click', downloadLetterPdf);
-            document.getElementById('letters-pdf-share').addEventListener('click', shareLetterPdf);
-            document.getElementById('letters-pdf-open').addEventListener('click', openLetterPdf);
             document.getElementById('letters-save-to-device').addEventListener('click', saveLetterToDevice);
+            document.getElementById('letters-save-pdf').addEventListener('click', letterExportPdf);
+            // نسخة الويب/الموبايل: لا يوجد ملف مؤقت يُعدَّل في Word ثم يُحدَّث، فنخفي زر التحديث ونوضح اسم الزر
+            if (!letterIsDesktop()) {
+                const r = document.getElementById('letters-refresh-preview'); if (r) r.hidden = true;
+                const o = document.getElementById('letters-open-word'); if (o) o.innerHTML = '<i class="fas fa-file-word"></i> تنزيل ملف Word';
+            }
         }
         setupLetterWorkspace();
 
@@ -19669,6 +19451,40 @@ function updateStats() {
             return { xml: out, header, body, placeholders: ph.changed, phUsed: ph.used };
         }
 
+
+        // ====================================================================
+        // تحميل مكتبات الخطابات/الحوافظ/PDF عند الحاجة بأكثر من مسار: vendor/ ثم جذر الموقع ثم CDN
+        // (يعمل مع الاستضافات المسطحة مثل GitHub Pages وعلى الموبايل)
+        // ====================================================================
+        const LETTER_LIB_SOURCES = {
+            jszip:       { ok: () => !!window.JSZip,                            srcs: ['vendor/jszip.min.js', 'jszip.min.js', 'https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js'] },
+            docx:        { ok: () => !!(window.docx && window.docx.renderAsync), srcs: ['vendor/docx-preview.min.js', 'docx-preview.min.js', 'https://cdn.jsdelivr.net/npm/docx-preview@0.3.3/dist/docx-preview.min.js'] },
+            html2canvas: { ok: () => !!window.html2canvas,                      srcs: ['vendor/html2canvas.min.js', 'html2canvas.min.js', 'https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js'] },
+            jspdf:       { ok: () => !!(window.jspdf && window.jspdf.jsPDF),    srcs: ['vendor/jspdf.umd.min.js', 'jspdf.umd.min.js', 'https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js'] }
+        };
+        function letterLoadScript(src) {
+            return new Promise(resolve => {
+                const el = document.createElement('script');
+                el.src = src; el.async = false;
+                el.onload = () => resolve(true);
+                el.onerror = () => { el.remove(); resolve(false); };
+                document.head.appendChild(el);
+            });
+        }
+        async function letterEnsureLib(name) {
+            const def = LETTER_LIB_SOURCES[name];
+            if (!def || def.ok()) return true;
+            for (const src of def.srcs) {
+                await letterLoadScript(src);
+                if (def.ok()) return true;
+            }
+            return false;
+        }
+        async function letterEnsureLibs(names) {
+            for (const n of names) {
+                if (!(await letterEnsureLib(n))) throw new Error(n === 'jszip' ? 'JSZIP_MISSING' : 'LIB_MISSING:' + n);
+            }
+        }
         async function letterLoadTemplateBytes(fileName) {
             if (/^custom_/.test(String(fileName))) {
                 const id = String(fileName).replace(/^custom_/, '').replace(/\.docx$/i, '');
@@ -19689,7 +19505,7 @@ function updateStats() {
                 for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
                 return bytes;
             }
-            // يُجرَّب مجلد templates أولًا ثم جذر الموقع (عند رفع الملفات على GitHub في مستوى واحد)
+            // الويب/الموبايل: المسار المعتاد templates/ ثم جذر الموقع (للاستضافات المسطحة بلا مجلدات)
             for (const base of ['./templates/', './']) {
                 try {
                     const resp = await fetch(base + encodeURIComponent(fileName), { cache: 'no-cache' });
@@ -19698,16 +19514,17 @@ function updateStats() {
                     // الاستضافة قد تُرجع index.html بدل 404 للملف المفقود → نتحقق من توقيع ملف docx (PK)
                     if (bytes.length < 4 || bytes[0] !== 0x50 || bytes[1] !== 0x4B) continue;
                     return bytes;
-                } catch (e) { /* جرّب المسار التالي */ }
+                } catch (e) { /* نجرّب المسار التالي */ }
             }
             throw new Error('TEMPLATE_NOT_FOUND');
         }
         function letterErrorMessage(e, label) {
             const code = e && e.message;
             if (code === 'TEMPLATE_NOT_FOUND' && /^custom_/.test(LETTER_TEMPLATES[label] || '')) return 'قالب نوع الخطاب "' + label + '" غير موجود في البرنامج. أعد إضافة النوع من جديد.';
-            if (code === 'TEMPLATE_NOT_FOUND') return 'ملف قالب "' + label + '" غير موجود. ضعه في مجلد app/templates باسم: ' + (LETTER_TEMPLATES[label] || '');
+            if (code === 'TEMPLATE_NOT_FOUND') return 'ملف قالب "' + label + '" غير موجود. ضعه في مجلد templates (أو في جذر الموقع على الاستضافة) باسم: ' + (LETTER_TEMPLATES[label] || '');
             if (code === 'TEMPLATE_READ') return 'تعذر قراءة ملف القالب "' + label + '".';
-            if (code === 'JSZIP_MISSING') return 'مكتبة إنشاء ملفات Word لم تُحمَّل. تأكد من وجود app/vendor/jszip.min.js أو من الاتصال بالإنترنت.';
+            if (code === 'JSZIP_MISSING') return 'مكتبة إنشاء ملفات Word لم تُحمَّل. تأكد من وجود jszip.min.js مع الموقع أو من الاتصال بالإنترنت.';
+            if (/^LIB_MISSING/.test(String(code))) return 'تعذر تحميل مكتبة مطلوبة (' + String(code).split(':')[1] + '). تأكد من الاتصال بالإنترنت أو من رفع ملفات المكتبات مع الموقع.';
             if (code === 'XML_PARSE' || code === 'BAD_TEMPLATE') return 'ملف القالب "' + label + '" تالف أو ليس ملف Word صالحًا.';
             if (code === 'TOO_LARGE') return 'حجم الخطاب كبير جدًا.';
             return 'تعذر إنشاء الخطاب: ' + (code || 'خطأ غير معروف');
@@ -19731,7 +19548,7 @@ function updateStats() {
                 if (missing.length) showAlert('بيانات ناقصة تُركت فارغة في الخطاب: ' + missing.join('، '), 'warning');
                 if (!f.hearingDate) showAlert('لا توجد جلسة مسجلة لهذه القضية، تُرك حقل الجلسة فارغًا في الخطاب', 'warning');
 
-                if (typeof JSZip === 'undefined') throw new Error('JSZIP_MISSING');
+                await letterEnsureLibs(['jszip']);
                 const bytes = await letterLoadTemplateBytes(templateName);
                 let zip;
                 try { zip = await JSZip.loadAsync(bytes); } catch (e) { throw new Error('BAD_TEMPLATE'); }
@@ -19998,7 +19815,7 @@ function updateStats() {
                 if (!f.caseYear) missing.push('سنة الدعوى');
                 if (missing.length) showAlert('بيانات ناقصة تُركت فارغة في الحافظة: ' + missing.join('، '), 'warning');
                 if (!f.hearingDate) showAlert('لم يُحدَّد تاريخ الجلسة، تُرك فارغًا في الحافظة', 'warning');
-                if (typeof JSZip === 'undefined') throw new Error('JSZIP_MISSING');
+                await letterEnsureLibs(['jszip']);
                 const bytes = await letterLoadTemplateBytes(templateName);
                 let zip;
                 try { zip = await JSZip.loadAsync(bytes); } catch (e) { throw new Error('BAD_TEMPLATE'); }
