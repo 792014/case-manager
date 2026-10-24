@@ -123,13 +123,17 @@
         })();
     </script>
     <script src="vendor/chart.umd.min.js"></script>
+    <script>window.Chart || document.write('<script src="chart.umd.min.js"><\/script>');</script>
     <script>window.Chart || document.write('<script src="https://cdn.jsdelivr.net/npm/chart.js"><\/script>');</script>
     <!-- مكتبتان محليتان لتصدير تقرير لوحة التحكم إلى PDF مباشرة (بديل المتصفح عند تعذّر تصدير Electron) -->
     <script src="vendor/jspdf.umd.min.js"></script>
+    <script>window.jspdf || document.write('<script src="jspdf.umd.min.js"><\/script>');</script>
     <script>window.jspdf || document.write('<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js"><\/script>');</script>
     <script src="vendor/html2canvas.min.js"></script>
+    <script>window.html2canvas || document.write('<script src="html2canvas.min.js"><\/script>');</script>
     <script>window.html2canvas || document.write('<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"><\/script>');</script>
     <script src="vendor/jszip.min.js"></script>
+    <script>window.JSZip || document.write('<script src="jszip.min.js"><\/script>');</script>
     <script>window.JSZip || document.write('<script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"><\/script>');</script>
     <!-- Mammoth removed: offline behavior uses system apps to open files natively -->
     
@@ -5588,6 +5592,8 @@
     </div>
 
     <script src="vendor/docx-preview.min.js"></script>
+    <script>window.docx || document.write('<script src="docx-preview.min.js"><\/script>');</script>
+    <script>window.docx || document.write('<script src="https://cdn.jsdelivr.net/npm/docx-preview@0.3.3/dist/docx-preview.min.js"><\/script>');</script>
     <script>
         // ==================== إعدادات المزامنة عبر Firebase ====================
         // بيانات القضايا بتتخزن في جذر قاعدة بيانات Firebase Realtime Database مباشرة
@@ -19683,12 +19689,18 @@ function updateStats() {
                 for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
                 return bytes;
             }
-            const resp = await fetch('./templates/' + encodeURIComponent(fileName), { cache: 'no-cache' });
-            if (!resp.ok) throw new Error('TEMPLATE_NOT_FOUND');
-            const bytes = new Uint8Array(await resp.arrayBuffer());
-            // الاستضافة قد تُرجع index.html بدل 404 للملف المفقود → نتحقق من توقيع ملف docx (PK)
-            if (bytes.length < 4 || bytes[0] !== 0x50 || bytes[1] !== 0x4B) throw new Error('TEMPLATE_NOT_FOUND');
-            return bytes;
+            // يُجرَّب مجلد templates أولًا ثم جذر الموقع (عند رفع الملفات على GitHub في مستوى واحد)
+            for (const base of ['./templates/', './']) {
+                try {
+                    const resp = await fetch(base + encodeURIComponent(fileName), { cache: 'no-cache' });
+                    if (!resp.ok) continue;
+                    const bytes = new Uint8Array(await resp.arrayBuffer());
+                    // الاستضافة قد تُرجع index.html بدل 404 للملف المفقود → نتحقق من توقيع ملف docx (PK)
+                    if (bytes.length < 4 || bytes[0] !== 0x50 || bytes[1] !== 0x4B) continue;
+                    return bytes;
+                } catch (e) { /* جرّب المسار التالي */ }
+            }
+            throw new Error('TEMPLATE_NOT_FOUND');
         }
         function letterErrorMessage(e, label) {
             const code = e && e.message;
